@@ -1,7 +1,8 @@
-.App {
+html, body {
+  height: 100%;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: auto; 
 }
+

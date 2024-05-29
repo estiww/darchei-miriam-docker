@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Button,
@@ -16,15 +16,60 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
+const [error, setError] = useState("");
 
 function Login() {
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const email = data.get("email");
+    const password = data.get("password");
     console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+      email,
+      password,
     });
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    let foundUser;
+        const url = 'http://localhost:3000/login';
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            }) 
+        };
+        fetch(url, requestOptions)
+            .then(response => {
+                console.log(response.status)
+                console.log(response)
+                if (!response.ok) {
+                    setError("incorrect password or username");
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    foundUser = data;
+                    localStorage.setItem("currentUser", JSON.stringify(foundUser));
+                    // setUser(foundUser);
+                    setError('Registration successful');
+                    // navigate('/home');
+                }
+            })
+            .catch(error => {
+                setLoginError('Error', error);
+            });
+
+    // Clear error message if form is valid
+    setError("");
   };
 
   return (
@@ -37,7 +82,7 @@ function Login() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            margin: "auto",
+            minHeight: "100vh",
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -80,10 +125,11 @@ function Login() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 2, mb: 2 }}
             >
               Sign In
             </Button>
+           
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
@@ -96,6 +142,11 @@ function Login() {
                 </Link>
               </Grid>
             </Grid>
+            {error && (
+              <Typography variant="body2" color="error" sx={{ mt: 1}} >
+                {error}
+              </Typography>
+            )}
           </Box>
         </Box>
       </Container>

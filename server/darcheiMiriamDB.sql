@@ -27,7 +27,8 @@ CREATE TABLE AddressTable (
 CREATE TABLE PatientTable (
     PatientId INT PRIMARY KEY,
     PasswordId INT NOT NULL,
-    Name VARCHAR(100) NOT NULL,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
     AddressId INT NOT NULL,
     Phone VARCHAR(15) NOT NULL,
     Mail VARCHAR(100) NOT NULL,
@@ -39,7 +40,8 @@ CREATE TABLE PatientTable (
 CREATE TABLE VolunteerTable (
     VolunteerId INT PRIMARY KEY,
     PasswordId INT NOT NULL,
-    Name VARCHAR(100) NOT NULL,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
     AddressId INT NOT NULL,
     Phone VARCHAR(15) NOT NULL,
     Mail VARCHAR(100) NOT NULL,
