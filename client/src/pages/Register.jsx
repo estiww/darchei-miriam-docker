@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,9 +12,10 @@ import Link from "@mui/material/Link";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
-const [error, setError] = useState("");
 
 function Register() {
+  const [error, setError] = useState("");
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -34,29 +35,29 @@ function Register() {
     }
     const url = "http://localhost:3000/signup";
     const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        }) 
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
     };
 
     fetch(url, requestOptions)
-    .then((response) => response.json())
-    .then((data) => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log(data);
         localStorage.setItem("currentUser", JSON.stringify(data));
         // Implement your setUser and navigate functions accordingly
         // setUser(data);
         // navigate("/home");
         setError("User created successfully");
-    })
-    .catch((error) => {
-      setError(error);
-    });
+      })
+      .catch((error) => {
+        setError(error);
+      });
 
     // Clear error message if form is valid
     setError("");
