@@ -23,34 +23,36 @@ CREATE TABLE AddressTable (
     ZipCode VARCHAR(10)
 );
 
--- טבלת חולים
-CREATE TABLE PatientTable (
-    PatientId INT PRIMARY KEY,
-    PasswordId INT NOT NULL,
+-- טבלת משתמשים
+CREATE TABLE UserTable (
+    UserId INT PRIMARY KEY,
+    PasswordId INT NOT NULL UNIQUE,
     FirstName VARCHAR(100) NOT NULL,
     LastName VARCHAR(100) NOT NULL,
-    AddressId INT NOT NULL,
+    AddressId INT NOT NULL UNIQUE,
     Phone VARCHAR(15) NOT NULL,
     Mail VARCHAR(100) NOT NULL,
+    Role ENUM('Patient', 'Volunteer') NOT NULL,
     FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
     FOREIGN KEY (AddressId) REFERENCES AddressTable(AddressId)
 );
 
+-- טבלת חולים
+CREATE TABLE PatientTable (
+    PatientId INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES UserTable(UserId)
+);
+
 -- טבלת מתנדבים
 CREATE TABLE VolunteerTable (
-    VolunteerId INT PRIMARY KEY,
-    PasswordId INT NOT NULL,
-    FirstName VARCHAR(100) NOT NULL,
-    LastName VARCHAR(100) NOT NULL,
-    AddressId INT NOT NULL,
-    Phone VARCHAR(15) NOT NULL,
-    Mail VARCHAR(100) NOT NULL,
+    VolunteerId INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
     Location VARCHAR(100),
     CommunicationMethod VARCHAR(50),
     Gender ENUM('Male', 'Female', 'Other') NOT NULL,
     BirthDate DATE NOT NULL,
-    FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
-    FOREIGN KEY (AddressId) REFERENCES AddressTable(AddressId)
+    FOREIGN KEY (UserId) REFERENCES UserTable(UserId)
 );
 
 -- טבלת מרכזים רפואיים
@@ -103,25 +105,40 @@ CREATE TABLE EquipmentTransferTable (
 INSERT INTO PasswordTable (PasswordValue) VALUES 
 ('password123'),
 ('securepass456'),
-('mysecret789');
+('mysecret789'),
+('uniquePwd001'),
+('uniquePwd002'),
+('uniquePwd003');
 
 -- הכנסת נתונים לדוגמה בטבלת כתובות
 INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALUES 
 ('Jerusalem', 'Rehavia', 'Herzl', '15', '91000'),
 ('Tel Aviv', 'Neve Tzedek', 'Shabazi', '25', '65100'),
-('Haifa', 'Carmel', 'Hanasi', '5', '34980');
+('Haifa', 'Carmel', 'Hanasi', '5', '34980'),
+('Eilat', 'Shaham', 'Derech Yotam', '3', '88000'),
+('Beersheba', 'Ramot', 'Rager Blvd', '12', '84100'),
+('Rishon LeZion', 'HaHadarom', 'Rothschild', '4', '75200');
+
+-- הכנסת נתונים לדוגמה בטבלת משתמשים
+INSERT INTO UserTable (UserId, PasswordId, FirstName, LastName, AddressId, Phone, Mail, Role) VALUES 
+(123456789, 1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com', 'Patient'),
+(234567890, 2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com', 'Patient'),
+(345678901, 3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com', 'Patient'),
+(987654321, 4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com', 'Volunteer'),
+(876543210, 5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com', 'Volunteer'),
+(765432109, 6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com', 'Volunteer');
 
 -- הכנסת נתונים לדוגמה בטבלת חולים
-INSERT INTO PatientTable (PatientId, PasswordId, Name, AddressId, Phone, Mail) VALUES 
-(123456789, 1, 'David Cohen', 1, '050-1234567', 'david@example.com'),
-(234567890, 2, 'Sarah Levi', 2, '050-2345678', 'sarah@example.com'),
-(345678901, 3, 'Yosef Mor', 3, '050-3456789', 'yosef@example.com');
+INSERT INTO PatientTable (UserId) VALUES 
+(123456789),
+(234567890),
+(345678901);
 
 -- הכנסת נתונים לדוגמה בטבלת מתנדבים
-INSERT INTO VolunteerTable (VolunteerId, PasswordId, Name, AddressId, Phone, Mail, Location, CommunicationMethod, Gender, BirthDate) VALUES 
-(987654321, 1, 'Rachel Green', 1, '050-9876543', 'rachel@example.com', 'Jerusalem', 'Phone', 'Female', '1990-05-15'),
-(876543210, 2, 'Monica Geller', 2, '050-8765432', 'monica@example.com', 'Tel Aviv', 'Email', 'Female', '1985-08-22'),
-(765432109, 3, 'Ross Geller', 3, '050-7654321', 'ross@example.com', 'Haifa', 'WhatsApp', 'Male', '1987-10-18');
+INSERT INTO VolunteerTable (UserId, Location, CommunicationMethod, Gender, BirthDate) VALUES 
+(987654321, 'Jerusalem', 'Phone', 'Female', '1990-05-15'),
+(876543210, 'Tel Aviv', 'Email', 'Female', '1985-08-22'),
+(765432109, 'Haifa', 'WhatsApp', 'Male', '1987-10-18');
 
 -- הכנסת נתונים לדוגמה בטבלת מרכזים רפואיים
 INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES 
