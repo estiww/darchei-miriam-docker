@@ -31,6 +31,18 @@ async function getByUsername(username) {
     }
 }
 
+
+//מחזיר משתמש אם האימות הצליח במידה ולא יחזיר ערך ריק ולא שגיאה ויזרוק שגיאה במקרה שלא הצליח לגשת למסד נתונים
+async function authenticate(email, password) {
+    try {
+        const sql = 'SELECT u.UserId, u.FirstName, u.LastName, u.Role FROM UserTable u JOIN PasswordTable p ON u.PasswordId = p.PasswordId WHERE u.Mail = ? AND p.PasswordValue = ?';
+        const [result] = await pool.query(sql, [email, password]);
+        return result[0];
+    } catch (err) {
+        throw(err);
+    }
+}
+
 async function createUser(username, email, phone, street, city, password) {
     try {
         // Insert into addresses table
@@ -104,4 +116,4 @@ async function updateUser(id, username, email, phone, street, city, password) {
     }
 }
 
-module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getByUsername };
+module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getByUsername, authenticate };

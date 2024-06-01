@@ -40,6 +40,15 @@ async function getById(id) {
     }
 }
 
+async function authenticate(email,password) {
+    try {
+
+        return model.authenticate(email,password);
+    } catch (err) {
+        throw err;
+    }
+}
+
 async function getByUsername(username) {
     try {
         return model.getByUsername(username);
@@ -48,5 +57,7 @@ async function getByUsername(username) {
     }
 }
 
-module.exports = { create, getAll, getById, deleteUser, update, getByUsername }
+
+
+module.exports = { create, getAll, getById, deleteUser, update, getByUsername,authenticate }
 
