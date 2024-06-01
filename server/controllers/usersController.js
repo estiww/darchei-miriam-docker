@@ -1,4 +1,5 @@
 const model = require('../models/usersModels');
+const bcrypt = require('bcryptjs');
 
 async function create(username, email, phone, street, city, password) {
     try {
@@ -40,10 +41,11 @@ async function getById(id) {
     }
 }
 
-async function authenticate(email,password) {
+async function authenticate(email, password) {
     try {
-
-        return model.authenticate(email,password);
+        const encryptedPassword = await bcrypt.hash(password, 10);
+        return model.authenticate(email, encryptedPassword);
+        
     } catch (err) {
         throw err;
     }
@@ -59,5 +61,5 @@ async function getByUsername(username) {
 
 
 
-module.exports = { create, getAll, getById, deleteUser, update, getByUsername,authenticate }
+module.exports = { create, getAll, getById, deleteUser, update, getByUsername, authenticate }
 

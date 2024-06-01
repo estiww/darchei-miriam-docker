@@ -33,10 +33,10 @@ async function getByUsername(username) {
 
 
 //מחזיר משתמש אם האימות הצליח במידה ולא יחזיר ערך ריק ולא שגיאה ויזרוק שגיאה במקרה שלא הצליח לגשת למסד נתונים
-async function authenticate(email, password) {
+async function authenticate(email, encryptedPassword) {
     try {
         const sql = 'SELECT u.UserId, u.FirstName, u.LastName, u.Role FROM UserTable u JOIN PasswordTable p ON u.PasswordId = p.PasswordId WHERE u.Mail = ? AND p.PasswordValue = ?';
-        const [result] = await pool.query(sql, [email, password]);
+        const [result] = await pool.query(sql, [email, encryptedPassword]);
         return result[0];
     } catch (err) {
         throw(err);
