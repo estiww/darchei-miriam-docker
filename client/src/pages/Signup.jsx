@@ -13,7 +13,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
 
-function Register() {
+function Signup() {
   const [error, setError] = useState("");
 
   const handleSubmit = (event) => {
@@ -128,7 +128,7 @@ function Register() {
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link
-                  href="#"
+                  href="/login"
                   variant="body2"
                   sx={{ display: "flex", justifyContent: "center" }}
                 >
@@ -143,4 +143,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default Signup;
