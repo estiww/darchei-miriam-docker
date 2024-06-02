@@ -26,14 +26,16 @@ function Home() {
   return (
     <div>
       <AppBar position="fixed" style={{ width: '100%' }}>
-        <Toolbar>
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6">
             My Application
           </Typography>
-          <Button color="inherit" component={Link} to="/home">Home</Button>
-          <Button color="inherit" component={Link} to="column1">Column 1</Button>
-          <Button color="inherit" component={Link} to="column2">Column 2</Button>
-          <Button color="inherit" component={Link} to="column3">Column 3</Button>
+          <div style={{ display: 'flex', flexGrow: 1, justifyContent: 'center', gap: '20px' }}>
+            <Button color="inherit" component={Link} to="/home">Home</Button>
+            <Button color="inherit" component={Link} to="column1">Column 1</Button>
+            <Button color="inherit" component={Link} to="column2">Column 2</Button>
+            <Button color="inherit" component={Link} to="column3">Column 3</Button>
+          </div>
           <div>
             <IconButton
               edge="end"
@@ -90,7 +92,8 @@ const Column2 = () => (
       <Typography variant="h6">Column 2</Typography>
       <Typography>Content for column 2...</Typography>
     </Grid>
-  </Grid>);
+  </Grid>
+);
 
 const Column3 = () => (
   <Grid container spacing={3} style={{ marginTop: 20 }}>
