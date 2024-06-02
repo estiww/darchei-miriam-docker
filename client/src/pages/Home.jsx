@@ -10,6 +10,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import UserProfile from './UserProfile'; // ייבוא של הרכיב החדש
 
 function Home() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -24,15 +25,15 @@ function Home() {
 
   return (
     <div>
-      <AppBar position="static">
+      <AppBar position="fixed" style={{ width: '100%' }}>
         <Toolbar>
           <Typography variant="h6" style={{ flexGrow: 1 }}>
             My Application
           </Typography>
           <Button color="inherit" component={Link} to="/home">Home</Button>
-          <Button color="inherit" component={Link} to="/column1">Column 1</Button>
-          <Button color="inherit" component={Link} to="/column2">Column 2</Button>
-          <Button color="inherit" component={Link} to="/column3">Column 3</Button>
+          <Button color="inherit" component={Link} to="column1">Column 1</Button>
+          <Button color="inherit" component={Link} to="column2">Column 2</Button>
+          <Button color="inherit" component={Link} to="column3">Column 3</Button>
           <div>
             <IconButton
               edge="end"
@@ -46,19 +47,19 @@ function Home() {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose} component={Link} to="/profile">Profile</MenuItem>
+              <MenuItem onClick={handleClose} component={Link} to="profile">Profile</MenuItem>
               <MenuItem onClick={handleClose}>Logout</MenuItem>
             </Menu>
           </div>
         </Toolbar>
       </AppBar>
-      <Container style={{ marginTop: '20px' }}>
+      <Container style={{ marginTop: '80px' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="column1" element={<Column1 />} />
           <Route path="column2" element={<Column2 />} />
           <Route path="column3" element={<Column3 />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="profile" element={<UserProfile />} /> {/* שינוי ל-UserProfile */}
         </Routes>
       </Container>
     </div>
