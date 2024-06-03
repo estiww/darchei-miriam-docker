@@ -9,14 +9,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// const usersRouter = require("./routes/usersRouter");
-// const albumsRouter = require('./routes/albumsRouter');
-// const commentsRouter = require('./routes/commentsRouter');
-// const photosRouter = require('./routes/photosRouter');
-// const postsRouter = require('./routes/postsRouter');
-// const todosRouter = require('./routes/todosRouter');
-// const passwordRouter = require('./routes/passwordsRouter');
 const loginRoute = require('./routes/loginRoute');
+const travelRequestsRoute = require('./routes/travelRequestsRoute');
+
 // const signupRoute = require('./routes/signupRoute');
 
 const logger = (req, res, next) => {
@@ -39,6 +34,7 @@ app.use(logger);
 // app.use('/users', usersRouter);
 // app.use('/passwords', passwordRouter);
 app.use('/login', loginRoute);
+app.use('/travelRequests', travelRequestsRoute);
 // app.use('/signup', signupRoute);
 
 const PORT = process.env.PORT || 3000;

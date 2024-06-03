@@ -1,92 +1,66 @@
-import React, { useState } from 'react';
-import { Button, Box, Typography, Container, Grid } from '@mui/material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-
-const mockRequests = [
-  {
-    TravelRequestId: 1,
-    PatientId: 101,
-    Origin: 'Tel Aviv',
-    TravelTime: '08:00',
-    TravelDate: '2024-06-01',
-    Destination: 'Jerusalem',
-    NumberOfPassengers: 1,
-    IsAlone: true,
-    Frequency: 'Daily',
-    Status: 'התקבלה',
-  },
-  {
-    TravelRequestId: 2,
-    PatientId: 102,
-    Origin: 'Haifa',
-    TravelTime: '09:30',
-    TravelDate: '2024-06-02',
-    Destination: 'Tel Aviv',
-    NumberOfPassengers: 2,
-    IsAlone: false,
-    Frequency: 'Weekly',
-    Status: 'התקבלה',
-  },
-  {
-    TravelRequestId: 3,
-    PatientId: 103,
-    Origin: 'Eilat',
-    TravelTime: '14:00',
-    TravelDate: '2024-06-03',
-    Destination: 'Beersheba',
-    NumberOfPassengers: 3,
-    IsAlone: false,
-    Frequency: 'Monthly',
-    Status: 'התקבלה',
-  },
-];
+import React, { useState, useEffect } from "react";
+import { Button, Box, Typography, Container } from "@mui/material";
 
 const TravelRequests = () => {
-  const [requests, setRequests] = useState(mockRequests);
+  const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [error, setError] = useState("");
 
-  const handleViewDetails = (id) => {
-    const request = requests.find((req) => req.TravelRequestId === id);
-    setSelectedRequest(request);
-  };
+  useEffect(() => {
+    fetch("http://localhost:3000/travelRequests")
+      .then((response) => {
+        console.log(response);
+        if (response.status === 204) {
+          throw new Error("No Open Travel Request");
+        }
+        return response.json();
+      })
+      .then((data) => setRequests(data))
+      .catch((error) => {
+        setError(error.message);
+      });
+  }, []);
 
-  const handleTakeRequest = (id) => {
-    const updatedRequests = requests.filter((req) => req.TravelRequestId !== id);
-    setRequests(updatedRequests);
-    setSelectedRequest(null);
-  };
+  // const handleViewDetails = (id) => {
+  //   fetch(`http://localhost:3000/travelRequests/${id}`)
+  //     .then(response => response.json())
+  //     .then(data => setSelectedRequest(data))
+  //     .catch(error => setError(error.ToSring));
+  // };
+
+  // const handleTakeRequest = (id) => {
+  //   fetch(`http://localhost:3000/take-request/${id}`, {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //   })
+  //     .then(response => {
+  //       if (response.ok) {
+  //         setRequests(requests.filter(request => request.TravelRequestId !== id));
+  //         setSelectedRequest(null);
+  //       } else {
+  //         throw new Error('Failed to take request');
+  //       }
+  //     })
+  //     .catch(error => setError(error.message));
+  // };
 
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
         Open Travel Requests
       </Typography>
+      {error && <Typography color="error">{error}</Typography>}
       <Box>
-        <Grid container spacing={2}>
-          {selectedRequest === null && requests.map((request) => (
-            <Grid item xs={12} key={request.TravelRequestId}>
-              <Button variant="outlined" fullWidth onClick={() => handleViewDetails(request.TravelRequestId)}>
-                <Grid container direction="column" alignItems="flex-start" spacing={1}>
-                  <Grid item>
-                    <CalendarTodayIcon /> {`Date: ${request.TravelDate}`}
-                  </Grid>
-                  <Grid item>
-                    <AccessTimeIcon /> {`Time: ${request.TravelTime}`}
-                  </Grid>
-                  <Grid item>
-                    <LocationOnIcon /> {`Origin: ${request.Origin}`}
-                  </Grid>
-                  <Grid item>
-                    <ArrowForwardIcon /> {`Destination: ${request.Destination}`}
-                  </Grid>
-                </Grid>
-              </Button>
-            </Grid>
-          ))}
-        </Grid>
+        {requests.map((request) => (
+          <Box key={request.TravelRequestId} mb={2}>
+            <Button
+              variant="outlined"
+              onClick={() => handleViewDetails(request.TravelRequestId)}
+            >
+              {`Date: ${request.TravelDate}, Time: ${request.TravelTime}, Origin: ${request.Origin}, Destination: ${request.Destination}`}
+            </Button>
+          </Box>
+        ))}
       </Box>
       {selectedRequest && (
         <Box mt={4}>
@@ -101,7 +75,11 @@ const TravelRequests = () => {
           <Typography>{`Is Alone: ${selectedRequest.IsAlone}`}</Typography>
           <Typography>{`Frequency: ${selectedRequest.Frequency}`}</Typography>
           <Typography>{`Status: ${selectedRequest.Status}`}</Typography>
-          <Button variant="contained" color="primary" onClick={() => handleTakeRequest(selectedRequest.TravelRequestId)}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleTakeRequest(selectedRequest.TravelRequestId)}
+          >
             Take Request
           </Button>
         </Box>

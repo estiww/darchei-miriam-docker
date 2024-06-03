@@ -158,3 +158,9 @@ INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES
 ('Hadassah Medical Center', 1, '02-1234567', 'Dr. Alice'),
 ('Sourasky Medical Center', 2, '03-2345678', 'Dr. Bob'),
 ('Rambam Health Care Campus', 3, '04-3456789', 'Dr. Charlie');
+
+-- הכנסת נתונים לדוגמה לטבלת בקשות נסיעה
+INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Frequency, Status) VALUES 
+(1, 'Jerusalem', '10:00:00', '2024-06-01', 'Hadassah Medical Center', 1, TRUE, 'Weekly', 'נלקחה'),
+(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'Monthly', 'נלקחה'),
+(3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'One-time', 'הושלמה');

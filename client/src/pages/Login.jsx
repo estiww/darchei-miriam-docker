@@ -18,7 +18,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
 
-
 function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -37,40 +36,40 @@ function Login() {
       return;
     }
     let foundUser;
-        const url = 'http://localhost:3000/login';
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            }) 
-        };
-        fetch(url, requestOptions)
-            .then(response => {
-                console.log(response.status)
-                console.log(response)
-                if (!response.ok) {
-                    setError("incorrect password or username");
-                    return;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data) {
-                  console.log(data);
-                    user = data;
-                    // localStorage.setItem("currentUser", JSON.stringify(foundUser));
-                    setUser(user);
-                    setError('Registration successful');
-                    navigate('/home');
-                }
-            })
-            .catch(error => {
-                setError('Error', error);
-            });
+    const url = "http://localhost:3000/login";
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    };
+    fetch(url, requestOptions)
+      .then((response) => {
+        console.log(response.status);
+        console.log(response);
+        if (!response.ok) {
+          setError("incorrect password or username");
+          return;
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data) {
+          console.log(data);
+          user = data;
+          // localStorage.setItem("currentUser", JSON.stringify(foundUser));
+          setUser(user);
+          setError("Registration successful");
+          navigate("/home");
+        }
+      })
+      .catch((error) => {
+        setError("Error", error);
+      });
 
     // Clear error message if form is valid
     setError("");
@@ -133,7 +132,7 @@ function Login() {
             >
               Sign In
             </Button>
-           
+
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
@@ -147,7 +146,7 @@ function Login() {
               </Grid>
             </Grid>
             {error && (
-              <Typography variant="body2" color="error" sx={{ mt: 1}} >
+              <Typography variant="body2" color="error" sx={{ mt: 1 }}>
                 {error}
               </Typography>
             )}
