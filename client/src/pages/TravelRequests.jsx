@@ -67,9 +67,9 @@ const TravelRequests = () => {
       <Box>
         <Grid container spacing={2}>
           {selectedRequest === null && requests.map((request) => (
-            <Grid item xs={12} sm={6} md={4} key={request.TravelRequestId}>
+            <Grid item xs={12} key={request.TravelRequestId}>
               <Button variant="outlined" fullWidth onClick={() => handleViewDetails(request.TravelRequestId)}>
-                <Grid container direction="column" alignItems="flex-start">
+                <Grid container direction="column" alignItems="flex-start" spacing={1}>
                   <Grid item>
                     <CalendarTodayIcon /> {`Date: ${request.TravelDate}`}
                   </Grid>
