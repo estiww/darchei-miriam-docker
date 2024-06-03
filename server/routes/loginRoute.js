@@ -10,9 +10,9 @@ router.post("/", async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ error: "Missing required fields" });
         }
-        const user = await userscontroller.authenticate(email,password);
-        if (result.length > 0) {
-            res.send(user);
+        const result = await userscontroller.authenticate(email,password);
+        if (result.length>0) {
+            return res.send(result[0]);
         }
         return res.status(403).json({ error: "Incorrect password or username" });
     } catch (err) {

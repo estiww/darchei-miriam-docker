@@ -44,7 +44,7 @@ async function getById(id) {
 async function authenticate(email, password) {
     try {
         const encryptedPassword = await bcrypt.hash(password, 10);
-        return model.authenticate(email, encryptedPassword);
+        return model.authenticate(email, password);
         
     } catch (err) {
         throw err;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Avatar,
   Button,
@@ -20,6 +21,8 @@ const theme = createTheme();
 
 function Login() {
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  let user;
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -57,15 +60,16 @@ function Login() {
             })
             .then(data => {
                 if (data) {
-                    foundUser = data;
-                    localStorage.setItem("currentUser", JSON.stringify(foundUser));
-                    // setUser(foundUser);
+                  console.log(data);
+                    user = data;
+                    // localStorage.setItem("currentUser", JSON.stringify(foundUser));
+                    setUser(user);
                     setError('Registration successful');
-                    // navigate('/home');
+                    navigate('/home');
                 }
             })
             .catch(error => {
-                setLoginError('Error', error);
+                setError('Error', error);
             });
 
     // Clear error message if form is valid

@@ -10,7 +10,8 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import UserProfile from './UserProfile'; // ייבוא של הרכיב החדש
+import UserProfile from './UserProfile';
+import TravelRequests from'./TravelRequests';
 
 function Home() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -32,7 +33,7 @@ function Home() {
           </Typography>
           <div style={{ display: 'flex', flexGrow: 1, justifyContent: 'center', gap: '20px' }}>
             <Button color="inherit" component={Link} to="/home">Home</Button>
-            <Button color="inherit" component={Link} to="column1">Column 1</Button>
+            <Button color="inherit" component={Link} to="travelRequests">בקשות פתוחת</Button>
             <Button color="inherit" component={Link} to="column2">Column 2</Button>
             <Button color="inherit" component={Link} to="column3">Column 3</Button>
           </div>
@@ -58,7 +59,7 @@ function Home() {
       <Container style={{ marginTop: '80px' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="column1" element={<Column1 />} />
+          <Route path="TravelRequests" element={<TravelRequests />} />
           <Route path="column2" element={<Column2 />} />
           <Route path="column3" element={<Column3 />} />
           <Route path="profile" element={<UserProfile />} /> {/* שינוי ל-UserProfile */}
@@ -77,7 +78,7 @@ const HomePage = () => (
   </Grid>
 );
 
-const Column1 = () => (
+const OpenRequest = () => (
   <Grid container spacing={3} style={{ marginTop: 20 }}>
     <Grid item xs={12}>
       <Typography variant="h6">Column 1</Typography>
