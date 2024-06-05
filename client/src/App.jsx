@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
+import FullRegistration from "./pages/FullRegisteration";
 import "./App.css";
 import { createContext, useState } from "react";
 
@@ -20,6 +21,7 @@ function App() {
               <Route path="/" element={<Navigate to="/home" />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/fullRegisteration" element={<FullRegistration />} />
               {/* <Route path="/userDetails" element={<UserDetails />} /> */}
               <Route path="/home/*" element={<Home/>}/>
             </Routes>

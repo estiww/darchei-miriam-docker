@@ -61,8 +61,8 @@ function Login() {
         if (data) {
           console.log(data);
           user = data;
-          // localStorage.setItem("currentUser", JSON.stringify(foundUser));
-          setUser(user);
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          // setUser(user);
           setError("Registration successful");
           navigate("/home");
         }
@@ -130,7 +130,7 @@ function Login() {
               variant="contained"
               sx={{ mt: 2, mb: 2 }}
             >
-              Sign In
+              Log In
             </Button>
 
             <Grid container>

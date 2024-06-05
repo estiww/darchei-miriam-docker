@@ -52,7 +52,7 @@ function Signup() {
         localStorage.setItem("currentUser", JSON.stringify(data));
         // Implement your setUser and navigate functions accordingly
         // setUser(data);
-        // navigate("/home");
+        navigate("/fullRegisteration");
         setError("User created successfully");
       })
       .catch((error) => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -11,10 +11,14 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import UserProfile from './UserProfile';
-import TravelRequests from'./TravelRequests';
+import TravelRequests from './TravelRequests';
+import TravelMatches from './TravelMatches';
+import TravelRequestForm from './TravelRequestForm';
 
-function Home() {
+const Home = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+  const currentUser = localStorage.getItem('currentUser');
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -24,34 +28,35 @@ function Home() {
     setAnchorEl(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    navigate('/');
+  };
+
   return (
     <div>
       <AppBar position="fixed" style={{ width: '100%' }}>
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6">
-            My Application
-          </Typography>
-          <div style={{ display: 'flex', flexGrow: 1, justifyContent: 'center', gap: '20px' }}>
-            <Button color="inherit" component={Link} to="/home">Home</Button>
-            <Button color="inherit" component={Link} to="travelRequests">בקשות פתוחת</Button>
-            <Button color="inherit" component={Link} to="column2">Column 2</Button>
-            <Button color="inherit" component={Link} to="column3">Column 3</Button>
-          </div>
+          <Typography variant="h6">My Application</Typography>
+          {currentUser && (
+            <div style={{ display: 'flex', flexGrow: 1, justifyContent: 'center', gap: '20px' }}>
+              <Button color="inherit" component={Link} to="/home">Home</Button>
+              <Button color="inherit" component={Link} to="travelRequests">בקשות פתוחת</Button>
+              <Button color="inherit" component={Link} to="travelMatches">TravelMatches</Button>
+              <Button color="inherit" component={Link} to="travelRequestForm">TravelRequestForm</Button>
+            </div>
+          )}
           <div>
-            <IconButton
-              edge="end"
-              color="inherit"
-              onClick={handleMenu}
-            >
-              <AccountCircle />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
+            {currentUser ? (
+              <IconButton edge="end" color="inherit" onClick={handleMenu}>
+                <AccountCircle />
+              </IconButton>
+            ) : (
+              <Button color="inherit" component={Link} to="/login">Log In</Button>
+            )}
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
               <MenuItem onClick={handleClose} component={Link} to="profile">Profile</MenuItem>
-              <MenuItem onClick={handleClose}>Logout</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </div>
         </Toolbar>
@@ -60,23 +65,35 @@ function Home() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="TravelRequests" element={<TravelRequests />} />
-          <Route path="column2" element={<Column2 />} />
-          <Route path="column3" element={<Column3 />} />
-          <Route path="profile" element={<UserProfile />} /> {/* שינוי ל-UserProfile */}
+          <Route path="travelMatches" element={<TravelMatches />} />
+          <Route path="travelRequestForm" element={<TravelRequestForm />} />
+          <Route path="profile" element={<UserProfile />} />
         </Routes>
       </Container>
     </div>
   );
-}
+};
 
-const HomePage = () => (
-  <Grid container spacing={3} style={{ marginTop: 20 }}>
-    <Grid item xs={12}>
-      <Typography variant="h6">Home</Typography>
-      <Typography>Welcome to the home page!</Typography>
+const HomePage = () => {
+  const navigate = useNavigate();
+  const currentUser = localStorage.getItem('currentUser');
+
+  return (
+    <Grid container spacing={3} style={{ marginTop: 20 }}>
+      <Grid item xs={12}>
+        <Typography variant="h6">Home</Typography>
+        <Typography>Welcome to the home page!</Typography>
+        {currentUser ? (
+          <Typography>Welcome back!</Typography>
+        ) : (
+          <Button variant="contained" onClick={() => navigate('/login')}>
+            Log In
+          </Button>
+        )}
+      </Grid>
     </Grid>
-  </Grid>
-);
+  );
+};
 
 const OpenRequest = () => (
   <Grid container spacing={3} style={{ marginTop: 20 }}>
