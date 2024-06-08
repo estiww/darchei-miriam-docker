@@ -18,12 +18,13 @@ function App() {
         <UserContext.Provider value={{ user, setUser }}>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Navigate to="/home" />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/fullRegisteration" element={<FullRegistration />} />
-              {/* <Route path="/userDetails" element={<UserDetails />} /> */}
-              <Route path="/home/*" element={<Home/>}/>
+            <Route path="/" element={<Navigate to="/darchei-miriam.com" />} />
+            <Route path="/darchei-miriam.com" element={<Home/>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/fullRegisteration" element={<FullRegistration />} />
+            {/* <Route path="/userDetails" element={<UserDetails />} /> 
+            <Route path="/home/*" element={<Home/>}/> */}
             </Routes>
           </BrowserRouter>
         </UserContext.Provider>
