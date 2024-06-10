@@ -7,9 +7,19 @@ const TravelRequests = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3000/travelRequests")
+    fetch("http://localhost:3000/travelRequests",{
+      method: "GET",
+      credentials: "include"
+    })
       .then((response) => {
         console.log(response);
+        console.log("response");
+        if(!response.ok){
+          return response.json().then((data) => {
+            console.log(data)
+            throw new Error(data.error);
+          });
+        }
         if (response.status === 204) {
           throw new Error("No Open Travel Request");
         }

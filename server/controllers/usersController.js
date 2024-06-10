@@ -67,14 +67,15 @@ const authenticate = async (req, res) => {
     console.log(foundUser);
     if (!foundUser) return res.sendStatus(401); //Unauthorized
     // evaluate password
+    console.log(await bcrypt.hash(password, 10))
     const match = await bcrypt.compare(password, foundUser.PasswordValue);
     console.log(match)
     
     if (match) {
       // create JWTs
       const accessToken = jwt.sign(
-        { email: foundUser.mail ,
-            role:foundUser.rolename
+        { id: foundUser.UserId ,
+          role:foundUser.RoleName
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "5m" }
@@ -88,8 +89,15 @@ const authenticate = async (req, res) => {
       );
       console.log(refreshToken);
      // Saving refreshToken with current user
-    const result =await model.refreshToken(foundUser.UserId,refreshToken);
-      res.cookie("jwt", refreshToken, {
+    await model.refreshToken(foundUser.UserId,refreshToken);
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+      maxAge: 5 * 60 * 1000,
+    });
+
+      res.cookie("jwt", accessToken, {
         httpOnly: true,
         sameSite: "None",
         secure: true,

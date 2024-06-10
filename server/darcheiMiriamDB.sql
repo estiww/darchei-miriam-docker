@@ -118,11 +118,11 @@ CREATE TABLE RefreshTokenTable (
 -- הכנסת נתונים לדוגמה בטבלת סיסמאות
 INSERT INTO PasswordTable (PasswordValue) VALUES 
 ('$2a$10$a.NYmglhT9kjxB3OexMbr.nLO1ZKwFZCDimaTB32JCK8LTn1boVWW'),
-('$2b$10$9tPL0POZ.kOW99Apj0rrDujOTZP4AfDdSLMOPqZjK7elPbb38zIXK'),
-('$2b$10$eU5NB7OpMfCM2GbgZ8G8SO2UdWWkdQhWTjFfC4vftO0uZBduAmr6u'),
-('$2b$10$5hOKrYQ8U1eTGtA1dRfWtOC27ukXPl0qYZ8VxKZSpHH5dwaJ4G1eG'),
-('$2b$10$9jINm6/iESxfYdz1hW3GUO3fyokpuIpmjMByAzpiRlh3AZPf4lKhC'),
-('$2b$10$M/0Jzxd41oEj4A17DRNSFeQw0i6ONMOk1OIbKkE91.xhBM2WQvQxa');
+('$2a$10$3PvNVK7qPLQ7SL2wkydD5unQ4t6SbPTcKQg.5YxE89M2c8J1H91eu'),
+('$2a$10$Z1JyeOu8z3.yfho4B2o0fO23bxmdQBrx0lxhulJNk/0hIp8JFehk2'),
+('$2a$10$oaB4yNjugjdbGsoJEMBO2uSRy2HjLZ726I7RMa2RDUm0.5XD0/AKm'),
+('$2a$10$Q/bc/UJUwXUBXpMuTgNWc.dS1R8AHdGJvVTm9CU.GmroTRsVPI1ka'),
+('$2a$10$nZUXNH7haJZFjAlMc7OPguZ446b519jBxwYe.MMwBKJmqXzkqF7Y2');
 -- INSERT INTO PasswordTable (PasswordValue) VALUES 
 -- ('password123'),
 -- ('securepass456'),

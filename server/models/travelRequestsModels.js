@@ -10,6 +10,7 @@ async function getOpentravelRequests() {
     } catch (err) {
         throw(err);
     }
+
 }
 
 // // נתיב לקבלת פרטים מלאים על בקשה לפי ID

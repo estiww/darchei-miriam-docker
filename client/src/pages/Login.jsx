@@ -46,6 +46,7 @@ function Login() {
         email: email,
         password: password,
       }),
+      credentials: "include",
     };
     fetch(url, requestOptions)
       .then((response) => {

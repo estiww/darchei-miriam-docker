@@ -7,7 +7,7 @@ router.use(express.urlencoded({ extended: true }));
 router.get("/", async (req, res) => {
     try {
         console.log(1);
-        const result = await travelRequestscontroller.getOpentravelRequests();
+        const result = await travelRequestscontroller.getOpentravelRequests(req);
         if (result.length>0) {
             console.log(204)
             return res.send(result);

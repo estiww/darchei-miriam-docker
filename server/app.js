@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 require('dotenv').config();
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+
 
 const loginRoute = require('./routes/loginRoute');
 const travelRequestsRoute = require('./routes/travelRequestsRoute');
@@ -13,8 +12,10 @@ const logger=require('./middleware/logger')
 const verifyJWT=require('./middleware/verifyJWT')
 
 // const signupRoute = require('./routes/signupRoute');
-
-
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(logger);
 
 // app.use('/albums', albumsRouter);
@@ -25,9 +26,8 @@ app.use(logger);
 // app.use('/users', usersRouter);
 // app.use('/passwords', passwordRouter);
 app.use('/login', loginRoute);
-app.use('/travelRequests', verifyJWT,travelRequestsRoute);
+app.use('/travelRequests',verifyJWT,travelRequestsRoute);
 // app.use('/signup', signupRoute);
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
