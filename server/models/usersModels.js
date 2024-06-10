@@ -32,15 +32,40 @@ async function getByUsername(username) {
 }
 
 
-//מחזיר משתמש אם האימות הצליח במידה ולא יחזיר ערך ריק ולא שגיאה ויזרוק שגיאה במקרה שלא הצליח לגשת למסד נתונים
-async function authenticate(email, encryptedPassword) {
+async function getUserByEmail(email) {
     try {
-        const sql = 'SELECT * FROM UserTable INNER JOIN PasswordTable ON UserTable.PasswordId = PasswordTable.PasswordId WHERE UserTable.Mail = ? AND PasswordTable.PasswordValue = ?';
-        const [result] = await pool.query(sql, [email, encryptedPassword]);
-        console.log(result)
-        return result;
+        const sql = `
+        SELECT 
+            UserTable.UserId,
+            UserTable.Mail,
+            PasswordTable.PasswordValue,
+            RoleTable.RoleName
+        FROM UserTable
+        INNER JOIN PasswordTable ON UserTable.PasswordId = PasswordTable.PasswordId
+        INNER JOIN RoleTable ON UserTable.RoleId = RoleTable.RoleId
+        WHERE UserTable.Mail = ?;
+    `;
+        const [result] = await pool.query(sql, [email]);
+        console.log(result) ;
+        return result[0]; // Assuming the email is unique, return the first (and only) user
     } catch (err) {
-        throw(err);
+        throw err;
+    }
+}
+async function refreshToken(userId, refreshToken) {
+    try {
+        const updateSql = 'UPDATE RefreshTokenTable SET RefreshToken = ? WHERE UserId = ?';
+        const [result] = await pool.query(updateSql, [refreshToken, userId]);
+        // אם אף שורה לא עודכנה, מכניסים רשומה חדשה
+        if (result.affectedRows === 0) {
+            const insertSql = 'INSERT INTO RefreshTokenTable (UserId, RefreshToken) VALUES (?, ?)';
+            const [insertResult] = await pool.query(insertSql, [userId, refreshToken]);
+            console.log('Refresh token inserted:', insertResult);
+        } else {
+            console.log('Refresh token updated:', result);
+        }
+    } catch (err) {
+        throw err;
     }
 }
 
@@ -117,4 +142,4 @@ async function updateUser(id, username, email, phone, street, city, password) {
     }
 }
 
-module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getByUsername, authenticate };
+module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getByUsername, getUserByEmail,refreshToken };

@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {Avatar,Button,CssBaseline,TextField,FormControlLabel,Checkbox,Link,Grid,Box,Typography, Container,} from "@mui/material";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  Container,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -9,7 +21,7 @@ const theme = createTheme();
 function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  let user;
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -40,25 +52,25 @@ function Login() {
         console.log(response.status);
         console.log(response);
         if (!response.ok) {
-          setError("incorrect password or username");
-          return;
+          return response.json().then((data) => {
+            throw new Error(data.message);
+          });
         }
         return response.json();
       })
       .then((data) => {
         if (data) {
           console.log(data);
-          user = data;
-          localStorage.setItem("currentUser", JSON.stringify(user));
+          foundUser = data;
+          localStorage.setItem("currentUser", JSON.stringify(foundUser));
           // setUser(user);
           setError("Registration successful");
           navigate("/home");
         }
       })
       .catch((error) => {
-        setError("Error", error);
+        setError(error.message);
       });
-
     // Clear error message if form is valid
     setError("");
   };

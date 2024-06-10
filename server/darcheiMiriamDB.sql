@@ -108,14 +108,28 @@ CREATE TABLE EquipmentTransferTable (
     TransferTime TIME NOT NULL
 );
 
+CREATE TABLE RefreshTokenTable (
+    RefreshTokenId INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+    RefreshToken VARCHAR(255) NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES UserTable(UserId)
+);
+
 -- הכנסת נתונים לדוגמה בטבלת סיסמאות
 INSERT INTO PasswordTable (PasswordValue) VALUES 
-('password123'),
-('securepass456'),
-('mysecret789'),
-('uniquePwd001'),
-('uniquePwd002'),
-('uniquePwd003');
+('$2a$10$a.NYmglhT9kjxB3OexMbr.nLO1ZKwFZCDimaTB32JCK8LTn1boVWW'),
+('$2b$10$9tPL0POZ.kOW99Apj0rrDujOTZP4AfDdSLMOPqZjK7elPbb38zIXK'),
+('$2b$10$eU5NB7OpMfCM2GbgZ8G8SO2UdWWkdQhWTjFfC4vftO0uZBduAmr6u'),
+('$2b$10$5hOKrYQ8U1eTGtA1dRfWtOC27ukXPl0qYZ8VxKZSpHH5dwaJ4G1eG'),
+('$2b$10$9jINm6/iESxfYdz1hW3GUO3fyokpuIpmjMByAzpiRlh3AZPf4lKhC'),
+('$2b$10$M/0Jzxd41oEj4A17DRNSFeQw0i6ONMOk1OIbKkE91.xhBM2WQvQxa');
+-- INSERT INTO PasswordTable (PasswordValue) VALUES 
+-- ('password123'),
+-- ('securepass456'),
+-- ('mysecret789'),
+-- ('uniquePwd001'),
+-- ('uniquePwd002'),
+-- ('uniquePwd003');
 
 -- הכנסת נתונים לדוגמה בטבלת כתובות
 INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALUES 
