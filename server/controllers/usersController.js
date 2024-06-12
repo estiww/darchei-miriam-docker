@@ -1,9 +1,9 @@
 const model = require("../models/usersModels");
 const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const fsPromises = require('fs').promises;
-const path = require('path');
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const fsPromises = require("fs").promises;
+const path = require("path");
 
 async function create(username, email, phone, street, city, password) {
   try {
@@ -61,58 +61,58 @@ const authenticate = async (req, res) => {
     // { error: "Missing required fields" }
     // { 'message': 'Username and password are required.' }
     if (!email || !password)
-      return res.status(400).json({ 'message': 'Username and password are required.' });
-    const foundUser =await model.getUserByEmail(email);
+      return res
+        .status(400)
+        .json({ message: "Username and password are required." });
+    const foundUser = await model.getUserByEmail(email);
     console.log(123);
     console.log(foundUser);
     if (!foundUser) return res.sendStatus(401); //Unauthorized
     // evaluate password
-    console.log(await bcrypt.hash(password, 10))
+    console.log(await bcrypt.hash(password, 10));
     const match = await bcrypt.compare(password, foundUser.PasswordValue);
-    console.log(match)
-    
+    console.log(match);
+
     if (match) {
       // create JWTs
       const accessToken = jwt.sign(
-        { id: foundUser.UserId ,
-          role:foundUser.RoleName
-        },
+        { id: foundUser.UserId, role: foundUser.RoleName },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "5m" }
       );
       const refreshToken = jwt.sign(
-        { id: foundUser.UserId,
-          role:foundUser.RoleName
-        },
+        { id: foundUser.UserId, role: foundUser.RoleName },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
       );
       console.log(refreshToken);
-     // Saving refreshToken with current user
-    await model.refreshToken(foundUser.UserId,refreshToken);
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 5 * 60 * 1000,
-    });
+      // Saving refreshToken with current user
+      await model.refreshToken(foundUser.UserId, refreshToken);
+      // res.cookie("accessToken", accessToken, {
+      //   httpOnly: true,
+      //   sameSite: "None",
+      //   secure: true,
+      //   maxAge: 5 * 60 * 1000,
+      // });
 
-      res.cookie("jwt", accessToken, {
+      res.cookie("jwt", refreshToken, {
         httpOnly: true,
         sameSite: "None",
         secure: true,
         maxAge: 24 * 60 * 60 * 1000,
       });
-    res.json({ accessToken });
-    // res.json({ email: foundUser.mail ,
-    //     role:foundUser.rolename
-    // });
-} else {
-      return res.status(401).json({ 'message': "Incorrect password or username" });
+      res.json({ accessToken });
+      // res.json({ email: foundUser.mail ,
+      //     role:foundUser.rolename
+      // });
+    } else {
+      return res
+        .status(401)
+        .json({ message: "Incorrect password or username" });
       // res.sendStatus(401);
     }
   } catch (err) {
-   return res.status(500).json({ 'message': err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
