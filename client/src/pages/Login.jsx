@@ -35,7 +35,7 @@ function Login() {
       setError("Please fill in all fields.");
       return;
     }
-    let foundUser;
+    let accessToken;
     const url = "http://localhost:3000/login";
     const requestOptions = {
       method: "POST",
@@ -60,13 +60,23 @@ function Login() {
         return response.json();
       })
       .then((data) => {
+        //דטה מכיל מייל ותפקיד
+        console.log("data");
         if (data) {
-          console.log(data);
-          foundUser = data;
-          localStorage.setItem("currentUser", JSON.stringify(foundUser));
+          console.log("access token");
+          localStorage.setItem("access token", JSON.stringify(accessToken));
+          //רק על מנת שיהיה אפשר לעשות לוגאאוט
+          localStorage.setItem("currentUser", JSON.stringify({ data }));
           // setUser(user);
           setError("Registration successful");
-          navigate("/home");
+          //ניתוב זמני
+          navigate("/home/travelRequests");
+          //     // Check if accessToken cookie exists
+          //     const accessToken = getCookie("accessToken"); // Assume you have a function getCookie() to retrieve cookies
+
+          //     if (accessToken) {
+          //       // Redirect to the desired page
+          //       navigate("/home");
         }
       })
       .catch((error) => {

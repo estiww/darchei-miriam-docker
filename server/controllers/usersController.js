@@ -65,7 +65,6 @@ const authenticate = async (req, res) => {
         .status(400)
         .json({ message: "Username and password are required." });
     const foundUser = await model.getUserByEmail(email);
-    console.log(123);
     console.log(foundUser);
     if (!foundUser) return res.sendStatus(401); //Unauthorized
     // evaluate password
@@ -78,7 +77,7 @@ const authenticate = async (req, res) => {
       const accessToken = jwt.sign(
         { id: foundUser.UserId, role: foundUser.RoleName },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "5m" }
+        { expiresIn: "30s" }
       );
       const refreshToken = jwt.sign(
         { id: foundUser.UserId, role: foundUser.RoleName },
@@ -88,23 +87,26 @@ const authenticate = async (req, res) => {
       console.log(refreshToken);
       // Saving refreshToken with current user
       await model.refreshToken(foundUser.UserId, refreshToken);
-      // res.cookie("accessToken", accessToken, {
-      //   httpOnly: true,
-      //   sameSite: "None",
-      //   secure: true,
-      //   maxAge: 5 * 60 * 1000,
-      // });
 
-      res.cookie("jwt", refreshToken, {
+       //שמירת אקססטוקן בתור קוקי
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 30 * 1000,
+      });
+
+      //פה נוצר הקוקי בדפדפן
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         sameSite: "None",
         secure: true,
         maxAge: 24 * 60 * 60 * 1000,
       });
-      res.json({ accessToken });
-      // res.json({ email: foundUser.mail ,
-      //     role:foundUser.rolename
-      // });
+     //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי 
+      res.json({ email: foundUser.Mail ,
+          role:foundUser.RoleName
+      });
     } else {
       return res
         .status(401)
@@ -115,8 +117,6 @@ const authenticate = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-
-module.exports = { authenticate };
 
 async function getByUsername(username) {
   try {

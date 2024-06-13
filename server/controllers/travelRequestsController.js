@@ -1,14 +1,18 @@
-const model = require('../models/travelRequestsModels');
+const model = require("../models/travelRequestsModels");
 
-async function getOpentravelRequests(req) {
-    try {
-        if(req.role==="Patient"){
-            throw new Error("Unauthorized access for patient role");
-        }
-        console.log(2);
-        return model.getOpentravelRequests();
-    } catch (err) {
-        throw err;
+const getOpentravelRequests = async (req, res) => {
+  try {
+    if (req.role == !"Patient") {
+      throw new Error("Unauthorized access for patient role");
+      const result = await model.getOpentravelRequests();
+      if (result.length > 0) {
+        return res.send(result);
+      }
     }
-}
-module.exports = { getOpentravelRequests};
+    return res.status(204).json();
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getOpentravelRequests };

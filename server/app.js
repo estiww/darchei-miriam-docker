@@ -18,16 +18,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(logger);
 
-// app.use('/albums', albumsRouter);
-// app.use('/comments', commentsRouter);
-// app.use('/photos', photosRouter);
-// app.use('/posts', postsRouter);
-// app.use('/todos', todosRouter);
-// app.use('/users', usersRouter);
-// app.use('/passwords', passwordRouter);
+
 app.use('/login', loginRoute);
-app.use('/travelRequests',verifyJWT,travelRequestsRoute);
 // app.use('/signup', signupRoute);
+//מה שכתוב מפה ואילך יעבור במידל וור
+// app.use(verifyJWT);
+
+app.use('/travelRequests',travelRequestsRoute);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
