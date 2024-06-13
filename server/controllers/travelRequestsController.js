@@ -2,8 +2,7 @@ const model = require("../models/travelRequestsModels");
 
 const getOpentravelRequests = async (req, res) => {
   try {
-    if (req.role == !"Patient") {
-      throw new Error("Unauthorized access for patient role");
+    if (req.role !== "Patient") {
       const result = await model.getOpentravelRequests();
       if (result.length > 0) {
         return res.send(result);
@@ -15,4 +14,6 @@ const getOpentravelRequests = async (req, res) => {
   }
 };
 
+  
+  
 module.exports = { getOpentravelRequests };

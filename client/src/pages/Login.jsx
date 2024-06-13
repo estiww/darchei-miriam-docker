@@ -35,24 +35,24 @@ function Login() {
       setError("Please fill in all fields.");
       return;
     }
-    let accessToken;
+    let foundUser;
     const url = "http://localhost:3000/login";
     const requestOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-      credentials: "include",
+      body: JSON.stringify({ email, password }),
+      credentials: "include", // This is important to include cookies
     };
     fetch(url, requestOptions)
       .then((response) => {
         console.log(response.status);
         console.log(response);
         if (!response.ok) {
+          if(response.status===401){
+            console.log('hi');
+          }
           return response.json().then((data) => {
             throw new Error(data.message);
           });
@@ -60,23 +60,16 @@ function Login() {
         return response.json();
       })
       .then((data) => {
-        //דטה מכיל מייל ותפקיד
-        console.log("data");
         if (data) {
-          console.log("access token");
-          localStorage.setItem("access token", JSON.stringify(accessToken));
-          //רק על מנת שיהיה אפשר לעשות לוגאאוט
-          localStorage.setItem("currentUser", JSON.stringify({ data }));
-          // setUser(user);
+          console.log(data);
+          foundUser = data;
+          // // document.cookie = `jwt_access=${foundUser.accessToken}; Max-Age=${60 * 5}; Secure; SameSite=None`;
+          // document.cookie = data.cookie;
+          localStorage.setItem("currentUser", JSON.stringify(foundUser));
+          // // setUser(user);
           setError("Registration successful");
-          //ניתוב זמני
+          //זמני
           navigate("/home/travelRequests");
-          //     // Check if accessToken cookie exists
-          //     const accessToken = getCookie("accessToken"); // Assume you have a function getCookie() to retrieve cookies
-
-          //     if (accessToken) {
-          //       // Redirect to the desired page
-          //       navigate("/home");
         }
       })
       .catch((error) => {

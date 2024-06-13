@@ -2,8 +2,6 @@ const model = require("../models/usersModels");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const fsPromises = require("fs").promises;
-const path = require("path");
 
 async function create(username, email, phone, street, city, password) {
   try {
