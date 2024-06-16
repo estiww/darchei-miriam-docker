@@ -26,7 +26,7 @@ CREATE TABLE AddressTable (
 -- טבלת תפקידים
 CREATE TABLE RoleTable (
     RoleId INT AUTO_INCREMENT PRIMARY KEY,
-    RoleName ENUM('Patient', 'Volunteer', 'Admin') NOT NULL
+    RoleName ENUM('Patient', 'Volunteer', 'Admin',) NOT NULL
 );
 
 -- טבלת משתמשים

@@ -12,7 +12,7 @@ async function signup(req, res) {
     }
 
     // Check if user already exists
-    const existingUser = await model.getUserByEmail(email);
+    const existingUser = await model.isUserExists(email);
     if (existingUser) {
       return res
       .status(401)
@@ -96,7 +96,7 @@ const authenticate = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Username and password are required." });
-    const foundUser = await model.getUserByEmail(email);
+    const foundUser = await model.isUserExists(email);
     console.log(foundUser);
     if (!foundUser) return res.sendStatus(401); //Unauthorized
     // evaluate password

@@ -12,14 +12,14 @@ const refreshTokenRoute = require('./routes/refreshTokenRoute');
 const travelRequestsRoute = require('./routes/travelRequestsRoute');
 const logger=require('./middleware/logger')
 const verifyJWT=require('./middleware/verifyJWT')
-
+const logoutRoute = require("./routes/logoutRoute");
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(logger);
 
-
+app.use("/logout", logoutRoute);
 app.use('/login', loginRoute);
 app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);

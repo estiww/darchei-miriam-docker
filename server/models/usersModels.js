@@ -21,10 +21,11 @@ async function getUser(id) {
     }
 }
 
-async function getboolianByMail(mail) {
+async function isUserExists(mail) {
     try {
-        const sql = 'SELECT UserTable.Mail WHERE UserTable.Mail = ?';
+        const sql = 'SELECT * FROM UserTable WHERE Mail = ?';
         const [result] = await pool.query(sql, [mail]);
+        console.log(result);
         return result[0];
     } catch (err) {
         console.log(err);
@@ -163,4 +164,4 @@ async function updateUser(id, username, email, phone, street, city, password) {
     }
 }
 
-module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getboolianByMail, getUserByEmail,refreshToken,signup };
+module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,refreshToken,signup };
