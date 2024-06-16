@@ -31,14 +31,14 @@ CREATE TABLE RoleTable (
 
 -- טבלת משתמשים
 CREATE TABLE UserTable (
-    UserId INT PRIMARY KEY,
+    UserId INT AUTO_INCREMENT PRIMARY KEY,
     PasswordId INT NOT NULL UNIQUE,
-    FirstName VARCHAR(100) NOT NULL,
-    LastName VARCHAR(100) NOT NULL,
-    AddressId INT NOT NULL UNIQUE,
-    Phone VARCHAR(15) NOT NULL,
+    FirstName VARCHAR(100) NULL,
+    LastName VARCHAR(100) NULL,
+    AddressId INT NULL,
+    Phone VARCHAR(15) NULL,
     Mail VARCHAR(100) NOT NULL,
-    RoleId INT NOT NULL,
+    RoleId INT NULL,
     FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
     FOREIGN KEY (AddressId) REFERENCES AddressTable(AddressId),
     FOREIGN KEY (RoleId) REFERENCES RoleTable(RoleId)
@@ -175,6 +175,6 @@ INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES
 
 -- הכנסת נתונים לדוגמה לטבלת בקשות נסיעה
 INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Frequency, Status) VALUES 
-(1, 'Jerusalem', '10:00:00', '2024-06-01', 'Hadassah Medical Center', 1, TRUE, 'Weekly', 'נלקחה'),
-(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'Monthly', 'נלקחה'),
+(1, 'Jerusalem', '10:00:00', '2024-06-01', 'Hadassah Medical Center', 1, TRUE, 'Weekly', 'התקבלה'),
+(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'Monthly', 'התקבלה'),
 (3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'One-time', 'הושלמה');

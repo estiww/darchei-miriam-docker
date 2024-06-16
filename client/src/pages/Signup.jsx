@@ -10,11 +10,14 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+
 
 const theme = createTheme();
 
 function Signup() {
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,7 +32,7 @@ function Signup() {
       setError("Please fill in all fields.");
       return;
     }
-    if (!ValidateEmail(userDetails.email)) {
+    if (!ValidateEmail(email)) {
       setError("You have entered an invalid email address!");
       return;
     }
@@ -43,28 +46,42 @@ function Signup() {
         email: email,
         password: password,
       }),
+      credentials: "include", 
     };
 
     fetch(url, requestOptions)
-      .then((response) => response.json())
+      .then(
+        (response) =>{
+          console.log(response)
+          if (!response.ok) {
+            if(response.status===401){
+              console.log('hi');
+            }
+            return response.json().then((data) => {
+              throw new Error(data.message);
+            });
+          }
+          response.json()
+        } )
       .then((data) => {
-        console.log(data);
-        localStorage.setItem("currentUser", JSON.stringify(data));
-        // Implement your setUser and navigate functions accordingly
-        // setUser(data);
-        navigate("/fullRegisteration");
-        setError("User created successfully");
-      })
+        // localStorage.setItem("currentUser", JSON.stringify(foundUser));
+        // // setUser(user);
+        setError("Registration successful");
+        //זמני
+        navigate("/home/travelRequests");
+      }
+      )
       .catch((error) => {
-        setError(error);
+        setError(error.message);
       });
 
     // Clear error message if form is valid
     setError("");
   };
-  function ValidateEmail(mailAdress) {
-    let mailformat = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/;
-    if (mailAdress.match(mailformat)) {
+
+  function ValidateEmail(mailAddress) {
+    let mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (mailAddress.match(mailformat)) {
       return true;
     } else {
       return false;
@@ -136,6 +153,11 @@ function Signup() {
                 </Link>
               </Grid>
             </Grid>
+            {error && (
+              <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
           </Box>
         </Box>
       </Container>

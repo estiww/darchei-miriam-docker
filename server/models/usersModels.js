@@ -21,16 +21,37 @@ async function getUser(id) {
     }
 }
 
-async function getByUsername(username) {
+async function getboolianByMail(mail) {
     try {
-        const sql = 'SELECT users.*, addresses.street, addresses.city FROM users INNER JOIN addresses ON users.address_id = addresses.id WHERE users.username = ?';
-        const [result] = await pool.query(sql, [username]);
+        const sql = 'SELECT UserTable.Mail WHERE UserTable.Mail = ?';
+        const [result] = await pool.query(sql, [mail]);
         return result[0];
     } catch (err) {
         console.log(err);
     }
 }
 
+async function signup(email, hashedPassword) {
+    try {
+        console.log(5)
+      // Insert password into PasswordTable
+      const insertPasswordSql = 'INSERT INTO PasswordTable (PasswordValue) VALUES (?)';
+      const [passwordResult] = await pool.query(insertPasswordSql, [hashedPassword]);
+      const passwordId = passwordResult.insertId;
+      console.log(passwordId)
+
+      // Insert user into UserTable
+      const insertUserSql = `
+      INSERT INTO UserTable (PasswordId, Mail, FirstName, LastName, AddressId, Phone, RoleId) 
+      VALUES (?, ?, NULL, NULL, NULL, NULL, NULL)`;
+    const [userResult] = await pool.query(insertUserSql, [passwordId, email]);
+    console.log(userResult)
+
+      return userResult;
+    } catch (err) {
+      throw err;
+    }
+  }
 
 async function getUserByEmail(email) {
     try {
@@ -142,4 +163,4 @@ async function updateUser(id, username, email, phone, street, city, password) {
     }
 }
 
-module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getByUsername, getUserByEmail,refreshToken };
+module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, getboolianByMail, getUserByEmail,refreshToken,signup };

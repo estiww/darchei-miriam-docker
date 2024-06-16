@@ -3,6 +3,40 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
+
+async function signup(req, res) {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Check if user already exists
+    const existingUser = await model.getUserByEmail(email);
+    if (existingUser) {
+      return res
+      .status(401)
+      .json({ message: "User already exists" });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+console.log(4)
+    // Insert user into database
+    const result = await model.signup(email, hashedPassword);
+    if (result) {
+      return res.status(201).json({ message: "User created successfully", user: result });
+    }
+    return res.status(500).json({ error: "Failed to create user" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+
+  
+
+
 async function create(username, email, phone, street, city, password) {
   try {
     return model.createUser(username, email, phone, street, city, password);
@@ -131,5 +165,5 @@ module.exports = {
   deleteUser,
   update,
   getByUsername,
-  authenticate,
+  authenticate,signup,
 };

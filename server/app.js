@@ -7,7 +7,7 @@ const app = express();
 
 
 const loginRoute = require('./routes/loginRoute');
-// const signupRoute = require('./routes/signupRoute');
+const signupRoute = require('./routes/signupRoute');
 const refreshTokenRoute = require('./routes/refreshTokenRoute');
 const travelRequestsRoute = require('./routes/travelRequestsRoute');
 const logger=require('./middleware/logger')
@@ -21,7 +21,7 @@ app.use(logger);
 
 
 app.use('/login', loginRoute);
-// app.use('/signup', signupRoute);
+app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);
 
 //מה שכתוב מפה ואילך יעבור במידל וור
