@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
-require('dotenv').config();
+require("dotenv").config();
 
 const app = express();
 
@@ -16,7 +16,7 @@ const verifyJWT=require('./middleware/verifyJWT')
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(logger);
 
 
@@ -27,7 +27,7 @@ app.use('/refreshTokenRoute', refreshTokenRoute);
 //מה שכתוב מפה ואילך יעבור במידל וור
 // app.use(verifyJWT);
 
-app.use('/travelRequests',verifyJWT,travelRequestsRoute);
+app.use("/travelRequests", verifyJWT, travelRequestsRoute);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
