@@ -14004,3 +14004,8 @@ Date: Mon Jun 17 2024 20:15:36 GMT+0300 (שעון ישראל (קיץ)), Url:/log
 Date: Mon Jun 17 2024 20:15:43 GMT+0300 (שעון ישראל (קיץ)), Url:/login 
 Date: Mon Jun 17 2024 20:15:43 GMT+0300 (שעון ישראל (קיץ)), Url:/travelRequests 
 Date: Mon Jun 17 2024 20:15:43 GMT+0300 (שעון ישראל (קיץ)), Url:/travelRequests 
+Date: Mon Jun 17 2024 20:31:12 GMT+0300 (שעון ישראל (קיץ)), Url:/logout 
+Date: Mon Jun 17 2024 20:31:13 GMT+0300 (שעון ישראל (קיץ)), Url:/login 
+Date: Mon Jun 17 2024 20:31:14 GMT+0300 (שעון ישראל (קיץ)), Url:/travelRequests 
+Date: Mon Jun 17 2024 20:31:14 GMT+0300 (שעון ישראל (קיץ)), Url:/travelRequests 
+Date: Mon Jun 17 2024 20:31:17 GMT+0300 (שעון ישראל (קיץ)), Url:/logout 
