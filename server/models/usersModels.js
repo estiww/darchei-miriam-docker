@@ -74,22 +74,22 @@ async function signup(email, hashedPassword) {
         throw err;
     }
 }
-async function refreshToken(userId, refreshToken) {
-    try {
-        const updateSql = 'UPDATE RefreshTokenTable SET RefreshToken = ? WHERE UserId = ?';
-        const [result] = await pool.query(updateSql, [refreshToken, userId]);
-        // אם אף שורה לא עודכנה, מכניסים רשומה חדשה
-        if (result.affectedRows === 0) {
-            const insertSql = 'INSERT INTO RefreshTokenTable (UserId, RefreshToken) VALUES (?, ?)';
-            const [insertResult] = await pool.query(insertSql, [userId, refreshToken]);
-            console.log('Refresh token inserted:', insertResult);
-        } else {
-            console.log('Refresh token updated:', result);
-        }
-    } catch (err) {
-        throw err;
-    }
-}
+// async function refreshToken(userId, refreshToken) {
+//     try {
+//         const updateSql = 'UPDATE RefreshTokenTable SET RefreshToken = ? WHERE UserId = ?';
+//         const [result] = await pool.query(updateSql, [refreshToken, userId]);
+//         // אם אף שורה לא עודכנה, מכניסים רשומה חדשה
+//         if (result.affectedRows === 0) {
+//             const insertSql = 'INSERT INTO RefreshTokenTable (UserId, RefreshToken) VALUES (?, ?)';
+//             const [insertResult] = await pool.query(insertSql, [userId, refreshToken]);
+//             console.log('Refresh token inserted:', insertResult);
+//         } else {
+//             console.log('Refresh token updated:', result);
+//         }
+//     } catch (err) {
+//         throw err;
+//     }
+// }
 
 async function createUser(username, email, phone, street, city, password) {
     try {
@@ -164,4 +164,4 @@ async function updateUser(id, username, email, phone, street, city, password) {
     }
 }
 
-module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,refreshToken,signup };
+module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,signup };

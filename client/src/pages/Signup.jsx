@@ -64,11 +64,11 @@ function Signup() {
           response.json()
         } )
       .then((data) => {
-        // localStorage.setItem("currentUser", JSON.stringify(foundUser));
-        // // setUser(user);
+        // localStorage.setItem("currentUser", JSON.stringify());
+        // setUser(user);
         setError("Registration successful");
         //זמני
-        navigate("/home/travelRequests");
+        navigate("/fullRegisteration");
       }
       )
       .catch((error) => {

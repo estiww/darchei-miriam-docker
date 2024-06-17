@@ -15,7 +15,8 @@ const login = async (req, res) => {
         .json({ message: "Username and password are required." });
     const foundUser = await model.getUserByEmail(email);
     console.log(foundUser);
-    if (!foundUser) return res.sendStatus(401); //Unauthorized
+    if (!foundUser) return res.status(401)
+      .json({ message: "Incorrect password or username" }); //Unauthorized
     // evaluate password
     console.log(await bcrypt.hash(password, 10));
     const match = await bcrypt.compare(password, foundUser.PasswordValue);
@@ -23,45 +24,7 @@ const login = async (req, res) => {
 
     if (match) {
       // create JWTs
-      const accessToken = jwt.sign(
-        {
-          email: foundUser.Mail,
-          roleId: foundUser.RoleId,
-          isAprroved: foundUser.IsAprroved,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "30s" }
-      );
-      const refreshToken = jwt.sign(
-        {
-          email: foundUser.Mail,
-          roleId: foundUser.RoleId,
-          isAprroved: foundUser.IsAprroved,
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "1d" }
-      );
-      console.log(refreshToken);
-      // Saving refreshToken with current user
-      await model.refreshToken(foundUser.UserId, refreshToken);
-
-      //שמירת אקססטוקן בתור קוקי
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-        maxAge: 30 * 1000,
-      });
-
-      //פה נוצר הקוקי בדפדפן
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-      //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
-      res.json({ email: foundUser.Mail, role: foundUser.RoleName });
+      return createJWTs(req, res, foundUser)
     } else {
       return res
         .status(401)
@@ -90,13 +53,62 @@ async function signup(req, res) {
     console.log(4);
     // Insert user into database
     const result = await model.signup(email, hashedPassword);
+
     if (result) {
-      await authenticate(req, res);
+      const newUser = {
+        Mail: email,
+        RoleId: null,
+        isAprroved: false,
+      }
+      return createJWTs(req, res,newUser)
     }
     return res.status(500).json({ error: "Failed to create user" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+}
+
+const createJWTs = async (req, res, user) => {
+  const accessToken = jwt.sign(
+    {
+      email: user.Mail,
+      roleId: user.RoleId,
+      isAprroved: user.IsAprroved,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "30s" }
+  );
+  const refreshToken = jwt.sign(
+    {
+      email: user.Mail,
+      roleId: user.RoleId,
+      isAprroved: user.IsAprroved,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "1d" }
+  );
+  console.log(refreshToken);
+  // Saving refreshToken with current user
+  // await model.refreshToken(user.UserId, refreshToken);
+
+  //שמירת אקססטוקן בתור קוקי
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 30 * 1000,
+  });
+
+  //פה נוצר הקוקי בדפדפן
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
+  res.json({ email: user.Mail, role: user.RoleId });
+
 }
 
 async function create(username, email, phone, street, city, password) {
