@@ -7,6 +7,6 @@ const verifyJWT=require('../middleware/verifyJWT')
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-router.get("/", verifyJWT, travelRequestsController.getOpentravelRequests);
+router.get("/", travelRequestsController.getOpentravelRequests);
 
 module.exports = router

@@ -15,9 +15,10 @@ const verifyJWT = (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.sendStatus(403); //invalid token
-            req.role = decoded.role;
+            req.roleId = decoded.roleId;
+            req.isAprroved = decoded.isAprroved;
             console.log(444)
-            console.log(req.role)
+            console.log(req.roleId)
             return next();
         }
     );

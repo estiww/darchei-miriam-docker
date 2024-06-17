@@ -26,7 +26,7 @@ CREATE TABLE AddressTable (
 -- טבלת תפקידים
 CREATE TABLE RoleTable (
     RoleId INT AUTO_INCREMENT PRIMARY KEY,
-    RoleName ENUM('Patient', 'Volunteer', 'Admin',) NOT NULL
+    RoleName ENUM('Patient', 'Volunteer', 'Admin') NOT NULL
 );
 
 -- טבלת משתמשים
@@ -38,6 +38,7 @@ CREATE TABLE UserTable (
     AddressId INT NULL,
     Phone VARCHAR(15) NULL,
     Mail VARCHAR(100) NOT NULL,
+    IsApproved BOOLEAN NOT NULL DEFAULT FALSE,
     RoleId INT NULL,
     FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
     FOREIGN KEY (AddressId) REFERENCES AddressTable(AddressId),
@@ -123,13 +124,6 @@ INSERT INTO PasswordTable (PasswordValue) VALUES
 ('$2a$10$oaB4yNjugjdbGsoJEMBO2uSRy2HjLZ726I7RMa2RDUm0.5XD0/AKm'),
 ('$2a$10$Q/bc/UJUwXUBXpMuTgNWc.dS1R8AHdGJvVTm9CU.GmroTRsVPI1ka'),
 ('$2a$10$nZUXNH7haJZFjAlMc7OPguZ446b519jBxwYe.MMwBKJmqXzkqF7Y2');
--- INSERT INTO PasswordTable (PasswordValue) VALUES 
--- ('password123'),
--- ('securepass456'),
--- ('mysecret789'),
--- ('uniquePwd001'),
--- ('uniquePwd002'),
--- ('uniquePwd003');
 
 -- הכנסת נתונים לדוגמה בטבלת כתובות
 INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALUES 
@@ -147,25 +141,25 @@ INSERT INTO RoleTable (RoleName) VALUES
 ('Admin');
 
 -- הכנסת נתונים לדוגמה בטבלת משתמשים
-INSERT INTO UserTable (UserId, PasswordId, FirstName, LastName, AddressId, Phone, Mail, RoleId) VALUES 
-(123456789, 1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com', 1),
-(234567890, 2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com', 1),
-(345678901, 3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com', 1),
-(987654321, 4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com', 2),
-(876543210, 5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com', 2),
-(765432109, 6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com', 2);
+INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail, RoleId, IsApproved) VALUES 
+(1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com', 1, FALSE),
+(2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com', 1, FALSE),
+(3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com', 1, FALSE),
+(4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com', 2, FALSE),
+(5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com', 2, FALSE),
+(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com', 2, FALSE);
 
 -- הכנסת נתונים לדוגמה בטבלת חולים
 INSERT INTO PatientTable (UserId) VALUES 
-(123456789),
-(234567890),
-(345678901);
+(1),
+(2),
+(3);
 
 -- הכנסת נתונים לדוגמה בטבלת מתנדבים
 INSERT INTO VolunteerTable (UserId, Location, CommunicationMethod, Gender, BirthDate) VALUES 
-(987654321, 'Jerusalem', 'Phone', 'Female', '1990-05-15'),
-(876543210, 'Tel Aviv', 'Email', 'Female', '1985-08-22'),
-(765432109, 'Haifa', 'WhatsApp', 'Male', '1987-10-18');
+(4, 'Jerusalem', 'Phone', 'Female', '1990-05-15'),
+(5, 'Tel Aviv', 'Email', 'Female', '1985-08-22'),
+(6, 'Haifa', 'WhatsApp', 'Male', '1987-10-18');
 
 -- הכנסת נתונים לדוגמה בטבלת מרכזים רפואיים
 INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES 

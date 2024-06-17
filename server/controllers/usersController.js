@@ -1,9 +1,77 @@
 const model = require("../models/usersModels");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    // { error: "Missing required fields" }
+    // { 'message': 'Username and password are required.' }
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ message: "Username and password are required." });
+    const foundUser = await model.getUserByEmail(email);
+    console.log(foundUser);
+    if (!foundUser) return res.sendStatus(401); //Unauthorized
+    // evaluate password
+    console.log(await bcrypt.hash(password, 10));
+    const match = await bcrypt.compare(password, foundUser.PasswordValue);
+    console.log(match);
+
+    if (match) {
+      // create JWTs
+      const accessToken = jwt.sign(
+        {
+          email: foundUser.Mail,
+          roleId: foundUser.RoleId,
+          isAprroved: foundUser.IsAprroved,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "30s" }
+      );
+      const refreshToken = jwt.sign(
+        {
+          email: foundUser.Mail,
+          roleId: foundUser.RoleId,
+          isAprroved: foundUser.IsAprroved,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "1d" }
+      );
+      console.log(refreshToken);
+      // Saving refreshToken with current user
+      await model.refreshToken(foundUser.UserId, refreshToken);
+
+      //שמירת אקססטוקן בתור קוקי
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 30 * 1000,
+      });
+
+      //פה נוצר הקוקי בדפדפן
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
+      res.json({ email: foundUser.Mail, role: foundUser.RoleName });
+    } else {
+      return res
+        .status(401)
+        .json({ message: "Incorrect password or username" });
+      // res.sendStatus(401);
+    }
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
 async function signup(req, res) {
   try {
     const { email, password } = req.body;
@@ -12,30 +80,24 @@ async function signup(req, res) {
     }
 
     // Check if user already exists
-    const existingUser = await model.isUserExists(email);
+    const existingUser = await model.getUserByEmail(email);
     if (existingUser) {
-      return res
-      .status(401)
-      .json({ message: "User already exists" });
+      return res.status(401).json({ message: "User already exists" });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-console.log(4)
+    console.log(4);
     // Insert user into database
     const result = await model.signup(email, hashedPassword);
     if (result) {
-      return res.status(201).json({ message: "User created successfully", user: result });
+      await authenticate(req, res);
     }
     return res.status(500).json({ error: "Failed to create user" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
-
-
-  
-
 
 async function create(username, email, phone, street, city, password) {
   try {
@@ -77,79 +139,6 @@ async function getById(id) {
   }
 }
 
-// async function authenticate(email, password) {
-//     try {
-//         const encryptedPassword = await bcrypt.hash(password, 10);
-//         return model.authenticate(email, password);
-
-//     } catch (err) {
-//         throw err;
-//     }
-// }
-
-const authenticate = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    // { error: "Missing required fields" }
-    // { 'message': 'Username and password are required.' }
-    if (!email || !password)
-      return res
-        .status(400)
-        .json({ message: "Username and password are required." });
-    const foundUser = await model.isUserExists(email);
-    console.log(foundUser);
-    if (!foundUser) return res.sendStatus(401); //Unauthorized
-    // evaluate password
-    console.log(await bcrypt.hash(password, 10));
-    const match = await bcrypt.compare(password, foundUser.PasswordValue);
-    console.log(match);
-
-    if (match) {
-      // create JWTs
-      const accessToken = jwt.sign(
-        { id: foundUser.UserId, role: foundUser.RoleName },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "30s" }
-      );
-      const refreshToken = jwt.sign(
-        { id: foundUser.UserId, role: foundUser.RoleName },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "1d" }
-      );
-      console.log(refreshToken);
-      // Saving refreshToken with current user
-      await model.refreshToken(foundUser.UserId, refreshToken);
-
-       //שמירת אקססטוקן בתור קוקי
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-        maxAge: 30 * 1000,
-      });
-
-      //פה נוצר הקוקי בדפדפן
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-     //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי 
-      res.json({ email: foundUser.Mail ,
-          role:foundUser.RoleName
-      });
-    } else {
-      return res
-        .status(401)
-        .json({ message: "Incorrect password or username" });
-      // res.sendStatus(401);
-    }
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-};
-
 async function getByUsername(username) {
   try {
     return model.getByUsername(username);
@@ -165,5 +154,6 @@ module.exports = {
   deleteUser,
   update,
   getByUsername,
-  authenticate,signup,
+  login,
+  signup,
 };

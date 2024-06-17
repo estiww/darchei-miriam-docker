@@ -54,21 +54,21 @@ async function signup(email, hashedPassword) {
     }
   }
 
-async function getUserByEmail(email) {
+  async function getUserByEmail(email) {
     try {
         const sql = `
         SELECT 
             UserTable.UserId,
             UserTable.Mail,
+            UserTable.IsApproved,
             PasswordTable.PasswordValue,
-            RoleTable.RoleName
+            UserTable.RoleId
         FROM UserTable
         INNER JOIN PasswordTable ON UserTable.PasswordId = PasswordTable.PasswordId
-        INNER JOIN RoleTable ON UserTable.RoleId = RoleTable.RoleId
         WHERE UserTable.Mail = ?;
-    `;
+        `;
         const [result] = await pool.query(sql, [email]);
-        console.log(result) ;
+        console.log(result);
         return result[0]; // Assuming the email is unique, return the first (and only) user
     } catch (err) {
         throw err;
