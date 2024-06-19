@@ -26,7 +26,7 @@ const PatientForm = () => {
   };
 
   return (
-    <Container sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
+    <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
         <Typography variant="h6">Assistance Request</Typography>
         <TextField

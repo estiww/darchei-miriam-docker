@@ -12,23 +12,32 @@ const FullRegistration = () => {
         return <VolunteerForm />;
       case "patient":
         return <PatientForm />;
+      default:
+        return null;
     }
   };
 
   return (
-    <Container>
+    <Container sx={{ marginTop: 4 }}>
       <Typography variant="h4" gutterBottom>
         Choose Request Type
       </Typography>
-      <Box>
-        <Button onClick={() => setSelectedForm("volunteer")} variant="contained" sx={{ m: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", marginBottom: 4 }}>
+        <Button
+          onClick={() => setSelectedForm("volunteer")}
+          variant="contained"
+          sx={{ marginRight: 2 }}
+        >
           Volunteer Request
         </Button>
-        <Button onClick={() => setSelectedForm("patient")} variant="contained" sx={{ m: 1 }}>
+        <Button
+          onClick={() => setSelectedForm("patient")}
+          variant="contained"
+        >
           Assistance Request
         </Button>
       </Box>
-      <Box sx={{ mt: 3 }}>
+      <Box>
         {renderForm()}
       </Box>
     </Container>

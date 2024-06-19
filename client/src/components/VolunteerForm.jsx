@@ -41,7 +41,7 @@ const VolunteerForm = () => {
   };
 
   return (
-    <Container sx={{ maxHeight: '100vh', overflowY: 'auto' }}>
+    <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
         <Typography variant="h6">Volunteer Registration</Typography>
         <TextField
