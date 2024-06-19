@@ -1,19 +1,34 @@
 import React, { useState } from "react";
-import { Button, TextField, Box, Container, Typography } from "@mui/material";
+import { Button,
+  TextField,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  Box,
+  Container,
+  Typography, } from "@mui/material";
 
-const PatientForm = () => {
+const PatientForm = ({ email, password }) => {
   const [formData, setFormData] = useState({
+    role: "Patient",
+    id: "",
     firstName: "",
     lastName: "",
+    gender: "",
+    birthDate: "",
     phone: "",
-    email: "",
-    password: "",
+    email: email,
+    password: password,
     city: "",
     neighborhood: "",
     street: "",
     houseNumber: "",
     zipCode: "",
   });
+
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,13 +37,56 @@ const PatientForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Here you would handle form submission, e.g., sending data to the server
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    const url = `http://localhost:3000/fullRegistration`;
+    const requestOptions = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData, "Patient"),
+      credentials: "include",
+    };
+
+    fetch(url, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.message);
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setError("Update successful");
+        console.log(data);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+
+    // Clear error message if form is valid
+    setError("");
   };
 
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
         <Typography variant="h6">Assistance Request</Typography>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Id"
+          name="id"
+          value={formData.id}
+          onChange={handleChange}
+        />
         <TextField
           margin="normal"
           required
@@ -45,6 +103,35 @@ const PatientForm = () => {
           label="Last Name"
           name="lastName"
           value={formData.lastName}
+          onChange={handleChange}
+        />{" "}
+        <FormControl component="fieldset" margin="normal">
+          <FormLabel component="legend">Gender</FormLabel>
+          <RadioGroup
+            row
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+          >
+            <FormControlLabel value="Male" control={<Radio />} label="Male" />
+            <FormControlLabel
+              value="Female"
+              control={<Radio />}
+              label="Female"
+            />
+          </RadioGroup>
+        </FormControl>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Birth Date"
+          name="birthDate"
+          type="date"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          value={formData.birthDate}
           onChange={handleChange}
         />
         <TextField
@@ -74,7 +161,9 @@ const PatientForm = () => {
           name="password"
           type="password"
           value={formData.password}
-          onChange={handleChange}
+          InputProps={{
+            readOnly: true,
+          }}
         />
         <Typography variant="h6" sx={{ mt: 2 }}>
           Address
@@ -122,9 +211,19 @@ const PatientForm = () => {
           value={formData.zipCode}
           onChange={handleChange}
         />
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
           Submit Assistance Request
         </Button>
+        {error && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
       </Box>
     </Container>
   );

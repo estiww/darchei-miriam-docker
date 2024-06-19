@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
+require('./cronJobs');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/logout", logoutRoute);
 app.use('/login', loginRoute);
 app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);
+app.use('/fullRegistration', signupRoute);
 
 //מה שכתוב מפה ואילך יעבור במידל וור
 // app.use(verifyJWT);

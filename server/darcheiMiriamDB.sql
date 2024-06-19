@@ -38,6 +38,8 @@ CREATE TABLE UserTable (
     AddressId INT NULL,
     Phone VARCHAR(15) NULL,
     Mail VARCHAR(100) NOT NULL,
+    Gender ENUM('Male', 'Female') NULL,
+    BirthDate DATE NULL,
     IsApproved BOOLEAN NOT NULL DEFAULT FALSE,
     RoleId INT NULL,
     FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
@@ -58,8 +60,7 @@ CREATE TABLE VolunteerTable (
     UserId INT NOT NULL,
     Location VARCHAR(100),
     CommunicationMethod VARCHAR(50),
-    Gender ENUM('Male', 'Female') NOT NULL,
-    BirthDate DATE NOT NULL,
+   
     FOREIGN KEY (UserId) REFERENCES UserTable(UserId)
 );
 
@@ -83,8 +84,10 @@ CREATE TABLE TravelRequestTable (
     Destination VARCHAR(100) NOT NULL,
     NumberOfPassengers INT NOT NULL,
     IsAlone BOOLEAN NOT NULL,
-    Frequency VARCHAR(50),
     Status ENUM('התקבלה', 'נלקחה', 'הושלמה', 'תשלום') NOT NULL,
+    Recurring BOOLEAN DEFAULT FALSE,
+    RecurringDays VARCHAR(50),
+    RecurringEndDate DATE,
     FOREIGN KEY (PatientId) REFERENCES PatientTable(PatientId)
 );
 
@@ -117,7 +120,7 @@ CREATE TABLE RefreshTokenTable (
 );
 
 -- הכנסת נתונים לדוגמה בטבלת סיסמאות
-INSERT INTO PasswordTable (PasswordValue) VALUES 
+INSERT INTO PasswordTable (PasswordValue) VALUES
 ('$2a$10$a.NYmglhT9kjxB3OexMbr.nLO1ZKwFZCDimaTB32JCK8LTn1boVWW'),
 ('$2a$10$3PvNVK7qPLQ7SL2wkydD5unQ4t6SbPTcKQg.5YxE89M2c8J1H91eu'),
 ('$2a$10$Z1JyeOu8z3.yfho4B2o0fO23bxmdQBrx0lxhulJNk/0hIp8JFehk2'),
@@ -126,7 +129,7 @@ INSERT INTO PasswordTable (PasswordValue) VALUES
 ('$2a$10$nZUXNH7haJZFjAlMc7OPguZ446b519jBxwYe.MMwBKJmqXzkqF7Y2');
 
 -- הכנסת נתונים לדוגמה בטבלת כתובות
-INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALUES 
+INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALUES
 ('Jerusalem', 'Rehavia', 'Herzl', '15', '91000'),
 ('Tel Aviv', 'Neve Tzedek', 'Shabazi', '25', '65100'),
 ('Haifa', 'Carmel', 'Hanasi', '5', '34980'),
@@ -135,40 +138,40 @@ INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALU
 ('Rishon LeZion', 'HaHadarom', 'Rothschild', '4', '75200');
 
 -- הכנסת נתונים לדוגמה בטבלת תפקידים
-INSERT INTO RoleTable (RoleName) VALUES 
+INSERT INTO RoleTable (RoleName) VALUES
 ('Patient'),
 ('Volunteer'),
 ('Admin');
 
 -- הכנסת נתונים לדוגמה בטבלת משתמשים
-INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail, RoleId, IsApproved) VALUES 
-(1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com', 1, FALSE),
-(2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com', 1, FALSE),
-(3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com', 1, FALSE),
-(4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com', 2, FALSE),
-(5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com', 2, FALSE),
-(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com', 2, FALSE);
+INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail,Gender,BirthDate, RoleId, IsApproved) VALUES
+(1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com','Male','2024-05-30', 1, FALSE),
+(2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com','Female','2024-05-30', 1, FALSE),
+(3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com','Male','2024-05-30', 1, FALSE),
+(4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com','Female','2024-05-30', 2, FALSE),
+(5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com','Female','2024-05-30', 2, FALSE),
+(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com','Female','2024-05-30', 2, FALSE);
 
 -- הכנסת נתונים לדוגמה בטבלת חולים
-INSERT INTO PatientTable (UserId) VALUES 
+INSERT INTO PatientTable (UserId) VALUES
 (1),
 (2),
 (3);
 
 -- הכנסת נתונים לדוגמה בטבלת מתנדבים
-INSERT INTO VolunteerTable (UserId, Location, CommunicationMethod, Gender, BirthDate) VALUES 
-(4, 'Jerusalem', 'Phone', 'Female', '1990-05-15'),
-(5, 'Tel Aviv', 'Email', 'Female', '1985-08-22'),
-(6, 'Haifa', 'WhatsApp', 'Male', '1987-10-18');
+INSERT INTO VolunteerTable (UserId, Location, CommunicationMethod) VALUES
+(4, 'Jerusalem', 'Phone'),
+(5, 'Tel Aviv', 'Email'),
+(6, 'Haifa', 'WhatsApp');
 
 -- הכנסת נתונים לדוגמה בטבלת מרכזים רפואיים
-INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES 
+INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES
 ('Hadassah Medical Center', 1, '02-1234567', 'Dr. Alice'),
 ('Sourasky Medical Center', 2, '03-2345678', 'Dr. Bob'),
 ('Rambam Health Care Campus', 3, '04-3456789', 'Dr. Charlie');
 
 -- הכנסת נתונים לדוגמה לטבלת בקשות נסיעה
-INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Frequency, Status) VALUES 
-(1, 'Jerusalem', '10:00:00', '2024-06-01', 'Hadassah Medical Center', 1, TRUE, 'Weekly', 'התקבלה'),
-(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'Monthly', 'התקבלה'),
-(3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'One-time', 'הושלמה');
+INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Status, Recurring, RecurringDays, RecurringEndDate) VALUES 
+(1, 'Jerusalem', '10:00:00', CURDATE(), 'Hadassah Medical Center', 1, TRUE, 'התקבלה', TRUE, 'ראשון,שלישי,שבת', '2024-12-31'),
+(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'התקבלה', TRUE, 'שני,שישי', '2024-12-31'),
+(3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'הושלמה', FALSE, NULL, NULL);

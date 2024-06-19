@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const VolunteerForm = () => {
+const VolunteerForm = ({ email, password }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,14 +21,15 @@ const VolunteerForm = () => {
     gender: "",
     birthDate: "",
     phone: "",
-    email: "",
-    password: "",
+    email: email,
+    password: password,
     city: "",
     neighborhood: "",
     street: "",
     houseNumber: "",
     zipCode: "",
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,6 +39,44 @@ const VolunteerForm = () => {
     e.preventDefault();
     console.log("Form submitted:", formData);
     // Here you would handle form submission, e.g., sending data to the server
+    console.log("Form submitted:", formData);
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    const url = `http://localhost:3000/fullRegistration`;
+    const requestOptions = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData,'Volunteer'),
+      credentials: "include", 
+    };
+
+    fetch(url, requestOptions)
+      .then(
+        (response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.message);
+            });
+          }
+          return response.json();
+        }
+      )
+      .then((data) => {
+        setError("Update successful");
+        console.log(data);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+
+    // Clear error message if form is valid
+    setError("");
   };
 
   return (
@@ -132,7 +171,9 @@ const VolunteerForm = () => {
           name="password"
           type="password"
           value={formData.password}
-          onChange={handleChange}
+          InputProps={{
+            readOnly: true,
+          }}          
         />
         <Typography variant="h6" sx={{ mt: 2 }}>
           Address

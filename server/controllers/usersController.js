@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -15,8 +14,10 @@ const login = async (req, res) => {
         .json({ message: "Username and password are required." });
     const foundUser = await model.getUserByEmail(email);
     console.log(foundUser);
-    if (!foundUser) return res.status(401)
-      .json({ message: "Incorrect password or username" }); //Unauthorized
+    if (!foundUser)
+      return res
+        .status(401)
+        .json({ message: "Incorrect password or username" }); //Unauthorized
     // evaluate password
     console.log(await bcrypt.hash(password, 10));
     const match = await bcrypt.compare(password, foundUser.PasswordValue);
@@ -24,7 +25,7 @@ const login = async (req, res) => {
 
     if (match) {
       // create JWTs
-      return createJWTs(req, res, foundUser)
+      return createJWTs(req, res, foundUser);
     } else {
       return res
         .status(401)
@@ -35,6 +36,7 @@ const login = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
 async function signup(req, res) {
   try {
     const { email, password } = req.body;
@@ -59,8 +61,8 @@ async function signup(req, res) {
         Mail: email,
         RoleId: null,
         isAprroved: false,
-      }
-      return createJWTs(req, res,newUser)
+      };
+      return createJWTs(req, res, newUser);
     }
     return res.status(500).json({ error: "Failed to create user" });
   } catch (err) {
@@ -108,24 +110,66 @@ const createJWTs = async (req, res, user) => {
   });
   //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
   res.json({ email: user.Mail, role: user.RoleId });
+};
 
-}
-
-async function create(username, email, phone, street, city, password) {
+async function updateUserDetails(req, res) {
+  console.log("updateUserDetails");
+  console.log(req.body);
+  const {
+    id,
+    firstName,
+    lastName,
+    gender,
+    birthDate,
+    phone,
+    email,
+    city,
+    neighborhood,
+    street,
+    houseNumber,
+    zipCode,
+  } = req.body;
+  //לבדוק את העניין של תז כבר קיים במערכת
   try {
-    return model.createUser(username, email, phone, street, city, password);
-  } catch (err) {
-    throw err;
+    // Update user details in UserTable
+    console.log(email);
+    await model.updateUserByEmail(
+      id,
+      firstName,
+      lastName,
+      gender,
+      birthDate,
+      phone,
+      email,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode
+    );
+
+    // If patient, add to PatientTable
+    // Assuming the role is hardcoded or passed through req.body
+    // if (req.body.role === 'Patient') {
+    //   await model.createPatient(id);
+    // }
+    // if (req.body.role === 'Volunteer') {
+    //   await model.createVolunteer(id);
+    // }
+
+    res.json({ message: "User details updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
 
-async function update(id, username, email, phone, street, city) {
-  try {
-    return model.updateUser(id, username, email, phone, street, city);
-  } catch (err) {
-    throw err;
-  }
-}
+// async function update(id, username, email, phone, street, city) {
+//   try {
+//     return model.updateUser(id, username, email, phone, street, city);
+//   } catch (err) {
+//     throw err;
+//   }
+// }
 
 async function deleteUser(id) {
   try {
@@ -158,14 +202,12 @@ async function getByUsername(username) {
     throw err;
   }
 }
-
 module.exports = {
-  create,
   getAll,
   getById,
   deleteUser,
-  update,
   getByUsername,
   login,
   signup,
+  updateUserDetails,
 };

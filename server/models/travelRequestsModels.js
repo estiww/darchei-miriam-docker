@@ -1,41 +1,54 @@
 const pool = require('../db.js');
 
 async function getOpentravelRequests() {
-    try {
-        console.log(3);
-        const sql = 'SELECT TravelRequestId, Origin, TravelTime, TravelDate, Destination FROM TravelRequestTable WHERE Status = ?';
-        const [rows] = await pool.query(sql, ['התקבלה']);
-        console.log(rows);
-        return rows;
-    } catch (err) {
-        throw(err);
-    }
-
+  try {
+    const sql = 'SELECT TravelRequestId, Origin, TravelTime, TravelDate, Destination FROM TravelRequestTable WHERE Status = ?';
+    const [rows] = await pool.query(sql, ['התקבלה']);
+    return rows;
+  } catch (err) {
+    throw err;
+  }
 }
 
-// // נתיב לקבלת פרטים מלאים על בקשה לפי ID
-// router.get('/request-details/:id', async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const sql = 'SELECT * FROM TravelRequestTable WHERE TravelRequestId = ?';
-//         const [rows] = await pool.query(sql, [id]);
-//         res.json(rows[0]);
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
+async function createTravelRequest(travelRequest) {
+  try {
+    const {
+      patientId,
+      origin,
+      travelTime,
+      travelDate,
+      destination,
+      numberOfPassengers,
+      isAlone,
+      status,
+      recurring,
+      recurringDays,
+      recurringEndDate,
+    } = travelRequest;
 
-// // נתיב ללקיחת בקשה
-// router.post('/take-request/:id', async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const sql = 'UPDATE TravelRequestTable SET Status = ? WHERE TravelRequestId = ?';
-//         await pool.query(sql, ['נלקחה', id]);
-//         res.json({ message: 'Request taken successfully' });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
+    const sql =
+      "INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Status, Recurring, RecurringDays, RecurringEndDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-// module.exports = router;
-module.exports = { getOpentravelRequests };
+    const values = [
+      patientId,
+      origin,
+      travelTime,
+      travelDate,
+      destination,
+      numberOfPassengers,
+      isAlone,
+      status,
+      recurring,
+      recurringDays,
+      recurringEndDate,
+    ];
+
+    const [result] = await pool.query(sql, values);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
+
+module.exports = { getOpentravelRequests, createTravelRequest };

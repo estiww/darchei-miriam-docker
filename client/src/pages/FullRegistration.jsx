@@ -2,23 +2,26 @@ import React, { useState } from "react";
 import { Button, Box, Container, Typography } from "@mui/material";
 import VolunteerForm from "../components/VolunteerForm";
 import PatientForm from "../components/PatientForm";
+import { useLocation } from "react-router-dom";
 
 const FullRegistration = () => {
+  const location = useLocation();
+  const { email, password } = location.state || {};
   const [selectedForm, setSelectedForm] = useState("volunteer");
 
   const renderForm = () => {
     switch (selectedForm) {
       case "volunteer":
-        return <VolunteerForm />;
+        return <VolunteerForm email={email} password={password} />;
       case "patient":
-        return <PatientForm />;
+        return <PatientForm email={email} password={password} />;
       default:
         return null;
     }
   };
 
   return (
-    <Container sx={{ marginTop: 4 }}>
+    <Container sx={{ marginTop: 8 }}>
       <Typography variant="h4" gutterBottom>
         Choose Request Type
       </Typography>
