@@ -6,26 +6,26 @@ const TravelRequests = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState("");
 
-// const sendRefreshToken = async () => {
-//     try {
-//       console.log('sendRefreshToken');
+const sendRefreshToken = async () => {
+    try {
+      console.log('sendRefreshToken');
 
-//       const response = await fetch('http://localhost:3000/refreshTokenRoute', {
-//         method: 'GET',
-//         credentials: 'include',
-//       });
+      const response = await fetch('http://localhost:3000/refreshTokenRoute', {
+        method: 'GET',
+        credentials: 'include',
+      });
 
-//       if (!response.ok) {
-//         throw new Error('Failed to refresh token');
-//       }
+      if (!response.ok) {
+        throw new Error('Failed to refresh token');
+      }
 
-//       const data = await response.json();
-//       console.log(data);
-//       return data;
-//     } catch (error) {
-//       throw new Error(error.message);
-//     }
-//   };  
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };  
  
   const fetchTravelRequests = async () => {
     try {
@@ -35,11 +35,11 @@ const TravelRequests = () => {
       });
 
       if (!response.ok) {
-        // if (response.status === 401) {
-        //   console.log('Refreshing token and retrying...');
-        //   // await sendRefreshToken();
-        //   return fetchTravelRequests(); // Retry fetch after token refresh
-        // }
+        if (response.status === 401) {
+          console.log('Refreshing token and retrying...');
+          await sendRefreshToken();
+          return fetchTravelRequests(); // Retry fetch after token refresh
+        }
 
         const data = await response.json();
         throw new Error(data.error);

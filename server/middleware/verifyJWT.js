@@ -1,50 +1,75 @@
 const jwt = require('jsonwebtoken');
-const controler = require('../controllers/refreshTokenController');
 require('dotenv').config();
 
-const verifyJWT = async (req, res, next) => {
-    console.log("verifyJWT");
-
-    // Extract the access token from cookies
-    let cookieToken = req.cookies.accessToken;
-    console.log(cookieToken);
-
-    if (!cookieToken) {
-        try {
-            console.log('Attempting to refresh token');
-
-            const response = await controler.handleRefreshToken(req, res);
-            console.log(response)
-            console.log(333)
-
-            if (!response.ok) {
-                return res.sendStatus(401);
-                // Failed to refresh token
-            }
-            console.log('666');
-            cookieToken = res.cookies.accessToken;
-        } catch (error) {
-            return res.sendStatus(401); // Failed to refresh token
-        }
-    }
-    console.log('888');
-
-    // Verify the existing or newly refreshed access token
-    jwt.verify(
+const verifyJWT = (req, res, next) => {
+    console.log("verifyJWT")
+    //זה טוב לשיטה עם לוקל סטורז
+    // const authHeader = req.headers['authorization'];
+    //פשוט לוקח את העוגיה
+    const cookieToken = req.cookies.accessToken;
+    console.log(cookieToken); 
+    //אם אין לך טוקן גישה תחזיר 
+    if (!cookieToken) return res.sendStatus(401);
+     jwt.verify(
         cookieToken,
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
-            if (err) return res.sendStatus(403); // Invalid token
+            if (err) return res.sendStatus(403); //invalid token
             req.roleId = decoded.roleId;
-            req.isApproved = decoded.isApproved;
-            console.log(444);
-            console.log(req.roleId);
+            req.isAprroved = decoded.isAprroved;
+            console.log(444)
+            console.log(req.roleId)
             return next();
         }
     );
-};
+}
 
-module.exports = verifyJWT;
+module.exports = verifyJWT
+
+// const verifyJWT = async (req, res, next) => {
+//     console.log("verifyJWT");
+
+//     // Extract the access token from cookies
+//     let cookieToken = req.cookies.accessToken;
+//     console.log(cookieToken);
+//     console.log(next.value);
+
+//     if (!cookieToken) {
+//         try {
+//             console.log('Attempting to refresh token');
+
+//             const response = await controler.handleRefreshToken(req, res);
+//             console.log(response)
+//             console.log(333)
+
+//             // if (!response.ok) {
+//             //     return res.sendStatus(401);
+//             //     // Failed to refresh token
+//             // }
+//             console.log('666');
+//             cookieToken = res.cookies.accessToken;
+//         } catch (error) {
+//             return res.sendStatus(401); // Failed to refresh token
+//         }
+//     }
+//     console.log('888');
+
+//     // Verify the existing or newly refreshed access token
+//     jwt.verify(
+//         cookieToken,
+//         process.env.ACCESS_TOKEN_SECRET,
+//         (err, decoded) => {
+//             if (err) return res.sendStatus(403); // Invalid token
+//             req.roleId = decoded.roleId;
+//             req.isApproved = decoded.isApproved;
+//             console.log(444);
+//             console.log(req.roleId);
+//             return next();
+//         }
+//     );
+// };
+
+// module.exports = verifyJWT;
 
 
 // const jwt = require('jsonwebtoken');

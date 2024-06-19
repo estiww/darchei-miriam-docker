@@ -4,7 +4,7 @@ import VolunteerForm from "../components/VolunteerForm";
 import PatientForm from "../components/PatientForm";
 
 const FullRegistration = () => {
-  const [selectedForm, setSelectedForm] = useState(null);
+  const [selectedForm, setSelectedForm] = useState("volunteer");
 
   const renderForm = () => {
     switch (selectedForm) {
@@ -12,8 +12,6 @@ const FullRegistration = () => {
         return <VolunteerForm />;
       case "patient":
         return <PatientForm />;
-      default:
-        return null;
     }
   };
 
