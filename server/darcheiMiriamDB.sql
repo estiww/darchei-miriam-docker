@@ -40,6 +40,7 @@ CREATE TABLE UserTable (
     Mail VARCHAR(100) NOT NULL,
     Gender ENUM('Male', 'Female') NULL,
     BirthDate DATE NULL,
+    CommunicationMethod VARCHAR(50),
     IsApproved BOOLEAN NOT NULL DEFAULT FALSE,
     RoleId INT NULL,
     FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
@@ -58,9 +59,7 @@ CREATE TABLE PatientTable (
 CREATE TABLE VolunteerTable (
     VolunteerId INT AUTO_INCREMENT PRIMARY KEY,
     UserId INT NOT NULL,
-    Location VARCHAR(100),
-    CommunicationMethod VARCHAR(50),
-   
+    Location VARCHAR(100),   
     FOREIGN KEY (UserId) REFERENCES UserTable(UserId)
 );
 
@@ -144,13 +143,13 @@ INSERT INTO RoleTable (RoleName) VALUES
 ('Admin');
 
 -- הכנסת נתונים לדוגמה בטבלת משתמשים
-INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail,Gender,BirthDate, RoleId, IsApproved) VALUES
-(1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com','Male','2024-05-30', 1, FALSE),
-(2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com','Female','2024-05-30', 1, FALSE),
-(3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com','Male','2024-05-30', 1, FALSE),
-(4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com','Female','2024-05-30', 2, FALSE),
-(5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com','Female','2024-05-30', 2, FALSE),
-(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com','Female','2024-05-30', 2, FALSE);
+INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail,Gender,BirthDate,CommunicationMethod,RoleId, IsApproved) VALUES
+(1, 'David', 'Cohen', 1, '050-1234567', 'david@example.com','Male','2024-05-30', 'Phone', 1, FALSE),
+(2, 'Sarah', 'Levi', 2, '050-2345678', 'sarah@example.com','Female','2024-05-30', 'Email', 1, FALSE),
+(3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com','Male','2024-05-30', 'Email', 1, FALSE),
+(4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com','Female','2024-05-30', 'Phone', 2, FALSE),
+(5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com','Female','2024-05-30', 'WhatsApp', 2, FALSE),
+(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com','Female','2024-05-30', 'WhatsApp', 2, FALSE);
 
 -- הכנסת נתונים לדוגמה בטבלת חולים
 INSERT INTO PatientTable (UserId) VALUES
@@ -159,10 +158,10 @@ INSERT INTO PatientTable (UserId) VALUES
 (3);
 
 -- הכנסת נתונים לדוגמה בטבלת מתנדבים
-INSERT INTO VolunteerTable (UserId, Location, CommunicationMethod) VALUES
-(4, 'Jerusalem', 'Phone'),
-(5, 'Tel Aviv', 'Email'),
-(6, 'Haifa', 'WhatsApp');
+INSERT INTO VolunteerTable (UserId, Location) VALUES
+(4, 'Jerusalem'),
+(5, 'Tel Aviv'),
+(6, 'Haifa');
 
 -- הכנסת נתונים לדוגמה בטבלת מרכזים רפואיים
 INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES

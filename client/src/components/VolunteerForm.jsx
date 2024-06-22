@@ -14,6 +14,8 @@ import {
 
 const VolunteerForm = ({ email, password }) => {
   const [formData, setFormData] = useState({
+    roleId: 2,
+    id:"",
     firstName: "",
     lastName: "",
     location: "",
@@ -38,8 +40,6 @@ const VolunteerForm = ({ email, password }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Here you would handle form submission, e.g., sending data to the server
-    console.log("Form submitted:", formData);
 
     if (!email || !password) {
       setError("Please fill in all fields.");
@@ -52,26 +52,25 @@ const VolunteerForm = ({ email, password }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData,'Volunteer'),
-      credentials: "include", 
+      body: JSON.stringify(formData),
+      credentials: "include",
     };
 
     fetch(url, requestOptions)
-      .then(
-        (response) => {
-          if (!response.ok) {
-            return response.json().then((data) => {
-              throw new Error(data.message);
-            });
-          }
-          return response.json();
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.message);
+          });
         }
-      )
+        return response.json();
+      })
       .then((data) => {
         setError("Update successful");
         console.log(data);
       })
       .catch((error) => {
+        console.log(error.message);
         setError(error.message);
       });
 
@@ -84,6 +83,14 @@ const VolunteerForm = ({ email, password }) => {
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
         <Typography variant="h6">Volunteer Registration</Typography>
         <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Id"
+          name="id"
+          value={formData.id}
+          onChange={handleChange}
+        /><TextField
           margin="normal"
           required
           fullWidth
@@ -110,15 +117,7 @@ const VolunteerForm = ({ email, password }) => {
           value={formData.location}
           onChange={handleChange}
         />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Communication Method"
-          name="communicationMethod"
-          value={formData.communicationMethod}
-          onChange={handleChange}
-        />
+
         <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">Gender</FormLabel>
           <RadioGroup
@@ -128,7 +127,11 @@ const VolunteerForm = ({ email, password }) => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel value="Female" control={<Radio />} label="Female" />
+            <FormControlLabel
+              value="Female"
+              control={<Radio />}
+              label="Female"
+            />
           </RadioGroup>
         </FormControl>
         <TextField
@@ -173,8 +176,28 @@ const VolunteerForm = ({ email, password }) => {
           value={formData.password}
           InputProps={{
             readOnly: true,
-          }}          
+          }}
         />
+        <FormControl component="fieldset" margin="normal">
+          <FormLabel component="legend">
+            Preferred Communication Method
+          </FormLabel>
+          <RadioGroup
+            row
+            name="communicationMethod"
+            value={formData.communicationMethod}
+            onChange={handleChange}
+          >
+            <FormControlLabel
+              value="WhatsApp"
+              control={<Radio />}
+              label="WhatsApp"
+            />
+            <FormControlLabel value="Email" control={<Radio />} label="Email" />
+            <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
+          </RadioGroup>
+        </FormControl>
+
         <Typography variant="h6" sx={{ mt: 2 }}>
           Address
         </Typography>
@@ -221,9 +244,19 @@ const VolunteerForm = ({ email, password }) => {
           value={formData.zipCode}
           onChange={handleChange}
         />
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
           Submit Volunteer Request
         </Button>
+        {error && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
       </Box>
     </Container>
   );

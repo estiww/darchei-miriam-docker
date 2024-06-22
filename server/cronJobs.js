@@ -66,9 +66,6 @@ const createFutureRequests = async () => {
       connection.release();
     }
   };
-  
-  // For testing purposes, run the function manually
-  createFutureRequests();
-  
+    
 // Schedule the cron job to run every minute
 cron.schedule('0 0 * * *', createFutureRequests);

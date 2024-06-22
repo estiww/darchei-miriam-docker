@@ -21,39 +21,44 @@ const pool = require("../db.js");
 //     }
 // }
 
-// async function isUserExists(mail) {
-//     try {
-//         const sql = 'SELECT * FROM UserTable WHERE Mail = ?';
-//         const [result] = await pool.query(sql, [mail]);
-//         console.log(result);
-//         return result[0];
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
+async function isUserExists(mail) {
+    try {
+        const sql = 'SELECT EXISTS(SELECT 1 FROM UserTable WHERE Mail = ?) as userExists';
+        const [rows] = await pool.query(sql, [mail]);
+        const userExists = rows[0].userExists === 1; // Convert 1 or 0 to true or false
+        console.log('User exists:', userExists);
+        return userExists;
+    } catch (err) {
+        throw new Error('Error checking user existence:', err);
+    }
+}
+
 
 async function signup(email, hashedPassword) {
-    try {
-      console.log(5);
-  
-      // Insert password into PasswordTable
-      const insertPasswordSql = "INSERT INTO PasswordTable (PasswordValue) VALUES (?)";
-      const [passwordResult] = await pool.query(insertPasswordSql, [hashedPassword]);
-      const passwordId = passwordResult.insertId;
-      console.log(passwordId);
-  
-      // Insert user into UserTable
-      const insertUserSql = `
+  try {
+    console.log(5);
+
+    // Insert password into PasswordTable
+    const insertPasswordSql =
+      "INSERT INTO PasswordTable (PasswordValue) VALUES (?)";
+    const [passwordResult] = await pool.query(insertPasswordSql, [
+      hashedPassword,
+    ]);
+    const passwordId = passwordResult.insertId;
+    console.log(passwordId);
+
+    // Insert user into UserTable
+    const insertUserSql = `
         INSERT INTO UserTable (PasswordId, Mail, FirstName, LastName, AddressId, Phone, Gender, BirthDate, RoleId, IsApproved) 
         VALUES (?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE)`;
-      const [userResult] = await pool.query(insertUserSql, [passwordId, email]);
-      console.log(userResult);
-  
-      return userResult;
-    } catch (err) {
-      throw err;
-    }
+    const [userResult] = await pool.query(insertUserSql, [passwordId, email]);
+    console.log(userResult);
+
+    return userResult;
+  } catch (err) {
+    throw err;
   }
+}
 
 async function getUserByEmail(email) {
   try {
@@ -75,112 +80,133 @@ async function getUserByEmail(email) {
     throw err;
   }
 }
+
 async function updateUserByEmail(
-    id,
-    firstName,
-    lastName,
-    gender,
-    birthDate,
-    phone,
-    email,
-    city,
-    neighborhood,
-    street,
-    houseNumber,
-    zipCode
-  ) {
-    try {
-      console.log("updateUserByEmail");
-      console.log(email);
-  
-      // קריאת פרטי המשתמש לפי האימייל
-      const getUserSql = `
-          SELECT UserId, AddressId
-          FROM UserTable
-          WHERE Mail = ?
-        `;
-      const [userData] = await pool.query(getUserSql, [email]);
-  
-      if (userData.length === 0) {
-        throw new Error("User not found");
-      }
-  
-      const userId = userData[0].UserId;
-      const addressId = userData[0].AddressId;
-  
-      // עדכון פרטי המשתמש
-      const updateUserSql = `
-          UPDATE UserTable
-          SET FirstName = ?, LastName = ?, Gender = ?, BirthDate = ?, Phone = ?, Mail = ?
-          WHERE UserId = ?
-        `;
-      await pool.query(updateUserSql, [
+  roleId,
+  id,
+  firstName,
+  lastName,
+  gender,
+  birthDate,
+  phone,
+  email,
+  city,
+  neighborhood,
+  street,
+  houseNumber,
+  zipCode,
+  communicationMethod
+) {
+  try {
+    console.log( roleId,
+        id,
         firstName,
         lastName,
         gender,
         birthDate,
         phone,
         email,
-        userId,
-      ]);
-  
-      if (addressId) {
-        // עדכון פרטי הכתובת הקיימת
-        const updateAddressSql = `
+        city,
+        neighborhood,
+        street,
+        houseNumber,
+        zipCode,
+        communicationMethod);
+    const getUserSql = `
+          SELECT AddressId
+          FROM UserTable
+          WHERE Mail = ?
+        `;
+    let [addressId] = await pool.query(getUserSql, [email]);
+    console.log(addressId[0].AddressId);
+    addressId=addressId[0].AddressId
+    if (addressId) {
+      // עדכון פרטי הכתובת הקיימת
+      const updateAddressSql = `
             UPDATE AddressTable
             SET City = ?, Neighborhood = ?, Street = ?, HouseNumber = ?, ZipCode = ?
             WHERE AddressId = ?
           `;
-        await pool.query(updateAddressSql, [
-          city,
-          neighborhood,
-          street,
-          houseNumber,
-          zipCode,
-          addressId,
-        ]);
-      } else {
-        // יצירת שורה חדשה בטבלת הכתובות
-        const insertAddressSql = `
+          console.log(addressId[0].AddressId)
+          
+      await pool.query(updateAddressSql, [
+        city,
+        neighborhood,
+        street,
+        houseNumber,
+        zipCode,
+        addressId
+      ]);
+    } else {
+      // יצירת שורה חדשה בטבלת הכתובות
+      const insertAddressSql = `
             INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode)
             VALUES (?, ?, ?, ?, ?)
           `;
-        const [result] = await pool.query(insertAddressSql, [
-          city,
-          neighborhood,
-          street,
-          houseNumber,
-          zipCode,
-        ]);
-        const newAddressId = result.insertId;
-  
-        // עדכון הכתובת של המשתמש עם הכתובת החדשה
-        const updateUserAddressSql = `
-            UPDATE UserTable
-            SET AddressId = ?
-            WHERE UserId = ?
-          `;
-        await pool.query(updateUserAddressSql, [newAddressId, userId]);
-      }
-  
-      return true; // אם העדכון הצליח
-    } catch (error) {
-      throw error;
-    }
-  }
+      const [result] = await pool.query(insertAddressSql, [
+        city,
+        neighborhood,
+        street,
+        houseNumber,
+        zipCode,
+      ]);
+      console.log(result) 
 
-// async function create(id, firstName, lastName, phone, street, city) {
-//   try {
-//     const sql = `
-//         INSERT INTO PatientTable (UserId)
-//         VALUES (?)
-//       `;
-//     const [result] = await pool.query(sql, [id]);
-//     return result;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
+      addressId = result.insertId;
+    }
+    console.log("addressId") 
+     console.log(addressId) 
+    
+    // עדכון פרטי המשתמש
+    const updateUserSql = `
+          UPDATE UserTable
+          SET UserId = ?, FirstName = ?, LastName = ?, Gender = ?, BirthDate = ?, Phone = ?, CommunicationMethod = ?, RoleId = ?, AddressId = ?
+          WHERE Mail = ?
+        `;
+   const[result]= await pool.query(updateUserSql, [
+      id,
+      firstName,
+      lastName,
+      gender,
+      birthDate,
+      phone,
+      communicationMethod,
+      roleId,
+      addressId,
+      email
+    ]);
+    console.log(result)
+    return true; // אם העדכון הצליח
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+async function createPatient(id) {
+  try {
+    const sql = `
+          INSERT INTO PatientTable (UserId)
+          VALUES (?)
+        `;
+    const [result] = await pool.query(sql, [id]);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+async function createVolunteer(id,location) {
+  try {
+    const sql = `
+          INSERT INTO VolunteerTable (UserId,Location)
+          VALUES (? ,?)
+        `;
+    const [result] = await pool.query(sql, [id,location]);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // async function refreshToken(userId, refreshToken) {
 //     try {
@@ -273,5 +299,4 @@ async function updateUserByEmail(
 // }
 
 // module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,signup };
-module.exports = { updateUserByEmail, getUserByEmail, signup };
-
+module.exports = { updateUserByEmail, getUserByEmail, signup ,createPatient,createVolunteer,isUserExists};

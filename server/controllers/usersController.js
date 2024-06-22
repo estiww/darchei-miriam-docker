@@ -115,10 +115,13 @@ const createJWTs = async (req, res, user) => {
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
   console.log(req.body);
+  
   const {
+    roleId,
     id,
     firstName,
-    lastName,
+    lastName, 
+    communicationMethod,
     gender,
     birthDate,
     phone,
@@ -128,12 +131,15 @@ async function updateUserDetails(req, res) {
     street,
     houseNumber,
     zipCode,
+    location=null,
   } = req.body;
   //לבדוק את העניין של תז כבר קיים במערכת
   try {
+   if( await model.isUserExists(email)){
     // Update user details in UserTable
     console.log(email);
     await model.updateUserByEmail(
+      roleId,
       id,
       firstName,
       lastName,
@@ -145,21 +151,27 @@ async function updateUserDetails(req, res) {
       neighborhood,
       street,
       houseNumber,
-      zipCode
+      zipCode,
+      communicationMethod
     );
 
     // If patient, add to PatientTable
     // Assuming the role is hardcoded or passed through req.body
-    // if (req.body.role === 'Patient') {
-    //   await model.createPatient(id);
-    // }
-    // if (req.body.role === 'Volunteer') {
-    //   await model.createVolunteer(id);
-    // }
+    if (roleId ===1) {
+      await model.createPatient(id);
+    }
+    if (roleId ===2) {
+      await model.createVolunteer(id,location);
+    }
 
     res.json({ message: "User details updated successfully" });
+  }
+  else {
+    //אם לא עבר בסיין אפ
+    res.status(400).json({ error: "User not exists" });
+  }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({'message': error.message });
   }
 }
 

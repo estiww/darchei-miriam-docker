@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button,
+import {
+  Button,
   TextField,
   FormControl,
   FormLabel,
@@ -8,14 +9,16 @@ import { Button,
   FormControlLabel,
   Box,
   Container,
-  Typography, } from "@mui/material";
+  Typography,
+} from "@mui/material";
 
 const PatientForm = ({ email, password }) => {
   const [formData, setFormData] = useState({
-    role: "Patient",
+    roleId: 1,
     id: "",
     firstName: "",
     lastName: "",
+    communicationMethod: "",
     gender: "",
     birthDate: "",
     phone: "",
@@ -49,7 +52,7 @@ const PatientForm = ({ email, password }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData, "Patient"),
+      body: JSON.stringify(formData),
       credentials: "include",
     };
 
@@ -104,7 +107,7 @@ const PatientForm = ({ email, password }) => {
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-        />{" "}
+        />
         <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">Gender</FormLabel>
           <RadioGroup
@@ -114,11 +117,7 @@ const PatientForm = ({ email, password }) => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel
-              value="Female"
-              control={<Radio />}
-              label="Female"
-            />
+            <FormControlLabel value="Female" control={<Radio />} label="Female" />
           </RadioGroup>
         </FormControl>
         <TextField
@@ -165,6 +164,20 @@ const PatientForm = ({ email, password }) => {
             readOnly: true,
           }}
         />
+        <FormControl component="fieldset" margin="normal">
+          <FormLabel component="legend">Preferred Communication Method</FormLabel>
+          <RadioGroup
+            row
+            name="communicationMethod"
+            value={formData.communicationMethod}
+            onChange={handleChange}
+          >
+            <FormControlLabel value="WhatsApp" control={<Radio />} label="WhatsApp" />
+            <FormControlLabel value="Email" control={<Radio />} label="Email" />
+            <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
+          </RadioGroup>
+        </FormControl>
+
         <Typography variant="h6" sx={{ mt: 2 }}>
           Address
         </Typography>
