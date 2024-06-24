@@ -1,5 +1,6 @@
 const model = require("../models/usersModels");
 const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
@@ -35,6 +36,7 @@ const login = async (req, res) => {
 
 async function signup(req, res) {
   try {
+    console.log(1)
     const {
       roleId,
       id,
@@ -90,6 +92,7 @@ async function signup(req, res) {
         RoleId: null,
         isAprroved: false,
       };
+
       if (roleId === 1) {
         await model.createPatient(id);
       }
@@ -100,6 +103,8 @@ async function signup(req, res) {
     }
     return res.status(500).json({ error: "Failed to create user" });
   } catch (err) {
+    console.log(2)
+
     res.status(500).json({ error: err.message });
   }
 }
@@ -148,7 +153,6 @@ const createJWTs = async (req, res, user) => {
 //עבור עדכון פרופיל
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
-  console.log(req.body);
   const {
     roleId,
     id,
@@ -199,47 +203,9 @@ async function updateUserDetails(req, res) {
       res.json({ message: "User details updated successfully" });
     
   } catch (error) {
+    console.log(3)
+
     res.status(500).json({ message: error.message });
-  }
-  //לבדוק את העניין של תז כבר קיים במערכת
-  try {
-   if( await model.isUserExists(email)){
-    // Update user details in UserTable
-    console.log(email);
-    await model.updateUserByEmail(
-      roleId,
-      id,
-      firstName,
-      lastName,
-      gender,
-      birthDate,
-      phone,
-      email,
-      city,
-      neighborhood,
-      street,
-      houseNumber,
-      zipCode,
-      communicationMethod
-    );
-
-    // If patient, add to PatientTable
-    // Assuming the role is hardcoded or passed through req.body
-    if (roleId ===1) {
-      await model.createPatient(id);
-    }
-    if (roleId ===2) {
-      await model.createVolunteer(id,location);
-    }
-
-    res.json({ message: "User details updated successfully" });
-  }
-  else {
-    //אם לא עבר בסיין אפ
-    res.status(400).json({ error: "User not exists" });
-  }
-  } catch (error) {
-    res.status(500).json({'message': error.message });
   }
 }
 

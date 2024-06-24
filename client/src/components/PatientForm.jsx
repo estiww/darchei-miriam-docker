@@ -41,11 +41,11 @@ const PatientForm = () => {
     e.preventDefault();
     console.log("Form submitted:", formData);
 
-    if (!email || !password) {
+    if (!formData.email || !formData.password) {
       setError("Please fill in all fields.");
       return;
     }
-    if (!ValidateEmail(email)) {
+    if (!ValidateEmail(formData.email)) {
             setError("You have entered an invalid email address!");
             return;
           }

@@ -23,13 +23,13 @@ const handleRefreshToken = async (req, res) => {
     const accessToken = jwt.sign(
       { id: foundUser.UserId, role: foundUser.RoleName },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "30s" }
+      { expiresIn: "300s" }
     );
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "None",
       secure: true,
-      maxAge: 30 * 1000,
+      maxAge: 300 * 1000,
     });
     res.json(foundUser);
   });

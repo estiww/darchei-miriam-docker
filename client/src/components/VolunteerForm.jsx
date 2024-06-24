@@ -185,6 +185,7 @@ const VolunteerForm = () => {
           type="password"
           value={formData.password}
           onChange={handleChange}
+
         />
         <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">

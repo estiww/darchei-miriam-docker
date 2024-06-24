@@ -37,44 +37,44 @@ async function isUserExists(mail) {
 
 //לשנות שיתאים לרישום של כלל הפרטים
 async function signup(
-    roleId,
-    id,
-    firstName,
-    lastName,
-    gender,
-    birthDate,
-    phone,
-    email,
-    hashedPassword,
-    city,
-    neighborhood,
-    street,
-    houseNumber,
-    zipCode,
-    communicationMethod
-  ) {
-    try {
-      // Insert password into PasswordTable
-      const insertPasswordSql = "INSERT INTO PasswordTable (PasswordValue) VALUES (?)";
-      const [passwordResult] = await pool.query(insertPasswordSql, [hashedPassword]);
-      const passwordId = passwordResult.insertId;
-      
-      // Insert address into AddressTable
-      const insertAddressSql = `
+  roleId,
+  id,
+  firstName,
+  lastName,
+  gender,
+  birthDate,
+  phone,
+  email,
+  hashedPassword,
+  city,
+  neighborhood,
+  street,
+  houseNumber,
+  zipCode,
+  communicationMethod
+) {
+  try {
+    // Insert password into PasswordTable
+    const insertPasswordSql = "INSERT INTO PasswordTable (PasswordValue) VALUES (?)";
+    const [passwordResult] = await pool.query(insertPasswordSql, [hashedPassword]);
+    const passwordId = passwordResult.insertId;
+
+    // Insert address into AddressTable
+    const insertAddressSql = `
         INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode)
         VALUES (?, ?, ?, ?, ?)
       `;
-      const [addressResult] = await pool.query(insertAddressSql, [
-        city,
-        neighborhood,
-        street,
-        houseNumber,
-        zipCode
-      ]);
-      const addressId = addressResult.insertId;
-  
-      // Insert user into UserTable
-      const insertUserSql = `
+    const [addressResult] = await pool.query(insertAddressSql, [
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode
+    ]);
+    const addressId = addressResult.insertId;
+
+    // Insert user into UserTable
+    const insertUserSql = `
         INSERT INTO UserTable (
           PasswordId, 
           Mail, 
@@ -90,24 +90,24 @@ async function signup(
         ) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE, ?)
       `;
-      const [userResult] = await pool.query(insertUserSql, [
-        passwordId,
-        email,
-        firstName,
-        lastName,
-        addressId,
-        phone,
-        gender,
-        birthDate,
-        roleId,
-        communicationMethod
-      ]);
-      
-      return userResult;
-    } catch (err) {
-      throw err;
-    }
+    const [userResult] = await pool.query(insertUserSql, [
+      passwordId,
+      email,
+      firstName,
+      lastName,
+      addressId,
+      phone,
+      gender,
+      birthDate,
+      roleId,
+      communicationMethod
+    ]);
+
+    return userResult;
+  } catch (err) {
+    throw err;
   }
+}
 
 //מחזיר חלק מפרטי המשתמש לפי אימייל
 //אם אין מחזיר רזלט ריק
@@ -229,18 +229,24 @@ async function createPatient(id) {
     const [result] = await pool.query(sql, [id]);
     return result;
   } catch (error) {
+    console.error('Error creating patient:', error);
     throw error;
   }
 }
+
 async function createVolunteer(id, location) {
   try {
+    console.log('Creating volunteer');
+
     const sql = `
-          INSERT INTO VolunteerTable (UserId,Location)
-          VALUES (? ,?)
-        `;
+    INSERT INTO VolunteerTable (UserId, Location)
+    VALUES (?, ?)
+  `;
     const [result] = await pool.query(sql, [id, location]);
+    console.log('Result:', result);
     return result;
   } catch (error) {
+    console.error('Error creating volunteer:', error);
     throw error;
   }
 }
@@ -267,31 +273,31 @@ async function getUserByToken(token) {
 
 async function updateUserPassword(userId, hashedPassword) {
   try {
-      // קריאה למסד הנתונים כדי לקבל את ה־PasswordId של המשתמש
-      const getPasswordIdSql = "SELECT PasswordId FROM UserTable WHERE UserId = ?";
-      const [rows] = await pool.query(getPasswordIdSql, [userId]);
-      
-      if (rows.length === 0) {
-          throw new Error(`User with UserId ${userId} not found.`);
-      }
-      
-      const passwordId = rows[0].PasswordId;
+    // קריאה למסד הנתונים כדי לקבל את ה־PasswordId של המשתמש
+    const getPasswordIdSql = "SELECT PasswordId FROM UserTable WHERE UserId = ?";
+    const [rows] = await pool.query(getPasswordIdSql, [userId]);
 
-      // עדכון הסיסמה בטבלת הסיסמאות
-      const updatePasswordTableSql = "UPDATE PasswordTable SET PasswordValue = ? WHERE PasswordId = ?";
-      await pool.query(updatePasswordTableSql, [hashedPassword, passwordId]);
+    if (rows.length === 0) {
+      throw new Error(`User with UserId ${userId} not found.`);
+    }
 
-      // עדכון השדות resetPasswordToken ו־resetPasswordExpires ל־NULL בטבלת המשתמשים
-      const updateUserTableSql = `
+    const passwordId = rows[0].PasswordId;
+
+    // עדכון הסיסמה בטבלת הסיסמאות
+    const updatePasswordTableSql = "UPDATE PasswordTable SET PasswordValue = ? WHERE PasswordId = ?";
+    await pool.query(updatePasswordTableSql, [hashedPassword, passwordId]);
+
+    // עדכון השדות resetPasswordToken ו־resetPasswordExpires ל־NULL בטבלת המשתמשים
+    const updateUserTableSql = `
           UPDATE UserTable 
           SET resetPasswordToken = NULL, resetPasswordExpires = NULL 
           WHERE UserId = ?
       `;
-      const [result] = await pool.query(updateUserTableSql, [userId]);
-      
-      return result;
+    const [result] = await pool.query(updateUserTableSql, [userId]);
+
+    return result;
   } catch (err) {
-      throw err;
+    throw err;
   }
 }
 async function getUserResetTokenEmail(email) {
@@ -395,5 +401,15 @@ async function getUserResetTokenEmail(email) {
 // }
 
 // module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,signup };
-module.exports = { updateUserByEmail, getUserByEmail, signup, updateUserToken,createVolunteer,createPatient, getUserByToken,updateUserPassword,getUserResetTokenEmail };
-
+module.exports = {
+  updateUserByEmail,
+  getUserByEmail,
+  signup,
+  createPatient,
+  createVolunteer,
+  isUserExists,
+  updateUserToken,
+  getUserByToken,
+  updateUserPassword,
+  getUserResetTokenEmail
+};
