@@ -395,5 +395,5 @@ async function getUserResetTokenEmail(email) {
 // }
 
 // module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,signup };
-module.exports = { updateUserByEmail, getUserByEmail, signup, updateUserToken,createVolunteer,createPatient, getUserByToken,updateUserPassword,getUserResetTokenEmail };
+module.exports = { updateUserByEmail, getUserByEmail, signup, updateUserToken,createVolunteer,createPatient getUserByToken,updateUserPassword,getUserResetTokenEmail };
 
