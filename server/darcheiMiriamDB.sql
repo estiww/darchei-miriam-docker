@@ -173,6 +173,6 @@ INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES
 
 -- הכנסת נתונים לדוגמה לטבלת בקשות נסיעה
 INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Status, Recurring, RecurringDays, RecurringEndDate) VALUES 
-(1, 'Jerusalem', '10:00:00', CURDATE(), 'Hadassah Medical Center', 1, TRUE, 'התקבלה', TRUE, 'ראשון,שלישי,שבת', '2024-12-31'),
-(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'התקבלה', TRUE, 'שני,שישי', '2024-12-31'),
+(1, 'Jerusalem', '10:00:00','2024-06-24' , 'הדסה עין כרם ', 1, TRUE, 'התקבלה', TRUE, 'ראשון,שלישי,שבת', '2024-12-31'),
+(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'הדסה הר הצופים ', 1, FALSE, 'התקבלה', TRUE, 'שני,שישי', '2024-12-31'),
 (3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'הושלמה', FALSE, NULL, NULL);

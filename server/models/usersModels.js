@@ -310,6 +310,21 @@ async function getUserResetTokenEmail(email) {
     throw err;
   }
 }
+async function getVolunteerIdByUserId(userId) {
+  try {
+    const sql = `
+        SELECT VolunteerId
+        FROM VolunteerTable
+        WHERE UserId = ?;
+    `;
+    const [result] = await pool.query(sql, [userId]);
+    console.log(result);
+    return result[0] ? result[0].VolunteerId : null; // Return the VolunteerId if found, otherwise null
+  } catch (err) {
+    throw err;
+  }
+}
+
 // async function refreshToken(userId, refreshToken) {
 //     try {
 //         const updateSql = 'UPDATE RefreshTokenTable SET RefreshToken = ? WHERE UserId = ?';
@@ -411,5 +426,6 @@ module.exports = {
   updateUserToken,
   getUserByToken,
   updateUserPassword,
-  getUserResetTokenEmail
+  getUserResetTokenEmail,
+  getVolunteerIdByUserId
 };

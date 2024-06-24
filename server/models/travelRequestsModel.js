@@ -50,5 +50,20 @@ async function createTravelRequest(travelRequest) {
     throw err;
   }
 }
+async function updateTravelRequestStatus(travelRequestId) {
+  try {
+    const sql = `
+        UPDATE TravelRequestTable
+        SET Status = 'נלקחה'
+        WHERE TravelRequestId = ?;
+    `;
+    const [result] = await pool.query(sql, [travelRequestId]);
+    console.log(result);
+    return result; 
+  } catch (err) {
+    throw err;
+  }
+}
 
-module.exports = { getOpentravelRequests, createTravelRequest };
+
+module.exports = { getOpentravelRequests, createTravelRequest,updateTravelRequestStatus };

@@ -88,9 +88,11 @@ async function signup(req, res) {
 
     if (result) {
       const newUser = {
+        UserId: id,
         Mail: email,
-        RoleId: null,
-        isAprroved: false,
+        RoleId: roleId,
+        IsAprroved: false,
+
       };
 
       if (roleId === 1) {
@@ -112,15 +114,17 @@ async function signup(req, res) {
 const createJWTs = async (req, res, user) => {
   const accessToken = jwt.sign(
     {
+      userId: user.UserId,
       email: user.Mail,
       roleId: user.RoleId,
       isAprroved: user.IsAprroved,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "30s" }
+    { expiresIn: "5m" }
   );
   const refreshToken = jwt.sign(
     {
+      userId: user.UserId,
       email: user.Mail,
       roleId: user.RoleId,
       isAprroved: user.IsAprroved,
@@ -128,6 +132,7 @@ const createJWTs = async (req, res, user) => {
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "1d" }
   );
+  console.log(user.UserId);
   console.log(refreshToken);
   // Saving refreshToken with current user
   // await model.refreshToken(user.UserId, refreshToken);
@@ -137,7 +142,7 @@ const createJWTs = async (req, res, user) => {
     httpOnly: true,
     sameSite: "None",
     secure: true,
-    maxAge: 30 * 1000,
+    maxAge: 5 * 60 * 1000,
   });
 
   //פה נוצר הקוקי בדפדפן
@@ -172,36 +177,36 @@ async function updateUserDetails(req, res) {
   } = req.body;
   //לבדוק את העניין של תז כבר קיים במערכת
   try {
-      // Update user details in UserTable
-      console.log(email);
-      await model.updateUserByEmail(
-        roleId,
-        id,
-        firstName,
-        lastName,
-        gender,
-        birthDate,
-        phone,
-        email,
-        city,
-        neighborhood,
-        street,
-        houseNumber,
-        zipCode,
-        communicationMethod
-      );
+    // Update user details in UserTable
+    console.log(email);
+    await model.updateUserByEmail(
+      roleId,
+      id,
+      firstName,
+      lastName,
+      gender,
+      birthDate,
+      phone,
+      email,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode,
+      communicationMethod
+    );
 
-      // If patient, add to PatientTable
-      // Assuming the role is hardcoded or passed through req.body
-      if (roleId === 1) {
-        await model.createPatient(id);
-      }
-      if (roleId === 2) {
-        await model.createVolunteer(id, location);
-      }
+    // If patient, add to PatientTable
+    // Assuming the role is hardcoded or passed through req.body
+    if (roleId === 1) {
+      await model.createPatient(id);
+    }
+    if (roleId === 2) {
+      await model.createVolunteer(id, location);
+    }
 
-      res.json({ message: "User details updated successfully" });
-    
+    res.json({ message: "User details updated successfully" });
+
   } catch (error) {
     console.log(3)
 

@@ -1,4 +1,4 @@
-const model = require("../models/travelRequestsModels");
+const model = require("../models/travelRequestsModel");
 
 const getOpentravelRequests = async (req, res) => {
   try {
@@ -51,4 +51,25 @@ const createTravelRequest = async (req, res) => {
   }
 };
 
-module.exports = { getOpentravelRequests, createTravelRequest };
+const requestTaken = async (req, res) => {
+  try {
+    
+    const volunteerId = req.userId;
+    const travelRequestId = req.params.id;
+
+    // עדכון סטטוס הבקשה לנלקחה
+    const response = await model.updateTravelRequestStatus(travelRequestId);
+    if (!response) {
+      return res.status(404).json({ error: "Travel request not found" });
+    }
+    
+    res.json({ message: "status updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+};
+
+
+
+module.exports = { getOpentravelRequests, createTravelRequest,requestTaken };

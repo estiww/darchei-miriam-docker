@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Button, Box, Typography, Container } from "@mui/material";
+import { Button, Box, Typography, Container, Grid, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import EventIcon from "@mui/icons-material/Event";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PlaceIcon from "@mui/icons-material/Place";
+import FlagIcon from "@mui/icons-material/Flag";
 
 const TravelRequests = () => {
   const [requests, setRequests] = useState([]);
-  const [selectedRequest, setSelectedRequest] = useState(null);
   const [error, setError] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [requestToTake, setRequestToTake] = useState(null);
 
-const sendRefreshToken = async () => {
+  const sendRefreshToken = async () => {
     try {
-      console.log('sendRefreshToken');
-
       const response = await fetch('http://localhost:3000/refreshTokenRoute', {
         method: 'GET',
         credentials: 'include',
@@ -20,13 +23,12 @@ const sendRefreshToken = async () => {
       }
 
       const data = await response.json();
-      console.log(data);
       return data;
     } catch (error) {
       throw new Error(error.message);
     }
-  };  
- 
+  };
+
   const fetchTravelRequests = async () => {
     try {
       const response = await fetch("http://localhost:3000/travelRequests", {
@@ -36,7 +38,6 @@ const sendRefreshToken = async () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.log('Refreshing token and retrying...');
           await sendRefreshToken();
           return fetchTravelRequests(); // Retry fetch after token refresh
         }
@@ -60,28 +61,72 @@ const sendRefreshToken = async () => {
     fetchTravelRequests();
   }, []);
 
-  // const handleViewDetails = (id) => {
-  //   fetch(`http://localhost:3000/travelRequests/${id}`)
-  //     .then(response => response.json())
-  //     .then(data => setSelectedRequest(data))
-  //     .catch(error => setError(error.ToSring));
-  // };
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
 
-  // const handleTakeRequest = (id) => {
-  //   fetch(`http://localhost:3000/take-request/${id}`, {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //   })
-  //     .then(response => {
-  //       if (response.ok) {
-  //         setRequests(requests.filter(request => request.TravelRequestId !== id));
-  //         setSelectedRequest(null);
-  //       } else {
-  //         throw new Error('Failed to take request');
-  //       }
-  //     })
-  //     .catch(error => setError(error.message));
-  // };
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return "Tomorrow";
+    } else {
+      return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+    }
+  };
+
+  const formatTime = (timeStr) => {
+    const [hours, minutes] = timeStr.split(":");
+    return `${hours}:${minutes}`;
+  };
+
+  const handleTakeRequest = async (requestId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/travelRequests/${requestId}`, {
+        method: "PUT",
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to take request");
+      }
+
+      await createTravelMatches(requestId);
+
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setOpenDialog(false);
+    }
+  };
+
+  const createTravelMatches = async (requestId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/travelMatches/${requestId}`, {
+        method: "POST",
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create travel matches');
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleOpenDialog = (id) => {
+    setRequestToTake(id);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setRequestToTake(null);
+    setOpenDialog(false);
+  };
 
   return (
     <Container>
@@ -89,40 +134,59 @@ const sendRefreshToken = async () => {
         Open Travel Requests
       </Typography>
       {error && <Typography color="error">{error}</Typography>}
-      <Box>
+      <Grid container spacing={2} justifyContent="center">
         {requests.map((request) => (
-          <Box key={request.TravelRequestId} mb={2}>
-            <Button
-              variant="outlined"
-              onClick={() => handleViewDetails(request.TravelRequestId)}
+          <Grid item xs={12} sm={6} md={3} key={request.TravelRequestId}>
+            <Box
+              border={1}
+              borderRadius={4}
+              p={2}
+              height="180px" // height increased
+              width="180px" // width increased
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="left"
             >
-              {`Date: ${request.TravelDate}, Time: ${request.TravelTime}, Origin: ${request.Origin}, Destination: ${request.Destination}`}
-            </Button>
-          </Box>
+              <Typography variant="body1">
+                <EventIcon /> {formatDate(request.TravelDate)} <br />
+                <AccessTimeIcon /> {formatTime(request.TravelTime)} <br />
+                <PlaceIcon /> {request.Origin} <br />
+                <FlagIcon /> {request.Destination}
+              </Typography>
+              <Box mt={2} width="100%">
+                <Button
+                  variant="outlined"
+                  onClick={() => handleOpenDialog(request.TravelRequestId)}
+                  fullWidth
+                >
+                  לקיחת בקשה
+                </Button>
+              </Box>
+            </Box>
+          </Grid>
         ))}
-      </Box>
-      {selectedRequest && (
-        <Box mt={4}>
-          <Typography variant="h6">Request Details</Typography>
-          <Typography>{`ID: ${selectedRequest.TravelRequestId}`}</Typography>
-          <Typography>{`Patient ID: ${selectedRequest.PatientId}`}</Typography>
-          <Typography>{`Origin: ${selectedRequest.Origin}`}</Typography>
-          <Typography>{`Time: ${selectedRequest.TravelTime}`}</Typography>
-          <Typography>{`Date: ${selectedRequest.TravelDate}`}</Typography>
-          <Typography>{`Destination: ${selectedRequest.Destination}`}</Typography>
-          <Typography>{`Number of Passengers: ${selectedRequest.NumberOfPassengers}`}</Typography>
-          <Typography>{`Is Alone: ${selectedRequest.IsAlone}`}</Typography>
-          <Typography>{`Frequency: ${selectedRequest.Frequency}`}</Typography>
-          <Typography>{`Status: ${selectedRequest.Status}`}</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleTakeRequest(selectedRequest.TravelRequestId)}
-          >
-            Take Request
+      </Grid>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+      >
+        <DialogTitle>אישור לקיחת בקשה</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            האם אתה בטוח שברצונך לקחת את הבקשה?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            ביטול
           </Button>
-        </Box>
-      )}
+          <Button onClick={() => handleTakeRequest(requestToTake)} color="primary">
+            אישור
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
