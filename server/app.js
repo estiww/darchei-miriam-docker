@@ -11,6 +11,8 @@ const loginRoute = require('./routes/loginRoute');
 const signupRoute = require('./routes/signupRoute');
 const refreshTokenRoute = require('./routes/refreshTokenRoute');
 const travelRequestsRoute = require('./routes/travelRequestsRoute');
+const forgotPasswordRoute=require('./routes/forgotPasswordRoute')
+const resetPasswordRoute =require('./routes/resetPasswordRoute')
 const logger=require('./middleware/logger')
 const verifyJWT=require('./middleware/verifyJWT')
 const logoutRoute = require("./routes/logoutRoute");
@@ -24,7 +26,10 @@ app.use("/logout", logoutRoute);
 app.use('/login', loginRoute);
 app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);
-app.use('/fullRegistration', signupRoute);
+app.use('/forgotPassword', forgotPasswordRoute);
+app.use('/resetPassword', resetPasswordRoute);
+
+
 
 //מה שכתוב מפה ואילך יעבור במידל וור
 // app.use(verifyJWT);

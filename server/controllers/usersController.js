@@ -6,8 +6,6 @@ const jwt = require("jsonwebtoken");
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // { error: "Missing required fields" }
-    // { 'message': 'Username and password are required.' }
     if (!email || !password)
       return res
         .status(400)
@@ -21,8 +19,6 @@ const login = async (req, res) => {
     // evaluate password
     console.log(await bcrypt.hash(password, 10));
     const match = await bcrypt.compare(password, foundUser.PasswordValue);
-    console.log(match);
-
     if (match) {
       // create JWTs
       return createJWTs(req, res, foundUser);
@@ -39,7 +35,25 @@ const login = async (req, res) => {
 
 async function signup(req, res) {
   try {
-    const { email, password } = req.body;
+    const {
+      roleId,
+      id,
+      firstName,
+      lastName,
+      communicationMethod,
+      gender,
+      birthDate,
+      phone,
+      email,
+      password,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode,
+      location = null,
+    } = req.body;
+    //להחליט איזה שדות הם שדות חובה
     if (!email || !password) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -49,12 +63,26 @@ async function signup(req, res) {
     if (existingUser) {
       return res.status(401).json({ message: "User already exists" });
     }
-
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(4);
     // Insert user into database
-    const result = await model.signup(email, hashedPassword);
+    const result = await model.signup(
+      roleId,
+      id,
+      firstName,
+      lastName,
+      gender,
+      birthDate,
+      phone,
+      email,
+      hashedPassword,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode,
+      communicationMethod
+    );
 
     if (result) {
       const newUser = {
@@ -62,6 +90,12 @@ async function signup(req, res) {
         RoleId: null,
         isAprroved: false,
       };
+      if (roleId === 1) {
+        await model.createPatient(id);
+      }
+      if (roleId === 2) {
+        await model.createVolunteer(id, location);
+      }
       return createJWTs(req, res, newUser);
     }
     return res.status(500).json({ error: "Failed to create user" });
@@ -111,14 +145,15 @@ const createJWTs = async (req, res, user) => {
   //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
   res.json({ email: user.Mail, role: user.RoleId });
 };
-
+//עבור עדכון פרופיל
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
-  console.log(req.body);
   const {
+    roleId,
     id,
     firstName,
     lastName,
+    communicationMethod,
     gender,
     birthDate,
     phone,
@@ -128,38 +163,42 @@ async function updateUserDetails(req, res) {
     street,
     houseNumber,
     zipCode,
+    location = null,
   } = req.body;
   //לבדוק את העניין של תז כבר קיים במערכת
   try {
-    // Update user details in UserTable
-    console.log(email);
-    await model.updateUserByEmail(
-      id,
-      firstName,
-      lastName,
-      gender,
-      birthDate,
-      phone,
-      email,
-      city,
-      neighborhood,
-      street,
-      houseNumber,
-      zipCode
-    );
+      // Update user details in UserTable
+      console.log(email);
+      await model.updateUserByEmail(
+        roleId,
+        id,
+        firstName,
+        lastName,
+        gender,
+        birthDate,
+        phone,
+        email,
+        city,
+        neighborhood,
+        street,
+        houseNumber,
+        zipCode,
+        communicationMethod
+      );
 
-    // If patient, add to PatientTable
-    // Assuming the role is hardcoded or passed through req.body
-    // if (req.body.role === 'Patient') {
-    //   await model.createPatient(id);
-    // }
-    // if (req.body.role === 'Volunteer') {
-    //   await model.createVolunteer(id);
-    // }
+      // If patient, add to PatientTable
+      // Assuming the role is hardcoded or passed through req.body
+      if (roleId === 1) {
+        await model.createPatient(id);
+      }
+      if (roleId === 2) {
+        await model.createVolunteer(id, location);
+      }
 
-    res.json({ message: "User details updated successfully" });
+      res.json({ message: "User details updated successfully" });
+    
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 

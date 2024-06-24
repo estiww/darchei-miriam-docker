@@ -42,6 +42,8 @@ CREATE TABLE UserTable (
     BirthDate DATE NULL,
     IsApproved BOOLEAN NOT NULL DEFAULT FALSE,
     RoleId INT NULL,
+    resetPasswordToken VARCHAR(255),
+    resetPasswordExpires DATETIME,
     FOREIGN KEY (PasswordId) REFERENCES PasswordTable(PasswordId),
     FOREIGN KEY (AddressId) REFERENCES AddressTable(AddressId),
     FOREIGN KEY (RoleId) REFERENCES RoleTable(RoleId)

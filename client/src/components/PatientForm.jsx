@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button,
+import {
+  Button,
   TextField,
   FormControl,
   FormLabel,
@@ -8,19 +9,21 @@ import { Button,
   FormControlLabel,
   Box,
   Container,
-  Typography, } from "@mui/material";
+  Typography,
+} from "@mui/material";
 
-const PatientForm = ({ email, password }) => {
+const PatientForm = () => {
   const [formData, setFormData] = useState({
-    role: "Patient",
+    roleId: 1,
     id: "",
     firstName: "",
     lastName: "",
+    communicationMethod: "",
     gender: "",
     birthDate: "",
     phone: "",
-    email: email,
-    password: password,
+    email:"",
+    password:"",
     city: "",
     neighborhood: "",
     street: "",
@@ -42,14 +45,17 @@ const PatientForm = ({ email, password }) => {
       setError("Please fill in all fields.");
       return;
     }
-
-    const url = `http://localhost:3000/fullRegistration`;
+    if (!ValidateEmail(email)) {
+            setError("You have entered an invalid email address!");
+            return;
+          }
+    const url = `http://localhost:3000/signup`;
     const requestOptions = {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData, "Patient"),
+      body: JSON.stringify(formData),
       credentials: "include",
     };
 
@@ -73,7 +79,14 @@ const PatientForm = ({ email, password }) => {
     // Clear error message if form is valid
     setError("");
   };
-
+  function ValidateEmail(mailAddress) {
+        let mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (mailAddress.match(mailformat)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -104,7 +117,7 @@ const PatientForm = ({ email, password }) => {
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-        />{" "}
+        />
         <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">Gender</FormLabel>
           <RadioGroup
@@ -114,11 +127,7 @@ const PatientForm = ({ email, password }) => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel
-              value="Female"
-              control={<Radio />}
-              label="Female"
-            />
+            <FormControlLabel value="Female" control={<Radio />} label="Female" />
           </RadioGroup>
         </FormControl>
         <TextField
@@ -161,10 +170,23 @@ const PatientForm = ({ email, password }) => {
           name="password"
           type="password"
           value={formData.password}
-          InputProps={{
-            readOnly: true,
-          }}
+          onChange={handleChange}
+
         />
+        <FormControl component="fieldset" margin="normal">
+          <FormLabel component="legend">Preferred Communication Method</FormLabel>
+          <RadioGroup
+            row
+            name="communicationMethod"
+            value={formData.communicationMethod}
+            onChange={handleChange}
+          >
+            <FormControlLabel value="WhatsApp" control={<Radio />} label="WhatsApp" />
+            <FormControlLabel value="Email" control={<Radio />} label="Email" />
+            <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
+          </RadioGroup>
+        </FormControl>
+
         <Typography variant="h6" sx={{ mt: 2 }}>
           Address
         </Typography>
