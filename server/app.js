@@ -17,6 +17,8 @@ const travelMatchesRoute = require('./routes/travelMatchesRoute');
 
 const logger = require('./middleware/logger');
 const verifyJWT = require('./middleware/verifyJWT');
+const verifyPermissions = require('./middleware/verifyPermissions'); 
+
 
 app.use(cookieParser());
 app.use(express.json());

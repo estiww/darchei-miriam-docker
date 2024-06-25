@@ -9,12 +9,13 @@ const verifyJWT = (req, res, next) => {
     const cookieToken = req.cookies.accessToken;
     console.log(cookieToken); 
     //אם אין לך טוקן גישה תחזיר 
-    if (!cookieToken) return res.sendStatus(401);
+    if (!cookieToken) return res.status(401).json({ message: "Access token not found" });
+    ;
      jwt.verify(
         cookieToken,
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
-            if (err) return res.sendStatus(403); //invalid token
+            if (err) return res.status(403).json({ message: "Invalid token" });
             req.userId=decoded.userId;
             req.email=decoded.email;
             req.roleId = decoded.roleId;

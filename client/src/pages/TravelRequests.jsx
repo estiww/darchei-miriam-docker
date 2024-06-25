@@ -39,11 +39,10 @@ const TravelRequests = () => {
       if (!response.ok) {
         if (response.status === 401) {
           await sendRefreshToken();
-          return fetchTravelRequests(); // Retry fetch after token refresh
+          return fetchTravelRequests(); 
         }
-
         const data = await response.json();
-        throw new Error(data.error);
+        throw new Error(data.message);
       }
 
       if (response.status === 204) {
