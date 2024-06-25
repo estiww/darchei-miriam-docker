@@ -6,7 +6,7 @@ const verifyPermissions = require('../middleware/verifyPermissions');
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-// router.get("/", travelMatchesController.gettravelMatches);
+router.get("/", travelMatchesController.gettravelMatches);
 router.post("/:requestId",verifyPermissions([2]),travelMatchesController.createTravelMatch);
 
 module.exports = router

@@ -36,10 +36,9 @@ const login = async (req, res) => {
 
 async function signup(req, res) {
   try {
-    console.log(1)
+    console.log(1222)
     const {
       roleId,
-      id,
       firstName,
       lastName,
       communicationMethod,
@@ -70,7 +69,6 @@ async function signup(req, res) {
     // Insert user into database
     const result = await model.signup(
       roleId,
-      id,
       firstName,
       lastName,
       gender,
@@ -85,21 +83,23 @@ async function signup(req, res) {
       zipCode,
       communicationMethod
     );
+    console.log("result.insertId",result.insertId)
 
     if (result) {
       const newUser = {
-        UserId: id,
+        UserId: result.insertId,
         Mail: email,
         RoleId: roleId,
         IsAprroved: false,
 
       };
+      console.log("roleId",roleId)
 
       if (roleId === 1) {
-        await model.createPatient(id);
+        await model.createPatient(result.insertId);
       }
       if (roleId === 2) {
-        await model.createVolunteer(id, location);
+        await model.createVolunteer(result.insertId, location);
       }
       return createJWTs(req, res, newUser);
     }

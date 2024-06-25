@@ -15,5 +15,34 @@ async function createTravelMatch(volunteerId, requestId) {
         throw err;
     }
 }
+async function getAll(req, res) {
+    try {
+      const sql = `
+        SELECT tm.TravelMatchId, 
+               tm.VolunteerId, 
+               DATE_FORMAT(tm.MatchTime, '%H:%i') AS MatchTime, 
+               DATE_FORMAT(tm.MatchDate, '%Y-%m-%d') AS MatchDate, 
+               tm.NumberOfPassengers,
+               tr.Origin AS TravelOrigin, 
+               DATE_FORMAT(tr.TravelTime, '%H:%i') AS TravelTime,
+               tr.Destination AS TravelDestination,
+               u.FirstName AS VolunteerFirstName, 
+               u.LastName AS VolunteerLastName,
+               p.FirstName AS PatientFirstName, 
+               p.LastName AS PatientLastName
+        FROM TravelMatchTable tm
+        INNER JOIN TravelRequestTable tr ON tm.TravelRequestId = tr.TravelRequestId
+        INNER JOIN VolunteerTable v ON tm.VolunteerId = v.VolunteerId
+        INNER JOIN UserTable u ON v.UserId = u.UserId
+        INNER JOIN PatientTable pt ON tr.PatientId = pt.PatientId
+        INNER JOIN UserTable p ON pt.UserId = p.UserId;
+      `;
+      const [rows] = await pool.query(sql);
+      return rows;
+    } catch (err) {
+      console.error("Error occurred while fetching travel matches:", err);
+      throw err;
+    }
+}
 
-module.exports = { createTravelMatch };
+module.exports = { createTravelMatch,getAll };

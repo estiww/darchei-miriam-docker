@@ -98,6 +98,8 @@ const TravelRequests = () => {
       setError(error.message);
     } finally {
       setOpenDialog(false);
+      setRequests([]);
+      fetchTravelRequests();
     }
   };
 

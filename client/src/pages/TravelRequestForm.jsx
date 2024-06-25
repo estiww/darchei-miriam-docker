@@ -19,9 +19,9 @@ const TravelRequestForm = () => {
   const [formData, setFormData] = useState({
     patientId: "",
     origin: "",
+    destination: "",
     travelTime: "",
     travelDate: "",
-    destination: "",
     numberOfPassengers: 1,
     isAlone: false,
     frequency: "",
@@ -38,11 +38,10 @@ const TravelRequestForm = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    // בדיקה שמספר הנוסעים הוא 1 או 2 בלבד
     if (name === "numberOfPassengers" && (value !== "1" && value !== "2")) {
       setError("Number of passengers must be 1 or 2");
     } else {
-      setError(""); // איפוס השגיאה אם הערך תקין
+      setError(""); 
     }
 
     setFormData({
@@ -65,7 +64,6 @@ const TravelRequestForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // בדיקת תאריך ושעה
     const currentDate = new Date();
     const travelDate = new Date(`${formData.travelDate}T${formData.travelTime}`);
 
@@ -99,16 +97,14 @@ const TravelRequestForm = () => {
       const data = await response.json();
       console.log("Travel request created successfully:", data);
 
-      // הגדרת מצב הצלחה ואיפוס הטופס
       setIsSubmitted(true);
 
-      // אופציונלי: איפוס הטופס לאחר השליחה המוצלחת
       setFormData({
         patientId: "",
         origin: "",
+        destination: "",
         travelTime: "",
         travelDate: "",
-        destination: "",
         numberOfPassengers: 1,
         isAlone: false,
         frequency: "",
@@ -144,90 +140,118 @@ const TravelRequestForm = () => {
             value={formData.patientId}
             onChange={handleChange}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Origin"
-            name="origin"
-            value={formData.origin}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Travel Time"
-            name="travelTime"
-            type="time"
-            InputLabelProps={{ shrink: true }}
-            value={formData.travelTime}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Travel Date"
-            name="travelDate"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={formData.travelDate}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Destination"
-            name="destination"
-            value={formData.destination}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Number of Passengers"
-            name="numberOfPassengers"
-            type="number"
-            value={formData.numberOfPassengers}
-            onChange={handleChange}
-            inputProps={{ min: 1, max: 2 }} // תגבול ל-1 או 2
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="travelType-label">Travel Type</InputLabel>
-            <Select
-              labelId="travelType-label"
-              name="travelType"
-              value={formData.travelType}
-              onChange={handleChange}
-              label="Travel Type"
-            >
-              <MenuItem value="חד פעמי">חד פעמי</MenuItem>
-              <MenuItem value="קבוע">קבוע</MenuItem>
-            </Select>
-          </FormControl>
-          {formData.travelType === "קבוע" && (
-            <>
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="recurringDuration-label">Recurring Duration</InputLabel>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                required
+                label="Origin"
+                name="origin"
+                value={formData.origin}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                required
+                label="Destination"
+                name="destination"
+                value={formData.destination}
+                onChange={handleChange}
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                required
+                label="Travel Date"
+                name="travelDate"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={formData.travelDate}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                required
+                label="Travel Time"
+                name="travelTime"
+                type="time"
+                InputLabelProps={{ shrink: true }}
+                value={formData.travelTime}
+                onChange={handleChange}
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                required
+                label="Number of Passengers"
+                name="numberOfPassengers"
+                type="number"
+                value={formData.numberOfPassengers}
+                onChange={handleChange}
+                inputProps={{ min: 1, max: 2 }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel id="travelType-label">Travel Type</InputLabel>
                 <Select
-                  labelId="recurringDuration-label"
-                  name="recurringDuration"
-                  value={formData.recurringDuration}
+                  labelId="travelType-label"
+                  name="travelType"
+                  value={formData.travelType}
                   onChange={handleChange}
-                  label="Recurring Duration"
+                  label="Travel Type"
                 >
-                  <MenuItem value="כל יום">כל יום</MenuItem>
-                  <MenuItem value="פעם בשבוע">פעם בשבוע</MenuItem>
-                  <MenuItem value="פעם בחודש">פעם בחודש</MenuItem>
-                  <MenuItem value="בחירת ימים בשבוע">בחירת ימים בשבוע</MenuItem>
+                  <MenuItem value="חד פעמי">חד פעמי</MenuItem>
+                  <MenuItem value="קבוע">קבוע</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+          </Grid>
+          {formData.travelType === "קבוע" && (
+            <>
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={6}>
+                  <FormControl fullWidth>
+                    <InputLabel id="recurringDuration-label">Recurring Duration</InputLabel>
+                    <Select
+                      labelId="recurringDuration-label"
+                      name="recurringDuration"
+                      value={formData.recurringDuration}
+                      onChange={handleChange}
+                      label="Recurring Duration"
+                    >
+                      <MenuItem value="כל יום">כל יום</MenuItem>
+                      <MenuItem value="פעם בשבוע">פעם בשבוע</MenuItem>
+                      <MenuItem value="פעם בחודש">פעם בחודש</MenuItem>
+                      <MenuItem value="בחירת ימים בשבוע">בחירת ימים בשבוע</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    label="End Date"
+                    name="endDate"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={formData.endDate}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
               {formData.recurringDuration === "בחירת ימים בשבוע" && (
                 <>
-                  <Typography variant="subtitle1">Select Days of the Week</Typography>
+                  <Typography variant="subtitle2">Select Days</Typography>
                   <FormGroup row>
                     {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
                       <FormControlLabel
@@ -245,17 +269,6 @@ const TravelRequestForm = () => {
                   </FormGroup>
                 </>
               )}
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="End Date"
-                name="endDate"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={formData.endDate}
-                onChange={handleChange}
-              />
             </>
           )}
           <FormControlLabel
@@ -269,7 +282,7 @@ const TravelRequestForm = () => {
             label="Is Alone"
           />
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-            Submit Travel Request
+            Submit Request
           </Button>
           {error && (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>

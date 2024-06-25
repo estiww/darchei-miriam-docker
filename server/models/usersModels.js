@@ -38,7 +38,6 @@ async function isUserExists(mail) {
 //לשנות שיתאים לרישום של כלל הפרטים
 async function signup(
   roleId,
-  id,
   firstName,
   lastName,
   gender,
