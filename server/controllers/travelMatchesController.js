@@ -14,7 +14,7 @@ const createTravelMatch = async (req, res) => {
       await connectionBetweenVolunteerandPatient(result.insertId);
       console.log("resulteeee");
 
-      return res.send(result.insertId);
+      return res.status(200).json({ insertId: result.insertId });
     }
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -50,7 +50,7 @@ const connectionBetweenVolunteerandPatient = async (matchId) => {
             מספר נוסעים: ${RequestDetails.NumberOfPassengers}
         `,
     };
-    sendEmail(mailToVolunteer);
+    await sendEmail(mailToVolunteer);
 
     const mailToPatient = {
       from: "darcheimiriam2024@gmail.com",
@@ -72,7 +72,7 @@ const connectionBetweenVolunteerandPatient = async (matchId) => {
               רפואה שלמה!
           `,
     };
-    sendEmail(mailToPatient);
+   await sendEmail(mailToPatient);
   } catch (err) {
     throw err;
   }

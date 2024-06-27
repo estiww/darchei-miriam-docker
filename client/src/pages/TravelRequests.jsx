@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -23,6 +24,8 @@ const TravelRequests = () => {
   const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [requestToTake, setRequestToTake] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
   const navigate = useNavigate();
 
   const fetchTravelRequests = async () => {
@@ -37,7 +40,7 @@ const TravelRequests = () => {
         if (response.status === 401) {
           const response = await sendRefreshToken();
           if (response.status === 440) {
-            console.log(440)
+            console.log(440);
             throw new Error("440"); // זרוק שגיאה עם הודעה ספציפית ל-440
           }
           return fetchTravelRequests();
@@ -48,6 +51,7 @@ const TravelRequests = () => {
       }
 
       if (response.status === 204) {
+        setRequests([]);
         throw new Error("No Open Travel Request");
       }
 
@@ -89,6 +93,8 @@ const TravelRequests = () => {
   };
 
   const handleTakeRequest = async (requestId) => {
+    setLoading(true);
+    setConfirmationMessage(""); // Clear previous confirmation message
     try {
       const response = await fetch(
         `http://localhost:3000/travelRequests/${requestId}`,
@@ -104,11 +110,11 @@ const TravelRequests = () => {
       }
 
       await createTravelMatches(requestId);
+      setConfirmationMessage("הנסיעה נלקחה תודה רבה!");
     } catch (error) {
       setError(error.message);
     } finally {
-      setOpenDialog(false);
-      setRequests([]);
+      setLoading(false);
       fetchTravelRequests();
     }
   };
@@ -140,7 +146,19 @@ const TravelRequests = () => {
   const handleCloseDialog = () => {
     setRequestToTake(null);
     setOpenDialog(false);
+    setConfirmationMessage("");
+    fetchTravelRequests();
   };
+
+  useEffect(() => {
+    let timer;
+    if (confirmationMessage) {
+      timer = setTimeout(() => {
+        handleCloseDialog();
+      }, 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [confirmationMessage]);
 
   return (
     <Container>
@@ -185,21 +203,31 @@ const TravelRequests = () => {
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>אישור לקיחת בקשה</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            האם אתה בטוח שברצונך לקחת את הבקשה?
-          </DialogContentText>
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <CircularProgress />
+            </Box>
+          ) : confirmationMessage ? (
+            <DialogContentText>{confirmationMessage}</DialogContentText>
+          ) : (
+            <DialogContentText>
+              האם אתה בטוח שברצונך לקחת את הבקשה?
+            </DialogContentText>
+          )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            ביטול
-          </Button>
-          <Button
-            onClick={() => handleTakeRequest(requestToTake)}
-            color="primary"
-          >
-            אישור
-          </Button>
-        </DialogActions>
+        {!loading && !confirmationMessage && (
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              ביטול
+            </Button>
+            <Button
+              onClick={() => handleTakeRequest(requestToTake)}
+              color="primary"
+            >
+              אישור
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
     </Container>
   );
