@@ -38,7 +38,7 @@ async function signup(req, res) {
   try {
     console.log(1222)
     const {
-      roleId,
+      roleName,
       firstName,
       lastName,
       communicationMethod,
@@ -68,7 +68,7 @@ async function signup(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
     // Insert user into database
     const result = await model.signup(
-      roleId,
+      roleName,
       firstName,
       lastName,
       gender,
@@ -89,16 +89,15 @@ async function signup(req, res) {
       const newUser = {
         UserId: result.insertId,
         Mail: email,
-        RoleId: roleId,
-        IsAprroved: false,
-
+        RoleName: roleName,
+        IsAprroved: false
       };
-      console.log("roleId",roleId)
+      console.log("RoleName",roleName)
 
-      if (roleId === 1) {
+      if (roleName === "Patient") {
         await model.createPatient(result.insertId);
       }
-      if (roleId === 2) {
+      if (roleName === "Volunteer") {
         await model.createVolunteer(result.insertId, location);
       }
       return createJWTs(req, res, newUser);
@@ -112,11 +111,12 @@ async function signup(req, res) {
 }
 
 const createJWTs = async (req, res, user) => {
+  console.log("createJWTs")
   const accessToken = jwt.sign(
     {
       userId: user.UserId,
       email: user.Mail,
-      roleId: user.RoleId,
+      roleName: user.RoleName,
       isAprroved: user.IsAprroved,
     },
     process.env.ACCESS_TOKEN_SECRET,
@@ -126,7 +126,7 @@ const createJWTs = async (req, res, user) => {
     {
       userId: user.UserId,
       email: user.Mail,
-      roleId: user.RoleId,
+      roleName: user.RoleName,
       isAprroved: user.IsAprroved,
     },
     process.env.REFRESH_TOKEN_SECRET,
@@ -153,13 +153,15 @@ const createJWTs = async (req, res, user) => {
     maxAge: 24 * 60 * 60 * 1000,
   });
   //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
-  res.json({ email: user.Mail, role: user.RoleId });
+  res.json({ email: user.Mail, role: user.RoleName });
 };
+
+
 //עבור עדכון פרופיל
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
   const {
-    roleId,
+    roleName,
     id,
     firstName,
     lastName,
@@ -180,7 +182,7 @@ async function updateUserDetails(req, res) {
     // Update user details in UserTable
     console.log(email);
     await model.updateUserByEmail(
-      roleId,
+      roleName,
       id,
       firstName,
       lastName,
@@ -198,10 +200,10 @@ async function updateUserDetails(req, res) {
 
     // If patient, add to PatientTable
     // Assuming the role is hardcoded or passed through req.body
-    if (roleId === 1) {
+    if (roleName === "Patient") {
       await model.createPatient(id);
     }
-    if (roleId === 2) {
+    if (roleName === "Volunteer") {
       await model.createVolunteer(id, location);
     }
 

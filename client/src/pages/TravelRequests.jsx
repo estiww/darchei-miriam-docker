@@ -1,46 +1,48 @@
 import React, { useState, useEffect } from "react";
-import { Button, Box, Typography, Container, Grid, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import {
+  Button,
+  Box,
+  Typography,
+  Container,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import FlagIcon from "@mui/icons-material/Flag";
+import sendRefreshToken from "../components/SendRefreshToken";
+import { useNavigate } from "react-router-dom";
 
 const TravelRequests = () => {
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [requestToTake, setRequestToTake] = useState(null);
-
-  const sendRefreshToken = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/refreshTokenRoute', {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to refresh token');
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  };
+  const navigate = useNavigate();
 
   const fetchTravelRequests = async () => {
     try {
       const response = await fetch("http://localhost:3000/travelRequests", {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
 
       if (!response.ok) {
+        console.log(response.status);
         if (response.status === 401) {
-          await sendRefreshToken();
-          return fetchTravelRequests(); 
+          const response = await sendRefreshToken();
+          if (response.status === 440) {
+            console.log(440)
+            throw new Error("440"); // זרוק שגיאה עם הודעה ספציפית ל-440
+          }
+          return fetchTravelRequests();
         }
+
         const data = await response.json();
         throw new Error(data.message);
       }
@@ -53,6 +55,9 @@ const TravelRequests = () => {
       setRequests(data);
     } catch (error) {
       setError(error.message);
+      if (error.message === "440") {
+        navigate("/login"); // זרוק מחדש את השגיאה כדי שהפונקציה הקוראת תטפל בה
+      }
     }
   };
 
@@ -71,7 +76,10 @@ const TravelRequests = () => {
     } else if (date.toDateString() === tomorrow.toDateString()) {
       return "Tomorrow";
     } else {
-      return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+      return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+      });
     }
   };
 
@@ -82,10 +90,13 @@ const TravelRequests = () => {
 
   const handleTakeRequest = async (requestId) => {
     try {
-      const response = await fetch(`http://localhost:3000/travelRequests/${requestId}`, {
-        method: "PUT",
-        credentials: "include"
-      });
+      const response = await fetch(
+        `http://localhost:3000/travelRequests/${requestId}`,
+        {
+          method: "PUT",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();
@@ -93,7 +104,6 @@ const TravelRequests = () => {
       }
 
       await createTravelMatches(requestId);
-
     } catch (error) {
       setError(error.message);
     } finally {
@@ -105,14 +115,17 @@ const TravelRequests = () => {
 
   const createTravelMatches = async (requestId) => {
     try {
-      const response = await fetch(`http://localhost:3000/travelMatches/${requestId}`, {
-        method: "POST",
-        credentials: "include"
-      });
+      const response = await fetch(
+        `http://localhost:3000/travelMatches/${requestId}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to create travel matches');
+        throw new Error(data.error || "Failed to create travel matches");
       }
     } catch (error) {
       setError(error.message);
@@ -169,10 +182,7 @@ const TravelRequests = () => {
           </Grid>
         ))}
       </Grid>
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-      >
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>אישור לקיחת בקשה</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -183,7 +193,10 @@ const TravelRequests = () => {
           <Button onClick={handleCloseDialog} color="primary">
             ביטול
           </Button>
-          <Button onClick={() => handleTakeRequest(requestToTake)} color="primary">
+          <Button
+            onClick={() => handleTakeRequest(requestToTake)}
+            color="primary"
+          >
             אישור
           </Button>
         </DialogActions>

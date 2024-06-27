@@ -22,7 +22,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const VolunteerForm = () => {
   const [formData, setFormData] = useState({
-    roleId: 2,
+    roleName: "Volunteer",
     firstName: "",
     lastName: "",
     birthDate: "",
@@ -81,7 +81,7 @@ const VolunteerForm = () => {
       })
       .catch((error) => {
         console.error("Error:", error.message);
-        setError("Failed to create patient request");
+        setError("Failed to create volunteer request");
       });
 
     setError("");
@@ -100,7 +100,7 @@ const VolunteerForm = () => {
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Typography variant="h6">Patient Registration</Typography>
+        <Typography variant="h6">Volunteer Registration</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -271,7 +271,7 @@ const VolunteerForm = () => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Submit Patient Request
+          Submit Volunteer Request
         </Button>
         {error && (
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>

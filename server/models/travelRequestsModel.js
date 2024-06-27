@@ -10,6 +10,23 @@ async function getOpentravelRequests() {
   }
 }
 
+
+
+async function getPatientIdByUserId(userId) {
+  try {
+    const patientSql = "SELECT PatientId FROM PatientTable WHERE UserId = ?";
+    const [patientResult] = await pool.query(patientSql, [userId]);
+
+    if (patientResult.length === 0) {
+      throw new Error("No patient found for the given UserId");
+    }
+
+    return patientResult[0].PatientId;
+  } catch (err) {
+    throw err;
+  }
+}
+
 async function createTravelRequest(travelRequest) {
   try {
     const {
@@ -26,7 +43,7 @@ async function createTravelRequest(travelRequest) {
       recurringEndDate,
     } = travelRequest;
 
-    const sql =
+    const travelRequestSql =
       "INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Status, Recurring, RecurringDays, RecurringEndDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     const values = [
@@ -43,13 +60,15 @@ async function createTravelRequest(travelRequest) {
       recurringEndDate,
     ];
 
-    const [result] = await pool.query(sql, values);
+    const [result] = await pool.query(travelRequestSql, values);
 
     return result;
   } catch (err) {
     throw err;
   }
 }
+
+
 async function updateTravelRequestStatus(travelRequestId) {
   try {
     const sql = `
@@ -66,4 +85,4 @@ async function updateTravelRequestStatus(travelRequestId) {
 }
 
 
-module.exports = { getOpentravelRequests, createTravelRequest,updateTravelRequestStatus };
+module.exports = { getOpentravelRequests, createTravelRequest,updateTravelRequestStatus ,getPatientIdByUserId};

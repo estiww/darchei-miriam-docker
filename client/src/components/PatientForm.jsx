@@ -22,7 +22,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const PatientForm = () => {
   const [formData, setFormData] = useState({
-    roleId: 1,
+    roleName: "Patient",
     firstName: "",
     lastName: "",
     birthDate: "",

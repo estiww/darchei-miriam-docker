@@ -16,7 +16,6 @@ const getOpentravelRequests = async (req, res) => {
 const createTravelRequest = async (req, res) => {
   try {
     const {
-      patientId,
       origin,
       travelTime,
       travelDate,
@@ -29,6 +28,8 @@ const createTravelRequest = async (req, res) => {
       endDate,
     } = req.body;
 
+    const patientId = await model.getPatientIdByUserId(req.userId);
+    
     const newTravelRequest = {
       patientId,
       origin,
@@ -39,10 +40,9 @@ const createTravelRequest = async (req, res) => {
       isAlone,
       status,
       recurring: travelType === "קבוע",
-      recurringDays: travelType === "קבוע" ? recurringDays.join(',') : null,
+      recurringDays: travelType === "קבוע" ? recurringDays.join(",") : null,
       recurringEndDate: travelType === "קבוע" ? endDate : null,
     };
-
     const result = await model.createTravelRequest(newTravelRequest);
 
     res.status(201).json(result);
@@ -53,7 +53,6 @@ const createTravelRequest = async (req, res) => {
 
 const requestTaken = async (req, res) => {
   try {
-    
     const volunteerId = req.userId;
     const travelRequestId = req.params.id;
 
@@ -62,7 +61,7 @@ const requestTaken = async (req, res) => {
     if (!response) {
       return res.status(404).json({ error: "Travel request not found" });
     }
-    
+
     res.json({ message: "status updated successfully" });
   } catch (error) {
     console.error(error);
@@ -70,6 +69,4 @@ const requestTaken = async (req, res) => {
   }
 };
 
-
-
-module.exports = { getOpentravelRequests, createTravelRequest,requestTaken };
+module.exports = { getOpentravelRequests, createTravelRequest, requestTaken };

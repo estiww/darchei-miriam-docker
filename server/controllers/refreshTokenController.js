@@ -5,33 +5,53 @@ const handleRefreshToken = async (req, res) => {
   console.log("handleRefreshToken");
 
   const cookies = req.cookies;
-  if (!cookies?.refreshToken) return res.sendStatus(401);
+  //אם אין רפרש-בצד שרת תוציא ללוג אין
+  if (!cookies?.refreshToken) return res.sendStatus(440);
+
   const refreshToken = cookies.refreshToken;
   console.log("refreshToken");
   console.log(refreshToken);
 
-  //זמני
-  let foundUser = { UserId: "123456789", RoleName: "Patient" };
+  
   //יש פה בדיקה האם קיים אדם שזה הרפרש טוקן שלו
   //צריך במידה והאתר פתוח יותר זמן משהות הרפרש טוקן ואז כבר לא קיים משתמש מחובר
   // const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
   // if (!foundUser) return res.sendStatus(403); //Forbidden
   // evaluate jwt
+
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
     // if (err || foundUser.username !== decoded.username) return res.sendStatus(403);
     if (err) return res.sendStatus(403);
+
+    req.userId = decoded.userId;
+    req.email = decoded.email;
+    req.roleName = decoded.roleName;
+    req.isAprroved = decoded.isAprroved;
+    console.log("req.userId")
+    console.log(req.userId)
+    console.log("req.email")
+    console.log(req.email)
+    console.log("req.roleName")
+    console.log(req.roleName)
+    console.log("req.isAprroved")
+    console.log(req.isAprroved)
     const accessToken = jwt.sign(
-      { id: foundUser.UserId, role: foundUser.RoleName },
+      {
+        userId: req.userId,
+        email: req.email,
+        roleName: req.roleName,
+        isAprroved: req.isAprroved,
+      },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "300s" }
+      { expiresIn: "5m" }
     );
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "None",
       secure: true,
-      maxAge: 300 * 1000,
+      maxAge: 5 * 60 * 1000,
     });
-    res.json(foundUser);
+    res.json(req.userId);
   });
 };
 

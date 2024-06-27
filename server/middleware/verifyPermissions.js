@@ -1,6 +1,6 @@
 const verifyPermissions = (requiredRoles) => {
     return (req, res, next) => {
-        console.log("verifyPermissions middleware triggered");
+        console.log("verifyPermissions middleware triggered 2");
 
         // Ensure user is authenticated
         if (!req.userId) {
@@ -9,12 +9,12 @@ const verifyPermissions = (requiredRoles) => {
         }
 
         // Check if the user has one of the required roles
-        if (!requiredRoles.includes(req.roleId)) {
-            console.log(`User with role ID ${req.roleId} does not have access`);
+        if (!requiredRoles.includes(req.roleName)) {
+            console.log(`User with role ID ${req.roleName} does not have access`);
             return res.status(403).json({ message: "User does not have the required permissions" });
         }
 
-        console.log(`User with role ID ${req.roleId} has access`);
+        console.log(`User with role ID ${req.roleName} has access`);
         return next();
     };
 }
