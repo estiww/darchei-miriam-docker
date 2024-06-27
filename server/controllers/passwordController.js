@@ -1,25 +1,7 @@
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
 const User = require("../models/usersModels");
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "darcheimiriam2024@gmail.com",
-    pass: "gfql bwjr czea zeap"
-  }
-});
-
-// בדיקת אם התחבורה לשליחת מיילים תקינה
-transporter.verify(function(error, success) {
-  if (error) {
-    console.log("Error verifying transporter: ", error);
-  } else {
-    console.log("Server is ready to take our messages");
-  }
-});
-
+const {sendEmail}=require("../services/sendEmail")
 // פונקציה לשכחת סיסמה - שולחת מייל עם קישור לאיפוס סיסמה
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -39,19 +21,17 @@ const forgotPassword = async (req, res) => {
     await User.updateUserToken(user.UserId, token, resetPasswordExpires);
 
     // הגדרות למייל שיישלח למשתמש כולל קישור לאיפוס סיסמה
-    const mailOptions = {
+    const resetPassword = {
       from: "darcheimiriam2024@gmail.com",
       to: email,
       subject: "Password Reset",
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-        Please click on the following link, or paste this into your browser to complete the process:\n\n
-        http://localhost:5173/resetPassword/${token}\n\n
-        If you did not request this, please ignore this email and your password will remain unchanged.\n`
+            Please click on the following link, or paste this into your browser to complete the process:\n\n
+            http://localhost:5173/resetPassword/${token}\n\n
+            If you did not request this, please ignore this email and your password will remain unchanged.\n`
     };
 
-    // שליחת המייל וטיפול בתשובה
-    await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully");
+    sendEmail(resetPassword);
     res.status(200).json({ success: true, message: "Email sent" });
   } catch (error) {
     console.error("Error sending email: ", error);
@@ -62,9 +42,9 @@ const forgotPassword = async (req, res) => {
 // פונקציה לאיפוס סיסמה - משנה את הסיסמה למשתמש על פי הטוקן המקושר לבקשה
 const resetPassword = async (req, res) => {
   console.log(555)
-  const { password,token } = req.body;
-console.log(token)
-console.log(password)
+  const { password, token } = req.body;
+  console.log(token)
+  console.log(password)
 
   try {
     // בדיקה אם הטוקן תקין ועדכון הסיסמה

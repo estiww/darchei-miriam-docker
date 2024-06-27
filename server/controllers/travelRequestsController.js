@@ -53,10 +53,7 @@ const createTravelRequest = async (req, res) => {
 
 const requestTaken = async (req, res) => {
   try {
-    const volunteerId = req.userId;
     const travelRequestId = req.params.id;
-
-    // עדכון סטטוס הבקשה לנלקחה
     const response = await model.updateTravelRequestStatus(travelRequestId);
     if (!response) {
       return res.status(404).json({ error: "Travel request not found" });

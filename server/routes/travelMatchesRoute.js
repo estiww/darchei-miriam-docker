@@ -7,6 +7,6 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 router.get("/", travelMatchesController.gettravelMatches);
-router.post("/:requestId",verifyPermissions([2]),travelMatchesController.createTravelMatch);
+router.post("/:requestId",verifyPermissions(["Volunteer"]),travelMatchesController.createTravelMatch);
 
 module.exports = router
