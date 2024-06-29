@@ -16,8 +16,7 @@ const verifyJWT = (req, res, next) => {
             
             req.userId = decoded.userId;
             req.email = decoded.email;
-            // req.roleName = decoded.isApproved ? decoded.roleName : undefined;
-            req.roleName = decoded.roleName
+            req.roleName = decoded.isApproved ? decoded.roleName : undefined;
             req.isApproved = decoded.isApproved;
 
             return next();

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { UserContext } from "../App"; // נייבא את הקונטקסט
 
 const theme = createTheme();
 
@@ -22,6 +23,7 @@ function Login() {
   const [error, setError] = useState("");
   const [email, setEmail] = useState(""); // State to hold email for forgot password
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext); // נשתמש ב-useContext כדי לגשת ל-setUser
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -57,7 +59,9 @@ function Login() {
         return response.json();
       })
       .then((data) => {
-        localStorage.setItem("currentUser", JSON.stringify(data));
+        setUser(data);
+        console.log('data');
+        console.log(data);
         setError("");
         navigate("/home/travelRequests");
       })

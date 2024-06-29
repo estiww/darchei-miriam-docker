@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,11 +14,14 @@ import UserProfile from './UserProfile';
 import TravelRequests from './TravelRequests';
 import TravelMatches from './TravelMatches';
 import TravelRequestForm from './TravelRequestForm';
+import { UserContext } from '../App'; // ייבוא הקונטקסט
+import Users from './Users';
+
 
 const Home = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
-  const currentUser = localStorage.getItem('currentUser');
+  const { user, setUser } = useContext(UserContext); // שימוש בקונטקסט
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -36,7 +39,7 @@ const Home = () => {
       });
 
       if (response.ok) {
-        localStorage.removeItem('currentUser');
+        setUser(null); // איפוס היוזר
         navigate('/login');
       } else {
         console.error('Logout failed');
@@ -54,12 +57,13 @@ const Home = () => {
             My Application
           </Typography>
           <div>
-            {currentUser ? (
+            {user ? (
               <>
                 <Button color="inherit" component={Link} to="/home">Home</Button>
                 <Button color="inherit" component={Link} to="travelRequests">בקשות פתוחות</Button>
                 <Button color="inherit" component={Link} to="travelMatches">Travel Matches</Button>
                 <Button color="inherit" component={Link} to="travelRequestForm">Travel Request Form</Button>
+                <Button color="inherit" component={Link} to="users">Users</Button>
                 <IconButton color="inherit" onClick={handleMenu}>
                   <AccountCircle />
                 </IconButton>
@@ -81,6 +85,7 @@ const Home = () => {
           <Route path="travelMatches" element={<TravelMatches />} />
           <Route path="travelRequestForm" element={<TravelRequestForm />} />
           <Route path="profile" element={<UserProfile />} />
+          <Route path="users" element={<Users/>} />
         </Routes>
       </Container>
     </div>
@@ -89,14 +94,14 @@ const Home = () => {
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const currentUser = localStorage.getItem('currentUser');
+  const { user } = useContext(UserContext); // שימוש בקונטקסט
 
   return (
     <Grid container spacing={3} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
       <Grid item xs={12} textAlign="center">
         <Typography variant="h6">Home</Typography>
         <Typography>Welcome to the home page!</Typography>
-        {currentUser ? (
+        {user ? (
           <Typography>Welcome back!</Typography>
         ) : (
           <Button variant="contained" onClick={() => navigate('/login')}>

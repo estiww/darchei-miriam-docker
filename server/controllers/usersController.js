@@ -1,7 +1,7 @@
-const model = require("../models/usersModels");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const model = require("../models/usersModels");
 
 const login = async (req, res) => {
   try {
@@ -35,7 +35,7 @@ const login = async (req, res) => {
 
 async function signup(req, res) {
   try {
-    console.log(1222)
+    console.log(1222);
     const {
       roleName,
       firstName,
@@ -82,16 +82,16 @@ async function signup(req, res) {
       zipCode,
       communicationMethod
     );
-    console.log("result.insertId",result.insertId)
+    console.log("result.insertId", result.insertId);
 
     if (result) {
       const newUser = {
         UserId: result.insertId,
         Mail: email,
         RoleName: roleName,
-        IsAprroved: false
+        IsApproved: false,
       };
-      console.log("RoleName",roleName)
+      console.log("RoleName", roleName);
 
       if (roleName === "Patient") {
         await model.createPatient(result.insertId);
@@ -103,20 +103,20 @@ async function signup(req, res) {
     }
     return res.status(500).json({ error: "Failed to create user" });
   } catch (err) {
-    console.log(2)
+    console.log(2);
 
     res.status(500).json({ error: err.message });
   }
 }
 
 const createJWTs = async (req, res, user) => {
-  console.log("createJWTs")
+  console.log("createJWTs");
   const accessToken = jwt.sign(
     {
       userId: user.UserId,
       email: user.Mail,
       roleName: user.RoleName,
-      isAprroved: user.IsAprroved,
+      isApproved: user.IsApproved,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "5m" }
@@ -126,7 +126,7 @@ const createJWTs = async (req, res, user) => {
       userId: user.UserId,
       email: user.Mail,
       roleName: user.RoleName,
-      isAprroved: user.IsAprroved,
+      isApproved: user.IsApproved,
     },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "1d" }
@@ -154,7 +154,6 @@ const createJWTs = async (req, res, user) => {
   //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
   res.json({ email: user.Mail, role: user.RoleName });
 };
-
 
 //עבור עדכון פרופיל
 async function updateUserDetails(req, res) {
@@ -207,9 +206,8 @@ async function updateUserDetails(req, res) {
     }
 
     res.json({ message: "User details updated successfully" });
-
   } catch (error) {
-    console.log(3)
+    console.log(3);
 
     res.status(500).json({ message: error.message });
   }
@@ -231,11 +229,21 @@ async function deleteUser(id) {
   }
 }
 
-async function getAll() {
+async function getAll(req, res) {
   try {
-    return model.getUsers();
-  } catch (err) {
-    throw err;
+    const users = await model.getUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ massage: error.message });
+  }
+}
+async function updateIsApproved(req, res) {
+  try {
+    console.log(req.params.id,"DDD",req.body.isApproved)
+    const result = await model.updateIsApproved(req.params.id,req.body.isApproved);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ massage: error.message });
   }
 }
 
@@ -262,4 +270,5 @@ module.exports = {
   login,
   signup,
   updateUserDetails,
+  updateIsApproved,
 };

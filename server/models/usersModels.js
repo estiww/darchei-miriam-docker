@@ -1,25 +1,49 @@
 const pool = require("../db.js");
 
-// async function getUsers() {
-//     try {
-//         const sql = 'SELECT users.*, addresses.street, addresses.city FROM users INNER JOIN addresses ON users.address_id = addresses.id';
-//         const [rows, fields] = await pool.query(sql);
-//         console.log(rows);
-//         return rows;
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
-
-// async function getUser(id) {
-//     try {
-//         const sql = 'SELECT users.*, addresses.street, addresses.city FROM users INNER JOIN addresses ON users.address_id = addresses.id WHERE users.id = ?';
-//         const [result] = await pool.query(sql, [id]);
-//         return result[0];
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
+async function getUsers() {
+  try {
+      const sql = `
+          SELECT 
+              UserTable.UserId,
+              UserTable.FirstName,
+              UserTable.LastName,
+              UserTable.Phone,
+              UserTable.Mail,
+              UserTable.Gender,
+              UserTable.BirthDate,
+              UserTable.CommunicationMethod,
+              UserTable.IsApproved,
+              AddressTable.City,
+              AddressTable.Neighborhood,
+              AddressTable.Street,
+              AddressTable.HouseNumber,
+              AddressTable.ZipCode,
+              RoleTable.RoleName
+          FROM 
+              UserTable
+          LEFT JOIN 
+              AddressTable ON UserTable.AddressId = AddressTable.AddressId
+          LEFT JOIN 
+              RoleTable ON UserTable.RoleId = RoleTable.RoleId
+      `;
+      const [result] = await pool.query(sql);
+      console.log(result);
+      return result;
+  } catch (err) {
+      console.log(err);
+  }
+}
+async function updateIsApproved(id, isApproved) {
+  try {
+    console.log(`Update row(s)`);
+    const sql = "UPDATE UserTable SET IsApproved = ? WHERE UserId = ?";
+    const [result] = await pool.query(sql, [isApproved, id]);
+    console.log(`result`,result);
+    return result; 
+  } catch (err) {
+    throw new Error(`Error updating IsApproved: ${err.message}`);
+  }
+}
 
 //מחזיר ערך בוליאני
 async function isUserExists(mail) {
@@ -121,22 +145,34 @@ async function signup(
     }
   }
   
-//מחזיר חלק מפרטי המשתמש לפי אימייל
+// מחזיר את כל פרטי המשתמש לפי אימייל-מחזיר גם פרטים מטבלאות התפקיד
 //אם אין מחזיר רזלט ריק
 async function getUserByEmail(email) {
   try {
     const sql = `
-          SELECT 
-              UserTable.UserId,
-              UserTable.Mail,
-              UserTable.IsApproved,
-              PasswordTable.PasswordValue,
-              RoleTable.RoleName
-          FROM UserTable
-          INNER JOIN PasswordTable ON UserTable.PasswordId = PasswordTable.PasswordId
-          INNER JOIN RoleTable ON UserTable.RoleId = RoleTable.RoleId
-          WHERE UserTable.Mail = ?;
-          `;
+      SELECT 
+        UserTable.UserId,
+        PasswordTable.PasswordValue,
+        UserTable.FirstName,
+        UserTable.LastName,
+        AddressTable.City,
+        AddressTable.Neighborhood,
+        AddressTable.Street,
+        AddressTable.HouseNumber,
+        AddressTable.ZipCode,
+        UserTable.Phone,
+        UserTable.Mail,
+        UserTable.CommunicationMethod,
+        UserTable.IsApproved,
+        RoleTable.RoleName,
+        VolunteerTable.Location
+      FROM UserTable
+      INNER JOIN PasswordTable ON UserTable.PasswordId = PasswordTable.PasswordId
+      INNER JOIN RoleTable ON UserTable.RoleId = RoleTable.RoleId
+      LEFT JOIN AddressTable ON UserTable.AddressId = AddressTable.AddressId
+      LEFT JOIN VolunteerTable ON UserTable.UserId = VolunteerTable.UserId
+      WHERE UserTable.Mail = ?;
+    `;
     const [result] = await pool.query(sql, [email]);
     console.log(result);
     return result[0]; // Assuming the email is unique, return the first (and only) user
@@ -144,6 +180,8 @@ async function getUserByEmail(email) {
     throw err;
   }
 }
+
+
 
 async function updateUserByEmail(
   roleName,
@@ -445,4 +483,6 @@ module.exports = {
   updateUserPassword,
   getUserResetTokenEmail,
   getVolunteerIdByUserId,
+  getUsers,
+  updateIsApproved
 };

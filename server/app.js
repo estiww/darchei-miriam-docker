@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-require('./cronJobs');
+require('./services/cronJobs');
 
 const app = express();
 
@@ -14,6 +14,7 @@ const forgotPasswordRoute = require('./routes/forgotPasswordRoute')
 const resetPasswordRoute = require('./routes/resetPasswordRoute');
 const logoutRoute = require("./routes/logoutRoute");
 const travelMatchesRoute = require('./routes/travelMatchesRoute');
+const usersRoute = require('./routes/usersRoute');
 
 const logger = require('./middleware/logger');
 const verifyJWT = require('./middleware/verifyJWT');
@@ -31,6 +32,8 @@ app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);
 app.use('/forgotPassword', forgotPasswordRoute);
 app.use('/resetPassword', resetPasswordRoute);
+app.use('/users', usersRoute);
+
 
 // Routes that need JWT verification
 app.use(verifyJWT);

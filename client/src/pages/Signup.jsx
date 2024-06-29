@@ -62,7 +62,6 @@
 //         return response.json();
 //       })
 //       .then((data) => {
-//         // localStorage.setItem("currentUser", JSON.stringify());
 //         // setUser(user);
 //         setError("Registration successful");
 //         navigate("/fullRegistration", { state: { email, password } });

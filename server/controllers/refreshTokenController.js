@@ -26,21 +26,21 @@ const handleRefreshToken = async (req, res) => {
     req.userId = decoded.userId;
     req.email = decoded.email;
     req.roleName = decoded.roleName;
-    req.isAprroved = decoded.isAprroved;
+    req.isApproved = decoded.isApproved;
     console.log("req.userId")
     console.log(req.userId)
     console.log("req.email")
     console.log(req.email)
     console.log("req.roleName")
     console.log(req.roleName)
-    console.log("req.isAprroved")
-    console.log(req.isAprroved)
+    console.log("req.isApproved")
+    console.log(req.isApproved)
     const accessToken = jwt.sign(
       {
         userId: req.userId,
         email: req.email,
         roleName: req.roleName,
-        isAprroved: req.isAprroved,
+        isApproved: req.isApproved,
       },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "5m" }
