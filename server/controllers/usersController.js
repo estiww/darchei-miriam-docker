@@ -164,15 +164,15 @@ const createJWTs = async (req, res, user) => {
     zipCode: user.ZipCode,
     communicationMethod: user.CommunicationMethod,
     phone: user.Phone,
-    role: user.RoleName,
+    roleName: user.RoleName,
     isApproved: user.IsApproved,
   });
 };
 
-//עבור עדכון פרופיל
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
   const {
+    roleName,
     firstName,
     lastName,
     email,
@@ -185,17 +185,30 @@ async function updateUserDetails(req, res) {
     communicationMethod,
     location = null,
   } = req.body;
-  //לבדוק את העניין של תז כבר קיים במערכת
+
+  console.log(
+    'roleName',roleName,
+    'firstName',firstName,
+    'lastName',lastName,
+    'email',email,
+    'phone',phone,
+    'city',city,
+    'neighborhood',neighborhood,
+    'street',street,
+    'houseNumber',houseNumber,
+    'zipCode',zipCode,
+    'communicationMethod',communicationMethod,
+    'location',location
+  );
+
   try {
+    const id = req.params.id;
+
     // Update user details in UserTable
-    console.log(email);
     await model.updateUserByEmail(
-      roleName,
       id,
       firstName,
       lastName,
-      gender,
-      birthDate,
       phone,
       email,
       city,
@@ -206,19 +219,18 @@ async function updateUserDetails(req, res) {
       communicationMethod
     );
 
-    // If patient, add to PatientTable
-    // Assuming the role is hardcoded or passed through req.body
+    // If patient, update PatientTable
     if (roleName === "Patient") {
-      await model.createPatient(id);
+      await model.updatePatient(id);
     }
+    
+    // If volunteer, update VolunteerTable
     if (roleName === "Volunteer") {
-      await model.createVolunteer(id, location);
+      await model.updateVolunteer(id, location);
     }
 
     res.json({ message: "User details updated successfully" });
   } catch (error) {
-    console.log(3);
-
     res.status(500).json({ message: error.message });
   }
 }

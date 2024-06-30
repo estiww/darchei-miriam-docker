@@ -30,13 +30,15 @@ const UserProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log("PUT");
+    console.log(userDetails);
     try {
       const requestOptions = {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
+       
         body: JSON.stringify(userDetails),
         credentials: "include",
       };
@@ -50,7 +52,7 @@ const UserProfile = () => {
         throw new Error(data.error || "Failed to update user");
       }
     } catch (error) {
-      setError(error.message);
+      // setError(error.message);
     } finally {
       setUser(userDetails);
       setEditMode(false);
@@ -80,7 +82,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="First Name"
-                name="FirstName"
+                name="firstName"
                 value={userDetails.firstName}
                 onChange={handleChange}
                 fullWidth
@@ -89,7 +91,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Last Name"
-                name="LastName"
+                name="lastName"
                 value={userDetails.lastName}
                 onChange={handleChange}
                 fullWidth
@@ -98,7 +100,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Email"
-                name="Mail"
+                name="email"
                 value={userDetails.email}
                 onChange={handleChange}
                 fullWidth
@@ -107,7 +109,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Phone"
-                name="Phone"
+                name="phone"
                 value={userDetails.phone}
                 onChange={handleChange}
                 fullWidth
@@ -116,7 +118,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="City"
-                name="City"
+                name="city"
                 value={userDetails.city}
                 onChange={handleChange}
                 fullWidth
@@ -125,7 +127,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Neighborhood"
-                name="Neighborhood"
+                name="neighborhood"
                 value={userDetails.neighborhood}
                 onChange={handleChange}
                 fullWidth
@@ -134,7 +136,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Street"
-                name="Street"
+                name="street"
                 value={userDetails.street}
                 onChange={handleChange}
                 fullWidth
@@ -143,7 +145,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="House Number"
-                name="HouseNumber"
+                name="houseNumber"
                 value={userDetails.houseNumber}
                 onChange={handleChange}
                 fullWidth
@@ -152,7 +154,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Zip Code"
-                name="ZipCode"
+                name="zipCode"
                 value={userDetails.zipCode}
                 onChange={handleChange}
                 fullWidth
@@ -161,7 +163,7 @@ const UserProfile = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Communication Method"
-                name="CommunicationMethod"
+                name="communicationMethod"
                 value={userDetails.communicationMethod}
                 onChange={handleChange}
                 fullWidth
@@ -171,7 +173,7 @@ const UserProfile = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Location"
-                  name="Location"
+                  name="location"
                   value={userDetails.location || ""}
                   onChange={handleChange}
                   fullWidth
