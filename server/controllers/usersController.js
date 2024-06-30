@@ -134,7 +134,7 @@ const createJWTs = async (req, res, user) => {
   console.log(user.UserId);
   console.log(refreshToken);
   // Saving refreshToken with current user
-  // await model.refreshToken(user.UserId, refreshToken);
+  await model.upsertRefreshToken(user.UserId, refreshToken);
 
   //שמירת אקססטוקן בתור קוקי
   res.cookie("accessToken", accessToken, {
@@ -152,27 +152,37 @@ const createJWTs = async (req, res, user) => {
     maxAge: 24 * 60 * 60 * 1000,
   });
   //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
-  res.json({ email: user.Mail, role: user.RoleName });
+  res.json({
+    id: user.UserId,
+    email: user.Mail,
+    firstName: user.FirstName,
+    lastName: user.LastName,
+    city: user.City,
+    neighborhood: user.Neighborhood,
+    street: user.Street,
+    houseNumber: user.HouseNumber,
+    zipCode: user.ZipCode,
+    communicationMethod: user.CommunicationMethod,
+    phone: user.Phone,
+    role: user.RoleName,
+    isApproved: user.IsApproved,
+  });
 };
 
 //עבור עדכון פרופיל
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
   const {
-    roleName,
-    id,
     firstName,
     lastName,
-    communicationMethod,
-    gender,
-    birthDate,
-    phone,
     email,
+    phone,
     city,
     neighborhood,
     street,
     houseNumber,
     zipCode,
+    communicationMethod,
     location = null,
   } = req.body;
   //לבדוק את העניין של תז כבר קיים במערכת
@@ -237,15 +247,21 @@ async function getAll(req, res) {
     res.status(500).json({ massage: error.message });
   }
 }
+
+
 async function updateIsApproved(req, res) {
   try {
-    console.log(req.params.id,"DDD",req.body.isApproved)
-    const result = await model.updateIsApproved(req.params.id,req.body.isApproved);
+    console.log(req.params.id, "DDD", req.body.isApproved);
+    const result = await model.updateIsApproved(
+      req.params.id,
+      req.body.isApproved
+    );
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ massage: error.message });
   }
 }
+
 
 async function getById(id) {
   try {

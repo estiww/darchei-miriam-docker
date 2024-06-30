@@ -13,7 +13,13 @@ import {
   InputLabel,
   Grid,
   FormGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const TravelRequestForm = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +39,7 @@ const TravelRequestForm = () => {
 
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -97,6 +104,7 @@ const TravelRequestForm = () => {
       console.log("Travel request created successfully:", data);
 
       setIsSubmitted(true);
+      setOpenDialog(true);
 
       setFormData({
         origin: "",
@@ -116,6 +124,11 @@ const TravelRequestForm = () => {
       console.error("Error creating travel request:", error.message);
       setError("Failed to create travel request");
     }
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+    window.location.href = "/"; 
   };
 
   return (
@@ -200,8 +213,8 @@ const TravelRequestForm = () => {
                   onChange={handleChange}
                   label="Travel Type"
                 >
-                  <MenuItem value="חד פעמי">חד פעמי</MenuItem>
-                  <MenuItem value="קבוע">קבוע</MenuItem>
+                  <MenuItem value="חד פעמי">One-time</MenuItem>
+                  <MenuItem value="קבוע">Fixed</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -211,18 +224,18 @@ const TravelRequestForm = () => {
               <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item xs={6}>
                   <FormControl fullWidth>
-                    <InputLabel id="recurringDuration-label">Recurring Duration</InputLabel>
+                    <InputLabel id="recurringDuration-label">Recurring Frequency</InputLabel>
                     <Select
                       labelId="recurringDuration-label"
                       name="recurringDuration"
                       value={formData.recurringDuration}
                       onChange={handleChange}
-                      label="Recurring Duration"
+                      label="Recurring Frequency"
                     >
-                      <MenuItem value="כל יום">כל יום</MenuItem>
-                      <MenuItem value="פעם בשבוע">פעם בשבוע</MenuItem>
-                      <MenuItem value="פעם בחודש">פעם בחודש</MenuItem>
-                      <MenuItem value="בחירת ימים בשבוע">בחירת ימים בשבוע</MenuItem>
+                      <MenuItem value="Daily">Daily</MenuItem>
+                      <MenuItem value="Weekly">Weekly</MenuItem>
+                      <MenuItem value="Monthly">Monthly</MenuItem>
+                      <MenuItem value="Select Days in a Week">Select Days in a Week</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -238,7 +251,7 @@ const TravelRequestForm = () => {
                   />
                 </Grid>
               </Grid>
-              {formData.recurringDuration === "בחירת ימים בשבוע" && (
+              {formData.recurringDuration === "Select Days in a Week" && (
                 <>
                   <Typography variant="subtitle2">Select Days</Typography>
                   <FormGroup row>
@@ -268,7 +281,7 @@ const TravelRequestForm = () => {
                 onChange={handleChange}
               />
             }
-            label="Is Alone"
+            label="Alone"
           />
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
             Submit Request
@@ -280,6 +293,24 @@ const TravelRequestForm = () => {
           )}
         </Box>
       )}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <CheckCircleOutlineIcon color="success" />
+            Travel request submitted successfully!
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Travel request submitted successfully!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

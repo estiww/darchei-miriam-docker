@@ -380,22 +380,23 @@ async function getVolunteerIdByUserId(userId) {
   }
 }
 
-// async function refreshToken(userId, refreshToken) {
-//     try {
-//         const updateSql = 'UPDATE RefreshTokenTable SET RefreshToken = ? WHERE UserId = ?';
-//         const [result] = await pool.query(updateSql, [refreshToken, userId]);
-//         // אם אף שורה לא עודכנה, מכניסים רשומה חדשה
-//         if (result.affectedRows === 0) {
-//             const insertSql = 'INSERT INTO RefreshTokenTable (UserId, RefreshToken) VALUES (?, ?)';
-//             const [insertResult] = await pool.query(insertSql, [userId, refreshToken]);
-//             console.log('Refresh token inserted:', insertResult);
-//         } else {
-//             console.log('Refresh token updated:', result);
-//         }
-//     } catch (err) {
-//         throw err;
-//     }
-// }
+async function upsertRefreshToken(userId, refreshToken) {
+  try {
+      const updateSql = 'UPDATE RefreshTokenTable SET RefreshToken = ? WHERE UserId = ?';
+      const [result] = await pool.query(updateSql, [refreshToken, userId]);
+      // אם אף שורה לא עודכנה, מכניסים רשומה חדשה
+      if (result.affectedRows === 0) {
+          const insertSql = 'INSERT INTO RefreshTokenTable (UserId, RefreshToken) VALUES (?, ?)';
+          const [insertResult] = await pool.query(insertSql, [userId, refreshToken]);
+          console.log('Refresh token inserted:', insertResult);
+      } else {
+          console.log('Refresh token updated:', result);
+      }
+  } catch (err) {
+      throw err;
+  }
+}
+
 
 // async function createUser(username, email, phone, street, city, password) {
 //     try {
@@ -478,7 +479,7 @@ module.exports = {
   createPatient,
   createVolunteer,
   isUserExists,
-  updateUserToken,
+  upsertRefreshToken,
   getUserByToken,
   updateUserPassword,
   getUserResetTokenEmail,
