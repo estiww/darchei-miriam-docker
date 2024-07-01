@@ -3,30 +3,71 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const model = require("../models/usersModels");
 
+const generateTokens = (user) => {
+  const accessToken = jwt.sign(
+    {
+      userId: user.UserId,
+      email: user.Mail,
+      roleName: user.RoleName,
+      isApproved: user.IsApproved,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "5m" }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      userId: user.UserId,
+      email: user.Mail,
+      roleName: user.RoleName,
+      isApproved: user.IsApproved,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  return { accessToken, refreshToken };
+};
+
+const setTokensAsCookies = (res, tokens) => {
+  res.cookie("accessToken", tokens.accessToken, {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 5 * 60 * 1000,
+  });
+
+  res.cookie("refreshToken", tokens.refreshToken, {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+};
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
-      return res
-        .status(400)
-        .json({ message: "Username and password are required." });
-    const foundUser = await model.getUserByEmail(email);
-    console.log(foundUser);
-    if (!foundUser)
-      return res
-        .status(401)
-        .json({ message: "Incorrect password or username" }); //Unauthorized
+      return res.status(400).json({ message: "Username and password are required." });
+
+    const user = await model.getUserByEmail(email);
+    console.log(user);
+    if (!user)
+      return res.status(401).json({ message: "Incorrect password or username" });
+
     // evaluate password
     console.log(await bcrypt.hash(password, 10));
-    const match = await bcrypt.compare(password, foundUser.PasswordValue);
+    const match = await bcrypt.compare(password, user.PasswordValue);
     if (match) {
       // create JWTs
-      return createJWTs(req, res, foundUser);
+      const tokens = generateTokens(user);
+      await model.upsertRefreshToken(user.UserId, tokens.refreshToken);
+      setTokensAsCookies(res, tokens);
+      res.json({id: user.UserId,email: user.Mail,firstName: user.FirstName,lastName: user.LastName,city: user.City,neighborhood: user.Neighborhood,street: user.Street,houseNumber: user.HouseNumber,zipCode: user.ZipCode,communicationMethod: user.CommunicationMethod,phone: user.Phone,roleName: user.RoleName,isApproved: user.IsApproved});
+      
     } else {
-      return res
-        .status(401)
-        .json({ message: "Incorrect password or username" });
-      // res.sendStatus(401);
+      return res.status(401).json({ message: "Incorrect password or username" });
     }
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -53,7 +94,7 @@ async function signup(req, res) {
       zipCode,
       location = null,
     } = req.body;
-    //להחליט איזה שדות הם שדות חובה
+
     if (!email || !password) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -63,8 +104,10 @@ async function signup(req, res) {
     if (existingUser) {
       return res.status(401).json({ message: "User already exists" });
     }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
     // Insert user into database
     const result = await model.signup(
       roleName,
@@ -82,15 +125,17 @@ async function signup(req, res) {
       zipCode,
       communicationMethod
     );
+
     console.log("result.insertId", result.insertId);
 
     if (result) {
-      const newUser = {
+      const user = {
         UserId: result.insertId,
         Mail: email,
         RoleName: roleName,
         IsApproved: false,
       };
+
       console.log("RoleName", roleName);
 
       if (roleName === "Patient") {
@@ -99,7 +144,10 @@ async function signup(req, res) {
       if (roleName === "Volunteer") {
         await model.createVolunteer(result.insertId, location);
       }
-      return createJWTs(req, res, newUser);
+      const tokens = generateTokens(user);
+      await model.upsertRefreshToken(user.UserId, tokens.refreshToken);
+      setTokensAsCookies(res, tokens);
+      res.json({id: user.UserId,email: user.Mail,firstName: user.FirstName,lastName: user.LastName,city: user.City,neighborhood: user.Neighborhood,street: user.Street,houseNumber: user.HouseNumber,zipCode: user.ZipCode,communicationMethod: user.CommunicationMethod,phone: user.Phone,roleName: user.RoleName,isApproved: user.IsApproved});
     }
     return res.status(500).json({ error: "Failed to create user" });
   } catch (err) {
@@ -109,65 +157,7 @@ async function signup(req, res) {
   }
 }
 
-const createJWTs = async (req, res, user) => {
-  console.log("createJWTs");
-  const accessToken = jwt.sign(
-    {
-      userId: user.UserId,
-      email: user.Mail,
-      roleName: user.RoleName,
-      isApproved: user.IsApproved,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "5m" }
-  );
-  const refreshToken = jwt.sign(
-    {
-      userId: user.UserId,
-      email: user.Mail,
-      roleName: user.RoleName,
-      isApproved: user.IsApproved,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d" }
-  );
-  console.log(user.UserId);
-  console.log(refreshToken);
-  // Saving refreshToken with current user
-  await model.upsertRefreshToken(user.UserId, refreshToken);
 
-  //שמירת אקססטוקן בתור קוקי
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    maxAge: 5 * 60 * 1000,
-  });
-
-  //פה נוצר הקוקי בדפדפן
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-  //מחזירה לצד שרת פרטים על מנת לשמור משתמש נוכחי
-  res.json({
-    id: user.UserId,
-    email: user.Mail,
-    firstName: user.FirstName,
-    lastName: user.LastName,
-    city: user.City,
-    neighborhood: user.Neighborhood,
-    street: user.Street,
-    houseNumber: user.HouseNumber,
-    zipCode: user.ZipCode,
-    communicationMethod: user.CommunicationMethod,
-    phone: user.Phone,
-    roleName: user.RoleName,
-    isApproved: user.IsApproved,
-  });
-};
 
 async function updateUserDetails(req, res) {
   console.log("updateUserDetails");
@@ -187,18 +177,30 @@ async function updateUserDetails(req, res) {
   } = req.body;
 
   console.log(
-    'roleName',roleName,
-    'firstName',firstName,
-    'lastName',lastName,
-    'email',email,
-    'phone',phone,
-    'city',city,
-    'neighborhood',neighborhood,
-    'street',street,
-    'houseNumber',houseNumber,
-    'zipCode',zipCode,
-    'communicationMethod',communicationMethod,
-    'location',location
+    "roleName",
+    roleName,
+    "firstName",
+    firstName,
+    "lastName",
+    lastName,
+    "email",
+    email,
+    "phone",
+    phone,
+    "city",
+    city,
+    "neighborhood",
+    neighborhood,
+    "street",
+    street,
+    "houseNumber",
+    houseNumber,
+    "zipCode",
+    zipCode,
+    "communicationMethod",
+    communicationMethod,
+    "location",
+    location
   );
 
   try {
@@ -223,7 +225,7 @@ async function updateUserDetails(req, res) {
     if (roleName === "Patient") {
       await model.updatePatient(id);
     }
-    
+
     // If volunteer, update VolunteerTable
     if (roleName === "Volunteer") {
       await model.updateVolunteer(id, location);
@@ -235,19 +237,13 @@ async function updateUserDetails(req, res) {
   }
 }
 
-// async function update(id, username, email, phone, street, city) {
-//   try {
-//     return model.updateUser(id, username, email, phone, street, city);
-//   } catch (err) {
-//     throw err;
-//   }
-// }
-
-async function deleteUser(id) {
+async function deleteUser(req, res) {
   try {
-    return model.deleteUser(id);
+    const id = req.params.id;
+    await model.deleteUser(id);
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
-    throw err;
+    res.status(500).json({ message: err.message });
   }
 }
 
@@ -256,40 +252,42 @@ async function getAll(req, res) {
     const users = await model.getUsers();
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ massage: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
-
 
 async function updateIsApproved(req, res) {
   try {
-    console.log(req.params.id, "DDD", req.body.isApproved);
-    const result = await model.updateIsApproved(
-      req.params.id,
-      req.body.isApproved
-    );
+    const { id } = req.params;
+    const { isApproved } = req.body;
+    const result = await model.updateIsApproved(id, isApproved);
+    await model.deleteRefreshToken(id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ massage: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 
-
-async function getById(id) {
+async function getById(req, res) {
   try {
-    return model.getUser(id);
+    const { id } = req.params;
+    const user = await model.getUser(id);
+    res.status(200).json(user);
   } catch (err) {
-    throw err;
+    res.status(500).json({ message: err.message });
   }
 }
 
-async function getByUsername(username) {
+async function getByUsername(req, res) {
   try {
-    return model.getByUsername(username);
+    const { username } = req.params;
+    const user = await model.getByUsername(username);
+    res.status(200).json(user);
   } catch (err) {
-    throw err;
+    res.status(500).json({ message: err.message });
   }
 }
+
 module.exports = {
   getAll,
   getById,

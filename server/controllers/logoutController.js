@@ -1,9 +1,4 @@
-// const usersDB = {
-//     users: require('../model/users.json'),
-//     setUsers: function (data) { this.users = data }
-// }
-// const fsPromises = require('fs').promises;
-// const path = require('path');
+const model = require("../models/usersModels");
 
 const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
@@ -21,14 +16,12 @@ const handleLogout = async (req, res) => {
   //     return res.sendStatus(204);
   // }
 
-  // // Delete refreshToken in db
-  // const otherUsers = usersDB.users.filter(person => person.refreshToken !== foundUser.refreshToken);
-  // const currentUser = { ...foundUser, refreshToken: '' };
-  // usersDB.setUsers([...otherUsers, currentUser]);
-  // await fsPromises.writeFile(
-  //     path.join(__dirname, '..', 'model', 'users.json'),
-  //     JSON.stringify(usersDB.users)
-  // );
+  // Delete refreshToken in db
+
+  //???????מה המעלה שאני מרויחה שאני מוחקת על פי הרפרש בעצמו ולא על פי האיידי
+  const userId = req.params.id;
+
+  await model.deleteRefreshToken(userId);
 
   //מחיקת העוגיות
   res.clearCookie("accessToken", {

@@ -408,6 +408,20 @@ async function upsertRefreshToken(userId, refreshToken) {
     throw err;
   }
 }
+async function deleteRefreshToken(userId) {
+  console.log(userId);
+  try {
+    const deleteSql = "DELETE FROM RefreshTokenTable WHERE UserId = ?";
+    const [result] = await pool.query(deleteSql, [userId]);
+    if (result.affectedRows === 0) {
+      console.log("No refresh token found for userId:", userId);
+    } else {
+      console.log("Refresh token deleted for userId:", userId);
+    }
+  } catch (err) {
+    throw err;
+  }
+}
 
 // async function createUser(username, email, phone, street, city, password) {
 //     try {
@@ -493,6 +507,7 @@ module.exports = {
   updateVolunteer,
   isUserExists,
   upsertRefreshToken,
+  deleteRefreshToken,
   getUserByToken,
   updateUserPassword,
   getUserResetTokenEmail,
