@@ -114,12 +114,45 @@ const getRequestDetailsByMatchId = async (matchId) => {
   `;
 
   try {
-      const [rows, fields] = await pool.query(sql, [matchId]);
-      return rows[0]; // מחזיר את השורה הראשונה כתוצאה
+    const [rows, fields] = await pool.query(sql, [matchId]);
+    return rows[0]; // מחזיר את השורה הראשונה כתוצאה
   } catch (error) {
-      console.error(error);
-      throw new Error('Error fetching request details');
+    console.error(error);
+    throw new Error("Error fetching request details");
   }
+};
+
+const getUpcomingTravelsByVolunteerId = async (volunteerId) => {
+  const sql = `
+    SELECT 
+      tm.TravelMatchId AS id, 
+      tm.TravelRequestId AS requestId, 
+      tm.VolunteerId AS volunteerId, 
+      tr.Origin, 
+      tr.Destination, 
+      tr.TravelTime, 
+      DATE_FORMAT(tr.TravelDate, '%Y-%m-%d') AS TravelDate, 
+      tr.NumberOfPassengers,
+      tr.Status,
+      u.FirstName AS PatientFirstName
+    FROM 
+      TravelMatchTable tm
+    JOIN 
+      TravelRequestTable tr ON tm.TravelRequestId = tr.TravelRequestId
+    JOIN 
+      PatientTable pt ON tr.PatientId = pt.PatientId
+    JOIN 
+      UserTable u ON pt.UserId = u.UserId
+    WHERE 
+      tm.VolunteerId = ? 
+      AND tr.TravelDate >= CURDATE()
+    ORDER BY 
+      tr.TravelDate ASC;
+  `;
+
+
+  const [results] = await pool.query(sql, [volunteerId]);
+  return results;
 };
 
 module.exports = {
@@ -128,4 +161,5 @@ module.exports = {
   getPatientDetailsByMatchId,
   getVolunteerDetailsByMatchId,
   getRequestDetailsByMatchId,
+  getUpcomingTravelsByVolunteerId,
 };

@@ -15,10 +15,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  IconButton,
 } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-
 
 const PatientForm = () => {
   const [formData, setFormData] = useState({
@@ -47,12 +45,16 @@ const PatientForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
+    if (!formData.email || !formData.password || !formData.birthDate) {
       setError("Please fill in all fields.");
       return;
     }
     if (!validateEmail(formData.email)) {
       setError("You have entered an invalid email address!");
+      return;
+    }
+    if (!validateBirthDate(formData.birthDate)) {
+      setError("You have entered an invalid birth date!");
       return;
     }
 
@@ -89,6 +91,17 @@ const PatientForm = () => {
   const validateEmail = (mailAddress) => {
     let mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return mailAddress.match(mailformat);
+  };
+
+  const validateBirthDate = (birthDate) => {
+    const today = new Date();
+    const birthDateObj = new Date(birthDate);
+    const age = today.getFullYear() - birthDateObj.getFullYear();
+    const monthDifference = today.getMonth() - birthDateObj.getMonth();
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
+      return age > 18;
+    }
+    return age >= 18;
   };
 
   const handleClose = () => {
@@ -129,11 +142,7 @@ const PatientForm = () => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel
-              value="Female"
-              control={<Radio />}
-              label="Female"
-            />
+            <FormControlLabel value="Female" control={<Radio />} label="Female" />
           </RadioGroup>
         </FormControl>
 
@@ -185,28 +194,20 @@ const PatientForm = () => {
         </Box>
 
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">
-            Preferred Communication Method
-          </FormLabel>
+          <FormLabel component="legend">Preferred Communication Method</FormLabel>
           <RadioGroup
             row
             name="communicationMethod"
             value={formData.communicationMethod}
             onChange={handleChange}
           >
-            <FormControlLabel
-              value="WhatsApp"
-              control={<Radio />}
-              label="WhatsApp"
-            />
+            <FormControlLabel value="WhatsApp" control={<Radio />} label="WhatsApp" />
             <FormControlLabel value="Email" control={<Radio />} label="Email" />
             <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
           </RadioGroup>
         </FormControl>
 
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Address
-        </Typography>
+        <Typography variant="h6" sx={{ mt: 2 }}>Address</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -256,12 +257,7 @@ const PatientForm = () => {
           />
         </Box>
 
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
           Submit Patient Request
         </Button>
         {error && (
@@ -288,7 +284,6 @@ const PatientForm = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
     </Container>
   );
 };

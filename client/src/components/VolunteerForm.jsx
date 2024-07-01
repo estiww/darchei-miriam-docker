@@ -52,8 +52,12 @@ const VolunteerForm = () => {
       setError("Please fill in all fields.");
       return;
     }
-    if (!ValidateEmail(formData.email)) {
+    if (!validateEmail(formData.email)) {
       setError("You have entered an invalid email address!");
+      return;
+    }
+    if (!validateBirthDate(formData.birthDate)) {
+      setError("You have entered an invalid birthdate!");
       return;
     }
 
@@ -87,9 +91,15 @@ const VolunteerForm = () => {
     setError("");
   };
 
-  const ValidateEmail = (mailAddress) => {
+  const validateEmail = (mailAddress) => {
     let mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return mailAddress.match(mailformat);
+  };
+
+  const validateBirthDate = (birthDate) => {
+    const today = new Date();
+    const birthDateObj = new Date(birthDate);
+    return birthDateObj.setFullYear(birthDateObj.getFullYear() + 18) < today;
   };
 
   const handleClose = () => {

@@ -87,5 +87,15 @@ const gettravelMatches = async (req, res) => {
   }
 };
 
-module.exports = { createTravelMatch, gettravelMatches };
+const getUpcomingTravels = async (req, res) => {
+  try {
+    const volunteerId = await userModel.getVolunteerIdByUserId(req.userId);
+    const upcomingTravels = await TravelMatch.getUpcomingTravelsByVolunteerId(volunteerId);
+    res.status(200).json(upcomingTravels);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createTravelMatch, gettravelMatches,getUpcomingTravels };
 

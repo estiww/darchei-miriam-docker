@@ -16,10 +16,14 @@ import TravelMatches from './TravelMatches';
 import TravelRequestForm from './TravelRequestForm';
 import { UserContext } from '../App'; // ייבוא הקונטקסט
 import Users from './Users';
-
+import Reminders from '../components/Reminders';
+import CloseIcon from '@mui/icons-material/Close';
+import DriveEtaIcon from '@mui/icons-material/DriveEta';
+import MinimizeIcon from '@mui/icons-material/Minimize';
 
 const Home = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [minimizedReminders, setMinimizedReminders] = useState(false); // State to manage minimized status
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext); // שימוש בקונטקסט
 
@@ -47,6 +51,10 @@ const Home = () => {
     } catch (error) {
       console.error('Logout error:', error);
     }
+  };
+
+  const toggleReminders = () => {
+    setMinimizedReminders(!minimizedReminders);
   };
 
   return (
@@ -81,13 +89,29 @@ const Home = () => {
       <Container style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '64px' }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="TravelRequests" element={<TravelRequests />} />
+          <Route path="travelRequests" element={<TravelRequests />} />
           <Route path="travelMatches" element={<TravelMatches />} />
           <Route path="travelRequestForm" element={<TravelRequestForm />} />
           <Route path="profile" element={<UserProfile />} />
-          <Route path="users" element={<Users/>} />
+          <Route path="users" element={<Users />} />
         </Routes>
       </Container>
+      {user && user.roleName === "Volunteer" ? (
+        <div style={{ position: 'fixed', bottom: '16px', left: '16px', zIndex: 1300 }}>
+          {minimizedReminders ? (
+            <IconButton onClick={toggleReminders} style={{ backgroundColor: 'white', boxShadow: '0 0 10px rgba(0,0,0,0.3)' }}>
+              <DriveEtaIcon />
+            </IconButton>
+          ) : (
+            <div style={{ backgroundColor: 'white', boxShadow: '0 0 10px rgba(0,0,0,0.3)', padding: '16px', width: '250px' }}>
+              <IconButton onClick={toggleReminders} style={{ position: 'absolute', top: '8px', right: '8px' }}>
+                <CloseIcon />
+              </IconButton>
+              <Reminders />
+            </div>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };

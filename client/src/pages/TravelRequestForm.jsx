@@ -19,7 +19,7 @@ import {
   DialogContentText,
   DialogActions,
 } from "@mui/material";
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const TravelRequestForm = () => {
   const [formData, setFormData] = useState({
@@ -47,13 +47,22 @@ const TravelRequestForm = () => {
     if (name === "numberOfPassengers" && (value !== "1" && value !== "2")) {
       setError("Number of passengers must be 1 or 2");
     } else {
-      setError(""); 
+      setError("");
     }
 
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+
+    // Reset recurringDays if recurringDuration changes
+    if (name === "recurringDuration") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        recurringDays: [],
+        [name]: value,
+      }));
+    }
   };
 
   const handleDayChange = (e) => {
@@ -89,7 +98,7 @@ const TravelRequestForm = () => {
     try {
       const response = await fetch("http://localhost:3000/travelRequests", {
         method: "POST",
-        credentials: 'include',
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -128,7 +137,7 @@ const TravelRequestForm = () => {
 
   const handleClose = () => {
     setOpenDialog(false);
-    window.location.href = "/"; 
+    window.location.href = "/";
   };
 
   return (
@@ -141,7 +150,6 @@ const TravelRequestForm = () => {
         </Box>
       ) : (
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-         
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <TextField
@@ -221,24 +229,36 @@ const TravelRequestForm = () => {
           </Grid>
           {formData.travelType === "קבוע" && (
             <>
-              <Grid container spacing={2} sx={{ mt: 2 }}>
+              <Grid container spacing={1} sx={{ mt: 1 }}>
                 <Grid item xs={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="recurringDuration-label">Recurring Frequency</InputLabel>
-                    <Select
-                      labelId="recurringDuration-label"
-                      name="recurringDuration"
-                      value={formData.recurringDuration}
-                      onChange={handleChange}
-                      label="Recurring Frequency"
-                    >
-                      <MenuItem value="Daily">Daily</MenuItem>
-                      <MenuItem value="Weekly">Weekly</MenuItem>
-                      <MenuItem value="Monthly">Monthly</MenuItem>
-                      <MenuItem value="Select Days in a Week">Select Days in a Week</MenuItem>
-                    </Select>
-                  </FormControl>
+                    <>
+                      <Typography variant="subtitle2">Select Days</Typography>
+                      <FormGroup row>
+                        {[
+                          "ראשון",
+                          "שני",
+                          "שלישי",
+                          "רביעי",
+                          "חמישי",
+                          "שישי",
+                          "שבת",
+                        ].map((day) => (
+                          <FormControlLabel
+                            key={day}
+                            control={
+                              <Checkbox
+                                name={day}
+                                checked={formData.recurringDays.includes(day)}
+                                onChange={handleDayChange}
+                              />
+                            }
+                            label={day}
+                          />
+                        ))}
+                      </FormGroup>
+                    </>
                 </Grid>
+              
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
@@ -251,26 +271,6 @@ const TravelRequestForm = () => {
                   />
                 </Grid>
               </Grid>
-              {formData.recurringDuration === "Select Days in a Week" && (
-                <>
-                  <Typography variant="subtitle2">Select Days</Typography>
-                  <FormGroup row>
-                    {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
-                      <FormControlLabel
-                        key={day}
-                        control={
-                          <Checkbox
-                            name={day}
-                            checked={formData.recurringDays.includes(day)}
-                            onChange={handleDayChange}
-                          />
-                        }
-                        label={day}
-                      />
-                    ))}
-                  </FormGroup>
-                </>
-              )}
             </>
           )}
           <FormControlLabel
@@ -283,7 +283,12 @@ const TravelRequestForm = () => {
             }
             label="Alone"
           />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
             Submit Request
           </Button>
           {error && (

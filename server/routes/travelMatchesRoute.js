@@ -8,5 +8,7 @@ router.use(express.urlencoded({ extended: true }));
 
 router.get("/", travelMatchesController.gettravelMatches);
 router.post("/:requestId",verifyPermissions(["Volunteer"]),travelMatchesController.createTravelMatch);
+router.get("/upcoming", verifyPermissions(["Volunteer"]), travelMatchesController.getUpcomingTravels); 
+
 
 module.exports = router
