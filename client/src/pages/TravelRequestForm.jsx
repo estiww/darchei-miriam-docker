@@ -1,27 +1,13 @@
 import React, { useState } from "react";
-import {
-  Button,
-  TextField,
-  FormControl,
-  FormControlLabel,
-  Checkbox,
-  Box,
-  Container,
-  Typography,
-  MenuItem,
-  Select,
-  InputLabel,
-  Grid,
-  FormGroup,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from "@mui/material";
+import {useNavigate } from 'react-router-dom';
+import {Button,TextField,FormControl,FormControlLabel,Checkbox,Box,Container,Typography,MenuItem,Select,InputLabel,Grid,FormGroup,Dialog,DialogTitle,DialogContent,DialogContentText,DialogActions,} from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import sendRefreshToken from "../components/SendRefreshToken";
+
 
 const TravelRequestForm = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     origin: "",
     destination: "",
@@ -106,7 +92,9 @@ const TravelRequestForm = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create travel request");
+        if (response.status === 401) {
+          const response = await sendRefreshToken();
+        }
       }
 
       const data = await response.json();
@@ -137,7 +125,7 @@ const TravelRequestForm = () => {
 
   const handleClose = () => {
     setOpenDialog(false);
-    window.location.href = "/";
+    navigate('/home')
   };
 
   return (

@@ -26,7 +26,8 @@ const Home = () => {
   const [minimizedReminders, setMinimizedReminders] = useState(false); // State to manage minimized status
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext); // שימוש בקונטקסט
-
+console.log('user')
+console.log(user)
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -43,8 +44,8 @@ const Home = () => {
       });
 
       if (response.ok) {
-        setUser(null); // איפוס היוזר
-        navigate('/login');
+        setUser(undefined); // איפוס היוזר
+        navigate('/home');
       } else {
         console.error('Logout failed');
       }
@@ -61,29 +62,37 @@ const Home = () => {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="fixed">
         <Toolbar>
-          <Typography variant="h6" component={Link} to="/" style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
-            My Application
+          <Typography variant="h6" component={Link} to="/home" style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
+            DARCHEI MIRIAM LOGO
           </Typography>
           <div>
-            {user ? (
-              <>
-                <Button color="inherit" component={Link} to="/home">Home</Button>
-                <Button color="inherit" component={Link} to="travelRequests">בקשות פתוחות</Button>
-                <Button color="inherit" component={Link} to="travelMatches">Travel Matches</Button>
-                <Button color="inherit" component={Link} to="travelRequestForm">Travel Request Form</Button>
-                <Button color="inherit" component={Link} to="users">Users</Button>
-                <IconButton color="inherit" onClick={handleMenu}>
-                  <AccountCircle />
-                </IconButton>
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                  <MenuItem onClick={handleClose} component={Link} to="profile">Profile</MenuItem>
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Button color="inherit" component={Link} to="/login">Log In</Button>
-            )}
-          </div>
+  {user && user.isApproved ? (
+    <>
+      {(user.roleName === 'Admin' || user.roleName === 'Volunteer') && (
+        <Button color="inherit" component={Link} to="travelRequests">בקשות פתוחות</Button>
+      )}
+      {user.roleName === 'Admin' && (
+        <Button color="inherit" component={Link} to="travelMatches">Travel Matches</Button>
+      )}
+      {(user.roleName === 'Admin' || user.roleName === 'Patient') && (
+        <Button color="inherit" component={Link} to="travelRequestForm">Travel Request Form</Button>
+      )}
+      {user.roleName === 'Admin' && (
+        <Button color="inherit" component={Link} to="users">Users</Button>
+      )}
+      <IconButton color="inherit" onClick={handleMenu}>
+        <AccountCircle />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem onClick={handleClose} component={Link} to="profile">Profile</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      </Menu>
+    </>
+  ) : (
+    <Button color="inherit" component={Link} to="/login">Log In</Button>
+  )}
+</div>
+
         </Toolbar>
       </AppBar>
       <Container style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '64px' }}>

@@ -63,7 +63,7 @@ function Login() {
         console.log('data');
         console.log(data);
         setError("");
-        navigate("/home/travelRequests");
+        navigate("/home");
       })
       .catch((error) => {
         setError(error.message);
