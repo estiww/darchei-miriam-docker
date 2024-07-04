@@ -17,7 +17,7 @@ async function createTravelMatch(volunteerId, requestId) {
     throw err;
   }
 }
-async function getAll(req, res) {
+async function getAll() {
   try {
     const sql = `
         SELECT tm.TravelMatchId, 
@@ -46,6 +46,86 @@ async function getAll(req, res) {
     throw err;
   }
 }
+
+async function getVolunteerTravels(userId) {
+  try {
+    sql = `
+    SELECT 
+      tm.TravelMatchId AS matchId,
+      tr.Origin,
+      tr.Destination,
+      tr.TravelTime,
+      tr.TravelDate,
+      tr.NumberOfPassengers
+    FROM 
+      TravelMatchTable tm
+    JOIN 
+      TravelRequestTable tr ON tm.TravelRequestId = tr.TravelRequestId
+    WHERE 
+      tm.VolunteerId = (SELECT VolunteerId FROM VolunteerTable WHERE UserId = ?)
+    ORDER BY 
+      tr.TravelDate ASC
+  `;
+
+    const [rows] = await pool.query(sql, [userId]);
+    return rows[0]; // מחזיר את השורה הראשונה כתוצאה
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error fetching data");
+  }
+}
+
+async function getPatientTravels(userId) {
+  try {
+    sql = `
+    SELECT 
+      tr.TravelRequestId AS requestId,
+      tr.Origin,
+      tr.Destination,
+      tr.TravelTime,
+      tr.TravelDate,
+      tr.NumberOfPassengers
+    FROM 
+      TravelRequestTable tr
+    WHERE 
+      tr.PatientId = (SELECT PatientId FROM PatientTable WHERE UserId = ?)
+    ORDER BY 
+      tr.TravelDate ASC
+  `;
+    const [rows] = await pool.query(sql, [userId]);
+    console.log(rows);
+    return rows; // מחזיר את השורה הראשונה כתוצאה
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error fetching data");
+  }
+}
+
+const getVolunteerDetailsByMatchId = async (matchId) => {
+  const sql = `
+      SELECT 
+          UserTable.FirstName,
+          UserTable.Mail,
+          UserTable.Phone
+      FROM 
+          TravelMatchTable
+      JOIN 
+          VolunteerTable ON TravelMatchTable.VolunteerId = VolunteerTable.VolunteerId
+      JOIN 
+          UserTable ON VolunteerTable.UserId = UserTable.UserId
+      WHERE 
+          TravelMatchTable.TravelMatchId = ?;
+  `;
+
+  try {
+    const [rows, fields] = await pool.query(sql, [matchId]);
+    return rows[0]; // מחזיר את השורה הראשונה כתוצאה
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error fetching volunteer details");
+  }
+};
+
 const getPatientDetailsByMatchId = async (matchId) => {
   const sql = `
           SELECT 
@@ -72,30 +152,6 @@ const getPatientDetailsByMatchId = async (matchId) => {
   }
 };
 
-const getVolunteerDetailsByMatchId = async (matchId) => {
-  const sql = `
-      SELECT 
-          UserTable.FirstName,
-          UserTable.Mail,
-          UserTable.Phone
-      FROM 
-          TravelMatchTable
-      JOIN 
-          VolunteerTable ON TravelMatchTable.VolunteerId = VolunteerTable.VolunteerId
-      JOIN 
-          UserTable ON VolunteerTable.UserId = UserTable.UserId
-      WHERE 
-          TravelMatchTable.TravelMatchId = ?;
-  `;
-
-  try {
-    const [rows, fields] = await pool.query(sql, [matchId]);
-    return rows[0]; // מחזיר את השורה הראשונה כתוצאה
-  } catch (error) {
-    console.error(error);
-    throw new Error("Error fetching volunteer details");
-  }
-};
 const getRequestDetailsByMatchId = async (matchId) => {
   const sql = `
       SELECT 
@@ -150,7 +206,6 @@ const getUpcomingTravelsByVolunteerId = async (volunteerId) => {
       tr.TravelDate ASC;
   `;
 
-
   const [results] = await pool.query(sql, [volunteerId]);
   return results;
 };
@@ -162,4 +217,6 @@ module.exports = {
   getVolunteerDetailsByMatchId,
   getRequestDetailsByMatchId,
   getUpcomingTravelsByVolunteerId,
+  getPatientTravels,
+  getVolunteerTravels,
 };

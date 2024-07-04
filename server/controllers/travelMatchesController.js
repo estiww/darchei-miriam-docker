@@ -87,15 +87,40 @@ const gettravelMatches = async (req, res) => {
   }
 };
 
+const getMyTravels = async (req, res) => {
+  try {
+    let myTravels;
+    console.log("getMyTravels",req.roleName)
+    const userId = req.params.userId;
+    if(req.roleName=="Patient"){
+    myTravels = await TravelMatch.getPatientTravels(userId);
+  }
+    if(req.roleName=="Volunteer"){
+      myTravels = await TravelMatch.getVolunteerTravels(userId);
+    }
+    res.status(200).json(myTravels);
+    }
+ catch (error) {
+    res.status(500).json({ massage: error.message });
+  }
+};
+
 const getUpcomingTravels = async (req, res) => {
   try {
     const volunteerId = await userModel.getVolunteerIdByUserId(req.userId);
-    const upcomingTravels = await TravelMatch.getUpcomingTravelsByVolunteerId(volunteerId);
+    const upcomingTravels = await TravelMatch.getUpcomingTravelsByVolunteerId(
+      volunteerId
+    );
     res.status(200).json(upcomingTravels);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { createTravelMatch, gettravelMatches,getUpcomingTravels };
+module.exports = {
+  createTravelMatch,
+  gettravelMatches,
+  getUpcomingTravels,
+  getMyTravels,
+};
 

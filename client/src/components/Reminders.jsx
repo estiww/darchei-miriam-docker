@@ -14,9 +14,16 @@ const Reminders = () => {
           method: 'GET',
           credentials: 'include',
         });
-        const data = await response.json()
-        console.log(data);
-        setUpcomingTravels(data);
+        const data = await response.json();
+        console.log(data); // Debugging: log the fetched data
+
+        // Check if data is an array before setting it to state
+        if (Array.isArray(data)) {
+          setUpcomingTravels(data);
+        } else {
+          console.error('Fetched data is not an array:', data);
+          setUpcomingTravels([]); // Set to an empty array to prevent map errors
+        }
       } catch (error) {
         console.error('Error fetching upcoming travels:', error);
       }
@@ -35,14 +42,18 @@ const Reminders = () => {
     <div style={{ maxHeight: '570px', overflowY: 'auto' }}>
       <Typography variant="h6">Upcoming Travels</Typography>
       <List>
-        {upcomingTravels.map((travel) => (
-          <ListItem button onClick={() => setSelectedTravel(travel)} key={travel.id}>
-            <ListItemText
-              primary={`From: ${travel.Origin} To: ${travel.Destination}`}
-              secondary={`Date: ${travel.TravelDate} Time: ${travel.TravelTime}`}
-            />
-          </ListItem>
-        ))}
+        {Array.isArray(upcomingTravels) && upcomingTravels.length > 0 ? (
+          upcomingTravels.map((travel) => (
+            <ListItem button onClick={() => setSelectedTravel(travel)} key={travel.id}>
+              <ListItemText
+                primary={`From: ${travel.Origin} To: ${travel.Destination}`}
+                secondary={`Date: ${travel.TravelDate} Time: ${travel.TravelTime}`}
+              />
+            </ListItem>
+          ))
+        ) : (
+          <Typography variant="body1">No upcoming travels found.</Typography>
+        )}
       </List>
 
       {selectedTravel && (
