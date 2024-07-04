@@ -68,7 +68,7 @@ async function getVolunteerTravels(userId) {
   `;
 
     const [rows] = await pool.query(sql, [userId]);
-    return rows[0]; // מחזיר את השורה הראשונה כתוצאה
+    return rows; // מחזיר את השורה הראשונה כתוצאה
   } catch (error) {
     console.error(error);
     throw new Error("Error fetching data");
