@@ -21,7 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DriveEtaIcon from "@mui/icons-material/DriveEta";
 import MyTravels from "../components/MyTravels";
 import Logo from '../imgs/Logo.png'; 
-
+import HomePage from "./HomePage";
 const Home = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [minimizedReminders, setMinimizedReminders] = useState(false); // State to manage minimized status
@@ -197,42 +197,6 @@ const Home = () => {
         </div>
       ) : null}
     </div>
-  );
-};
-
-const HomePage = () => {
-  const navigate = useNavigate();
-  const { user } = useContext(UserContext);
-
-  return (
-    <Grid
-      container
-      spacing={3}
-      justifyContent="center"
-      alignItems="center"
-      style={{ minHeight: "100vh" }}
-    >
-      <Grid item xs={12} textAlign="center">
-        <Typography variant="h6">Home</Typography>
-        {user && !user.isApproved && (
-          <Typography style={{ color: "red" }}>
-            Your request to join has been sent for approval. You will be
-            notified once it is approved.
-          </Typography>
-        )}
-
-        <Typography>Welcome to the home page!</Typography>
-        {user ? (
-          user.isApproved ? (
-            <Typography>Welcome back!</Typography>
-          ) : null
-        ) : (
-          <Button variant="contained" onClick={() => navigate("/login")}>
-            Log In
-          </Button>
-        )}
-      </Grid>
-    </Grid>
   );
 };
 
