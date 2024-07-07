@@ -2,7 +2,8 @@ const model = require("../models/travelRequestsModel");
 
 const getOpentravelRequests = async (req, res) => {
   try {
-    const result = await model.getOpentravelRequests();
+    const status = req.query.status;
+    const result = await model.getOpentravelRequests(status);
     if (result.length > 0) {
       return res.send(result);
     }

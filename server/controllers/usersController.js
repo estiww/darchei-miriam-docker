@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const model = require("../models/usersModels");
 
 const generateTokens = (user) => {
+  console.log('generateTokens')
   const accessToken = jwt.sign(
     {
       userId: user.UserId,
@@ -297,4 +298,6 @@ module.exports = {
   signup,
   updateUserDetails,
   updateIsApproved,
+  generateTokens,
+  setTokensAsCookies
 };

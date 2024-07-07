@@ -15,6 +15,8 @@ const resetPasswordRoute = require('./routes/resetPasswordRoute');
 const logoutRoute = require("./routes/logoutRoute");
 const travelMatchesRoute = require('./routes/travelMatchesRoute');
 const usersRoute = require('./routes/usersRoute');
+const someEndpointRoute = require('./routes/someEndpointRoute');
+
 
 const logger = require('./middleware/logger');
 const verifyJWT = require('./middleware/verifyJWT');
@@ -32,11 +34,14 @@ app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);
 app.use('/forgotPassword', forgotPasswordRoute);
 app.use('/resetPassword', resetPasswordRoute);
-app.use('/users', usersRoute);
+
 
 
 // Routes that need JWT verification
 app.use(verifyJWT);
+// Route for refresh event
+app.use('/someEndpoint',someEndpointRoute);
+app.use('/users', usersRoute);
 app.use("/travelRequests", travelRequestsRoute);
 app.use('/travelMatches', travelMatchesRoute);
 

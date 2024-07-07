@@ -51,6 +51,9 @@ const handleRefreshToken = async (req, res) => {
       secure: true,
       maxAge: 5 * 60 * 1000,
     });
+    console.log("ששששששששששש")
+    console.log(req.userId)
+
     res.json(req.userId);
   });
 };

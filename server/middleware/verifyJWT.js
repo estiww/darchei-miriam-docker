@@ -6,8 +6,7 @@ const verifyJWT = (req, res, next) => {
     console.log(cookieToken);
 
     // אם אין טוקן גישה תחזיר הודעת שגיאה
-    if (!cookieToken) return res.status(401).json({ message: "Access token not found" });
-
+    if (!cookieToken) {console.log('401');return res.status(401).json({ message: "Access token not found" })};
     jwt.verify(
         cookieToken,
         process.env.ACCESS_TOKEN_SECRET,

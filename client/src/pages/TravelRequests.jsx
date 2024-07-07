@@ -30,7 +30,7 @@ const TravelRequests = () => {
 
   const fetchTravelRequests = async () => {
     try {
-      const response = await fetch("http://localhost:3000/travelRequests", {
+      const response = await fetch(`http://localhost:3000/travelRequests?status=התקבלה`, {
         method: "GET",
         credentials: "include",
       });
@@ -41,7 +41,7 @@ const TravelRequests = () => {
           const response = await sendRefreshToken();
           if (response.status === 440) {
             console.log(440);
-            throw new Error("440"); // זרוק שגיאה עם הודעה ספציפית ל-440
+            throw new Error("440");
           }
           return fetchTravelRequests();
         }
@@ -60,14 +60,10 @@ const TravelRequests = () => {
     } catch (error) {
       setError(error.message);
       if (error.message === "440") {
-        navigate("/login"); // זרוק מחדש את השגיאה כדי שהפונקציה הקוראת תטפל בה
+        navigate("/login");
       }
     }
   };
-
-  useEffect(() => {
-    fetchTravelRequests();
-  }, []);
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -94,7 +90,7 @@ const TravelRequests = () => {
 
   const handleTakeRequest = async (requestId) => {
     setLoading(true);
-    setConfirmationMessage(""); // Clear previous confirmation message
+    setConfirmationMessage("");
     try {
       const response = await fetch(
         `http://localhost:3000/travelRequests/${requestId}`,
@@ -160,6 +156,12 @@ const TravelRequests = () => {
     return () => clearTimeout(timer);
   }, [confirmationMessage]);
 
+  useEffect(() => {
+    fetchTravelRequests();
+    const interval = setInterval(fetchTravelRequests, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
@@ -173,8 +175,8 @@ const TravelRequests = () => {
               border={1}
               borderRadius={4}
               p={2}
-              height="180px" // height increased
-              width="180px" // width increased
+              height="180px"
+              width="180px"
               display="flex"
               flexDirection="column"
               justifyContent="center"

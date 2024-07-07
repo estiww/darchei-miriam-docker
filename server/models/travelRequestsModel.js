@@ -1,9 +1,9 @@
 const pool = require('../db.js');
 
-async function getOpentravelRequests() {
+async function getOpentravelRequests(status) {
   try {
     const sql = 'SELECT TravelRequestId, Origin, TravelTime, TravelDate, Destination FROM TravelRequestTable WHERE Status = ?';
-    const [rows] = await pool.query(sql, ['התקבלה']);
+    const [rows] = await pool.query(sql, [status]);
     return rows;
   } catch (err) {
     throw err;
