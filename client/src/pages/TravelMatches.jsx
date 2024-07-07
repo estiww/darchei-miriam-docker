@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, TextField } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, TextField, CircularProgress } from "@mui/material";
 
 const TravelMatches = () => {
   const [matches, setMatches] = useState([]);
@@ -7,10 +7,15 @@ const TravelMatches = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchError, setSearchError] = useState("");
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef();
 
-  const fetchTravelMatches = async () => {
+  const fetchTravelMatches = async (page = 0, limit = 50) => {
     try {
-      const response = await fetch("http://localhost:3000/travelMatches", {
+      setLoading(true);
+      const response = await fetch(`http://localhost:3000/travelMatches?limit=${limit}&offset=${page * limit}`, {
         method: "GET",
         credentials: "include",
       });
@@ -21,16 +26,23 @@ const TravelMatches = () => {
       }
 
       const data = await response.json();
-      setMatches(data);
+
+      // Filtering out matches that already exist in state
+      const newMatches = data.filter(newMatch => !matches.some(match => match.TravelMatchId === newMatch.TravelMatchId));
+
+      setMatches(prevMatches => [...prevMatches, ...newMatches]);
+      setHasMore(newMatches.length > 0); // Check if there are more matches to load
+      setLoading(false);
       setSearchError(""); // Clear search error message on successful fetch
     } catch (error) {
       setError(error.message);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTravelMatches();
-  }, []);
+    fetchTravelMatches(page);
+  }, [page]);
 
   const requestSort = (key) => {
     let direction = 'ascending';
@@ -105,7 +117,6 @@ const TravelMatches = () => {
     );
   };
 
-  // Check if there are no search results
   useEffect(() => {
     if (searchTerm.trim().length > 0 && matchesToShow.length === 0) {
       setSearchError("No matching results found.");
@@ -113,6 +124,17 @@ const TravelMatches = () => {
       setSearchError("");
     }
   }, [searchTerm, matchesToShow]);
+
+  const lastMatchElementRef = (node) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  };
 
   return (
     <Container>
@@ -128,7 +150,7 @@ const TravelMatches = () => {
         margin="normal"
         style={{ marginBottom: '2rem', width: '30%' }}
       />
-
+      
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -143,21 +165,38 @@ const TravelMatches = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {matchesToShow.map((match) => (
-              <TableRow key={match.TravelMatchId}>
-                <TableCell>{highlightSearchTerm(`${match.VolunteerFirstName} ${match.VolunteerLastName}`)}</TableCell>
-                <TableCell>{highlightSearchTerm(match.MatchDate)}</TableCell>
-                <TableCell>{highlightSearchTerm(match.MatchTime)}</TableCell>
-                <TableCell>{highlightSearchTerm(match.TravelOrigin)}</TableCell>
-                <TableCell>{highlightSearchTerm(match.TravelDestination)}</TableCell>
-                <TableCell>{highlightSearchTerm(match.TravelTime)}</TableCell>
-                <TableCell>{highlightSearchTerm(match.NumberOfPassengers.toString())}</TableCell>
-              </TableRow>
-            ))}
+            {matchesToShow.map((match, index) => {
+              if (matchesToShow.length === index + 1) {
+                return (
+                  <TableRow ref={lastMatchElementRef} key={match.TravelMatchId}>
+                    <TableCell>{highlightSearchTerm(`${match.VolunteerFirstName} ${match.VolunteerLastName}`)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.MatchDate)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.MatchTime)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.TravelOrigin)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.TravelDestination)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.TravelTime)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.NumberOfPassengers.toString())}</TableCell>
+                  </TableRow>
+                );
+              } else {
+                return (
+                  <TableRow key={match.TravelMatchId}>
+                    <TableCell>{highlightSearchTerm(`${match.VolunteerFirstName} ${match.VolunteerLastName}`)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.MatchDate)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.MatchTime)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.TravelOrigin)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.TravelDestination)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.TravelTime)}</TableCell>
+                    <TableCell>{highlightSearchTerm(match.NumberOfPassengers.toString())}</TableCell>
+                  </TableRow>
+                );
+              }
+            })}
           </TableBody>
         </Table>
       </TableContainer>
       {searchError && <Typography color="error">{searchError}</Typography>}
+      {loading && <CircularProgress />}
     </Container>
   );
 };

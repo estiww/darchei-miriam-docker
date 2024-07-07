@@ -78,12 +78,18 @@ const connectionBetweenVolunteerandPatient = async (matchId) => {
   }
 };
 
-const gettravelMatches = async (req, res) => {
+const getTravelMatches = async (req, res) => {
   try {
-    const travelMatches = await TravelMatch.getAll();
+    // Extract limit and offset from query parameters, with defaults
+    const limit = parseInt(req.query.limit) || 1;
+    const offset = parseInt(req.query.offset) || 0;
+
+    // Fetch travel matches with pagination
+    const travelMatches = await TravelMatch.getAll(limit, offset);
+
     res.status(200).json(travelMatches);
   } catch (error) {
-    res.status(500).json({ massage: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -119,7 +125,7 @@ const getUpcomingTravels = async (req, res) => {
 
 module.exports = {
   createTravelMatch,
-  gettravelMatches,
+  getTravelMatches,
   getUpcomingTravels,
   getMyTravels,
 };

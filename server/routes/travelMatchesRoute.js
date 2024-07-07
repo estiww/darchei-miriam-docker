@@ -7,9 +7,9 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 router.get("/upcoming", verifyPermissions(["Volunteer"]), travelMatchesController.getUpcomingTravels); 
-router.get("/", travelMatchesController.gettravelMatches);
-router.get('/:userId',travelMatchesController.getMyTravels)
-router.post("/:requestId",verifyPermissions(["Volunteer"]),travelMatchesController.createTravelMatch);
+router.get("/", verifyPermissions(["Admin"]), travelMatchesController.getTravelMatches);
+router.get('/:userId', verifyPermissions(["Volunteer","Admin"]),travelMatchesController.getMyTravels)
+router.post("/:requestId",verifyPermissions(["Volunteer","Admin"]),travelMatchesController.createTravelMatch);
 
 
 module.exports = router
