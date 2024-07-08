@@ -8,7 +8,7 @@ router.use(express.urlencoded({ extended: true }));
 
 router.get("/upcoming", verifyPermissions(["Volunteer"]), travelMatchesController.getUpcomingTravels); 
 router.get("/", verifyPermissions(["Admin"]), travelMatchesController.getTravelMatches);
-router.get('/:userId', verifyPermissions(["Volunteer","Admin"]),travelMatchesController.getMyTravels)
+router.get('/:userId', verifyPermissions(["Volunteer","Admin","Patient"]),travelMatchesController.getMyTravels)
 router.post("/:requestId",verifyPermissions(["Volunteer","Admin"]),travelMatchesController.createTravelMatch);
 
 

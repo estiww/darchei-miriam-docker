@@ -28,6 +28,27 @@ const TravelRequests = ({ setMinimizedReminders }) => {
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const navigate = useNavigate();
 
+  const hospitals = [
+    "הדסה עין כרם",
+    "הדסה הר הצופים",
+    "איכילוב",
+    "שיבא",
+    "רמב\"ם",
+    "סורוקה",
+    "שערי צדק",
+    "קפלן",
+    "וולפסון",
+    "לניאדו",
+    "בילינסון",
+    "אסף הרופא",
+    "פוריה",
+    "הלל יפה",
+    "ברזילי",
+    "זיו",
+    "בית לוינשטיין",
+    "משגב לדך",
+  ];
+ 
   const fetchTravelRequests = async () => {
     try {
       const response = await fetch(`http://localhost:3000/travelRequests?status=התקבלה`, {
@@ -163,6 +184,19 @@ const TravelRequests = ({ setMinimizedReminders }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const getRelevantPart = (address) => {
+    for (const hospital of hospitals) {
+      if (address.includes(hospital)) {
+        return hospital;
+      }
+    }
+    const parts = address.split(",");
+    if (parts.length > 2) {
+      return parts[1].trim(); // Get the second part
+    }
+    return address;
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
@@ -187,8 +221,8 @@ const TravelRequests = ({ setMinimizedReminders }) => {
               <Typography variant="body1">
                 <EventIcon /> {formatDate(request.TravelDate)} <br />
                 <AccessTimeIcon /> {formatTime(request.TravelTime)} <br />
-                <PlaceIcon /> {request.Origin} <br />
-                <FlagIcon /> {request.Destination}
+                <PlaceIcon /> {getRelevantPart(request.Origin)} <br />
+                <FlagIcon /> {getRelevantPart(request.Destination)}
               </Typography>
               <Box mt={2} width="100%">
                 <Button

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Button,
   TextField,
@@ -16,9 +18,11 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const AddAdmin = () => {
+    const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     roleName: "Admin",
     firstName: "",
@@ -32,8 +36,8 @@ const AddAdmin = () => {
     neighborhood: "",
     street: "",
     houseNumber: "",
-    zipCode: "",      
-    isApproved:true,
+    zipCode: "",
+    isApproved: true,
     communicationMethod: "",
   });
 
@@ -99,7 +103,10 @@ const AddAdmin = () => {
     const birthDateObj = new Date(birthDate);
     const age = today.getFullYear() - birthDateObj.getFullYear();
     const monthDifference = today.getMonth() - birthDateObj.getMonth();
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDateObj.getDate())
+    ) {
       return age > 18;
     }
     return age >= 18;
@@ -107,7 +114,7 @@ const AddAdmin = () => {
 
   const handleClose = () => {
     setOpen(false);
-    window.location.href = "/";
+    navigate("/home");
   };
 
   return (
@@ -143,7 +150,11 @@ const AddAdmin = () => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel value="Female" control={<Radio />} label="Female" />
+            <FormControlLabel
+              value="Female"
+              control={<Radio />}
+              label="Female"
+            />
           </RadioGroup>
         </FormControl>
 
@@ -195,20 +206,28 @@ const AddAdmin = () => {
         </Box>
 
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">Preferred Communication Method</FormLabel>
+          <FormLabel component="legend">
+            Preferred Communication Method
+          </FormLabel>
           <RadioGroup
             row
             name="communicationMethod"
             value={formData.communicationMethod}
             onChange={handleChange}
           >
-            <FormControlLabel value="WhatsApp" control={<Radio />} label="WhatsApp" />
+            <FormControlLabel
+              value="WhatsApp"
+              control={<Radio />}
+              label="WhatsApp"
+            />
             <FormControlLabel value="Email" control={<Radio />} label="Email" />
             <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
           </RadioGroup>
         </FormControl>
 
-        <Typography variant="h6" sx={{ mt: 2 }}>Address</Typography>
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Address
+        </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -258,7 +277,12 @@ const AddAdmin = () => {
           />
         </Box>
 
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
           Submit Admin Request
         </Button>
         {error && (

@@ -1,20 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import {
-  Button, TextField, FormControl, FormControlLabel, Checkbox, Box, Container,
-  Typography, MenuItem, Select, InputLabel, Grid, FormGroup, Dialog, DialogTitle,
-  DialogContent, DialogContentText, DialogActions
+  Button,
+  TextField,
+  FormControl,
+  FormControlLabel,
+  Checkbox,
+  Box,
+  Container,
+  Typography,
+  MenuItem,
+  Select,
+  InputLabel,
+  Grid,
+  FormGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import AsyncSelect from "react-select/async";
 import sendRefreshToken from "../components/SendRefreshToken";
-import AsyncSelect from 'react-select/async';
 
 const TravelRequestForm = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     origin: "",
+    originHouseNumber: "",
     destination: "",
+    destinationHouseNumber: "",
     travelTime: "",
     travelDate: "",
     numberOfPassengers: 1,
@@ -26,16 +43,9 @@ const TravelRequestForm = () => {
     endDate: "",
   });
 
-  const [originType, setOriginType] = useState('address'); // 'address' or 'medicalCenter'
-  const [destinationType, setDestinationType] = useState('medicalCenter'); // 'address' or 'medicalCenter'
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-
-  useEffect(() => {
-    // Fetch the options for addresses and medical centers
-    // You can also add fetch calls here to get options from the backend if needed
-  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -82,6 +92,15 @@ const TravelRequestForm = () => {
       }
     }
 
+    const originFullAddress = `${formData.origin}, ${formData.originHouseNumber}`;
+    const destinationFullAddress = `${formData.destination}, ${formData.destinationHouseNumber}`;
+
+    const updatedFormData = {
+      ...formData,
+      origin: originFullAddress,
+      destination: destinationFullAddress
+    };
+
     try {
       const response = await fetch("http://localhost:3000/travelRequests", {
         method: "POST",
@@ -89,7 +108,7 @@ const TravelRequestForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedFormData),
       });
 
       if (!response.ok) {
@@ -106,7 +125,9 @@ const TravelRequestForm = () => {
 
       setFormData({
         origin: "",
+        originHouseNumber: "",
         destination: "",
+        destinationHouseNumber: "",
         travelTime: "",
         travelDate: "",
         numberOfPassengers: 1,
@@ -128,13 +149,32 @@ const TravelRequestForm = () => {
     navigate('/home');
   };
 
-  const loadOptions = async (inputValue, type) => {
-    // Replace with your API call to get the data
-    const response = await fetch(`http://localhost:3000/${type}?query=${inputValue}`);
-    const data = await response.json();
-    return data.map((item) => ({ value: item.id, label: item.name }));
+  const loadAddressOptions = async (inputValue) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${inputValue}&countrycodes=il&limit=3`
+      );
+      const data = await response.json();
+      console.log("Data from API:", data);
+      return data.map((item) => {
+        const addressParts = item.display_name.split(',').slice(0, 3);
+        // הוסף את מספר הבית לאחר המרכיב הראשון
+        if (addressParts.length > 1) {
+          addressParts[1] = `${addressParts[1]} ${formData.originHouseNumber || formData.destinationHouseNumber}`;
+        }
+        const formattedAddress = addressParts.join(', ');
+        console.log("Formatted address:", formattedAddress);
+        return {
+          value: item.place_id,
+          label: formattedAddress,
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching address options:", error);
+      return [];
+    }
   };
-
+      
   return (
     <Container>
       {isSubmitted ? (
@@ -147,41 +187,44 @@ const TravelRequestForm = () => {
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="originType-label">Origin Type</InputLabel>
-                <Select
-                  labelId="originType-label"
-                  name="originType"
-                  value={originType}
-                  onChange={(e) => setOriginType(e.target.value)}
-                >
-                  <MenuItem value="address">Address</MenuItem>
-                  <MenuItem value="medicalCenter">Medical Center</MenuItem>
-                </Select>
-              </FormControl>
               <AsyncSelect
                 cacheOptions
-                loadOptions={(inputValue) => loadOptions(inputValue, originType)}
-                onChange={(option) => setFormData({ ...formData, origin: option.value })}
+                loadOptions={loadAddressOptions}
+                onChange={(option) =>
+                  setFormData((prev) => ({ ...prev, origin: option.label }))
+                }
+                placeholder="Search for origin address"
+                noOptionsMessage={() => "לא נמצאו תוצאות"}
+              />
+              <TextField
+                fullWidth
+                label="House Number"
+                name="originHouseNumber"
+                value={formData.originHouseNumber}
+                onChange={handleChange}
+                sx={{ mt: 2 }}
               />
             </Grid>
             <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="destinationType-label">Destination Type</InputLabel>
-                <Select
-                  labelId="destinationType-label"
-                  name="destinationType"
-                  value={destinationType}
-                  onChange={(e) => setDestinationType(e.target.value)}
-                >
-                  <MenuItem value="address">Address</MenuItem>
-                  <MenuItem value="medicalCenter">Medical Center</MenuItem>
-                </Select>
-              </FormControl>
               <AsyncSelect
                 cacheOptions
-                loadOptions={(inputValue) => loadOptions(inputValue, destinationType)}
-                onChange={(option) => setFormData({ ...formData, destination: option.value })}
+                loadOptions={loadAddressOptions}
+                onChange={(option) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    destination: option.label,
+                  }))
+                }
+                placeholder="Search for destination address"
+                noOptionsMessage={() => "לא נמצאו תוצאות"}
+              />
+              <TextField
+                fullWidth
+                label="House Number"
+                name="destinationHouseNumber"
+                value={formData.destinationHouseNumber}
+                onChange={handleChange}
+                sx={{ mt: 2 }}
               />
             </Grid>
           </Grid>
@@ -247,7 +290,15 @@ const TravelRequestForm = () => {
                   <>
                     <Typography variant="subtitle2">Select Days</Typography>
                     <FormGroup row>
-                      {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
+                      {[
+                        "ראשון",
+                        "שני",
+                        "שלישי",
+                        "רביעי",
+                        "חמישי",
+                        "שישי",
+                        "שבת",
+                      ].map((day) => (
                         <FormControlLabel
                           key={day}
                           control={
@@ -277,31 +328,47 @@ const TravelRequestForm = () => {
               </Grid>
             </>
           )}
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="isAlone"
+                checked={formData.isAlone}
+                onChange={handleChange}
+              />
+            }
+            label="Alone"
+          />
           <Button
             type="submit"
+            fullWidth
             variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
+            sx={{ mt: 3, mb: 2 }}
           >
-            Submit
+            Submit Request
           </Button>
           {error && (
-            <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
               {error}
             </Typography>
           )}
         </Box>
       )}
-      <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Success</DialogTitle>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <CheckCircleOutlineIcon color="success" />
+            Travel request submitted successfully!
+          </Box>
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Travel request submitted successfully!
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary" autoFocus>
-            Close
+          <Button onClick={handleClose} color="primary">
+            OK
           </Button>
         </DialogActions>
       </Dialog>

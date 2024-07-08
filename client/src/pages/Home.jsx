@@ -14,7 +14,7 @@ import UserProfile from "./UserProfile";
 import TravelRequests from "./TravelRequests";
 import TravelMatches from "./TravelMatches";
 import TravelRequestForm from "./TravelRequestForm";
-import AddAdmin from "./AddAdmin";
+import AddUser from "./AddUser";
 import Users from "./Users";
 import MyTravels from "../components/MyTravels";
 import { UserContext } from "../App";
@@ -89,8 +89,8 @@ const Home = () => {
                   </Button>
                 )}{(user.roleName === "Admin"
                   ) && (
-                  <Button color="inherit" component={Link} to="addAdmin" style={{ color: "#000" }}>
-                     AddAdmin
+                  <Button color="inherit" component={Link} to="addUser" style={{ color: "#000" }}>
+                     AddUser
                   </Button>
                 )}
                 {user.roleName === "Admin" && (
@@ -161,7 +161,7 @@ const Home = () => {
           <Route path="profile" element={<UserProfile />} />
           <Route path="myTravels" element={<MyTravels />} />
           <Route path="users" element={<Users />} />
-          <Route path="addAdmin" element={<AddAdmin />} />
+          <Route path="addUser" element={<AddUser />} />
         </Routes>
       </Container>
       {user && user.roleName === "Volunteer" ? (

@@ -32,7 +32,7 @@ const AppContent = () => {
       if (!response.ok) {
         if (response.status === 401) {
           console.log("401");
-          const result = await sendRefreshToken();
+         await sendRefreshToken();
          await fetchUserData();
         }
       } else {

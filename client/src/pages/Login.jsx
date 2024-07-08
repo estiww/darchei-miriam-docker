@@ -82,6 +82,8 @@ function Login() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
+      credentials: 'include',
+
     };
 
     fetch(url, requestOptions)

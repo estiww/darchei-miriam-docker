@@ -176,7 +176,96 @@ async function signup(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+async function createUser(req, res) {
+  try {
+    const {
+      roleName,
+      firstName,
+      lastName,
+      isApproved,
+      communicationMethod,
+      gender,
+      birthDate,
+      phone,
+      email,
+      password,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode,
+      location = null,
+    } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const existingUser = await model.getUserByEmail(email);
+    if (existingUser) {
+      return res.status(401).json({ message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await model.signup(
+      roleName,
+      firstName,
+      lastName,
+      gender,
+      birthDate,
+      phone,
+      email,
+      hashedPassword,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode,
+      isApproved,
+      communicationMethod
+    );
+
+    if (result) {
+      const user = {
+        UserId: result.insertId,
+        Mail: email,
+        RoleName: roleName,
+        IsApproved: isApproved,
+      };
+
+      if (roleName === "Patient") {
+        await model.createPatient(result.insertId);
+      }
+      if (roleName === "Volunteer") {
+        await model.createVolunteer(result.insertId, location);
+      }
+
+      // const tokens = generateTokens(user);
+      // await model.upsertRefreshToken(user.UserId, tokens.refreshToken);
+      // setTokensAsCookies(res, tokens);
+      return res.json({
+        id: user.UserId,
+        email: user.Mail,
+        firstName: user.FirstName,
+        lastName: user.LastName,
+        city: user.City,
+        neighborhood: user.Neighborhood,
+        street: user.Street,
+        houseNumber: user.HouseNumber,
+        zipCode: user.ZipCode,
+        communicationMethod: user.CommunicationMethod,
+        phone: user.Phone,
+        roleName: user.RoleName,
+        isApproved: user.IsApproved
+      });
+    } else {
+      return res.status(500).json({ error: "Failed to create user" });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
 async function updateUserDetails(req, res) {
   try {
     const {
@@ -245,6 +334,7 @@ async function getAll(req, res) {
 
 async function updateIsApproved(req, res) {
   try {
+    console.log('hiiiiiiiiiiiii')
     const { id } = req.params;
     const { isApproved } = req.body;
     const result = await model.updateIsApproved(id, isApproved);
@@ -282,6 +372,7 @@ module.exports = {
   getByUsername,
   login,
   signup,
+  createUser,
   updateUserDetails,
   updateIsApproved,
   generateTokens,

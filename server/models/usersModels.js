@@ -514,6 +514,24 @@ async function deleteRefreshToken(userId) {
 // }
 
 // module.exports = { updateUser, getUser, getUsers, deleteUser, createUser, isUserExists, getUserByEmail,signup };
+async function getUserIdByRefreshToken(refreshToken) {
+  try {
+    const sql = `
+      SELECT UserId 
+      FROM RefreshTokenTable 
+      WHERE RefreshToken = ?;
+    `;
+    const [rows] = await pool.query(sql, [refreshToken]);
+    
+    if (rows.length > 0) {
+      return rows[0].UserId;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    throw err;
+  }
+}
 module.exports = {
   updateUserByEmail,
   getUserByEmail,
@@ -531,4 +549,6 @@ module.exports = {
   getVolunteerIdByUserId,
   getUsers,
   updateIsApproved,
+  updateUserToken,
+  getUserIdByRefreshToken
 };

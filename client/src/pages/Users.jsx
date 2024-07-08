@@ -113,6 +113,7 @@ const Users = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ isApproved: isApproved ? 1 : 0 }),
+        credentials: 'include',
       });
 
       if (!response.ok) {

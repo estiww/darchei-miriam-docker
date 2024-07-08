@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
+
 import {
   Button,
   TextField,
@@ -16,9 +19,12 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
-const PatientForm = () => {
+const PatientForm = ({ isApproved = false }) => {
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
+
   const [formData, setFormData] = useState({
     roleName: "Patient",
     firstName: "",
@@ -32,8 +38,8 @@ const PatientForm = () => {
     neighborhood: "",
     street: "",
     houseNumber: "",
-    zipCode: "",     
-     isApproved:false,
+    zipCode: "",
+    isApproved: isApproved,
     communicationMethod: "",
   });
 
@@ -59,8 +65,12 @@ const PatientForm = () => {
       return;
     }
 
-    const url = `http://localhost:3000/signup`;
-    const requestOptions = {
+    let url;
+    if (user.roleName !== "Admin") {
+      url = `http://localhost:3000/signup`;
+    } else {
+      url = `http://host:3000/addUser`;
+    }    const requestOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,11 +84,13 @@ const PatientForm = () => {
         if (!response.ok) {
           return response.json().then((data) => {
             throw new Error(data.message);
+           
           });
         }
         return response.json();
       })
-      .then(() => {
+      .then((data) => {
+        if (user.roleName !== "Admin") setUser(data);
         setOpen(true);
       })
       .catch((error) => {
@@ -99,7 +111,10 @@ const PatientForm = () => {
     const birthDateObj = new Date(birthDate);
     const age = today.getFullYear() - birthDateObj.getFullYear();
     const monthDifference = today.getMonth() - birthDateObj.getMonth();
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDateObj.getDate())
+    ) {
       return age > 18;
     }
     return age >= 18;
@@ -107,7 +122,7 @@ const PatientForm = () => {
 
   const handleClose = () => {
     setOpen(false);
-    window.location.href = "/";
+    navigate("/home");
   };
 
   return (
@@ -143,7 +158,11 @@ const PatientForm = () => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel value="Female" control={<Radio />} label="Female" />
+            <FormControlLabel
+              value="Female"
+              control={<Radio />}
+              label="Female"
+            />
           </RadioGroup>
         </FormControl>
 
@@ -195,20 +214,28 @@ const PatientForm = () => {
         </Box>
 
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">Preferred Communication Method</FormLabel>
+          <FormLabel component="legend">
+            Preferred Communication Method
+          </FormLabel>
           <RadioGroup
             row
             name="communicationMethod"
             value={formData.communicationMethod}
             onChange={handleChange}
           >
-            <FormControlLabel value="WhatsApp" control={<Radio />} label="WhatsApp" />
+            <FormControlLabel
+              value="WhatsApp"
+              control={<Radio />}
+              label="WhatsApp"
+            />
             <FormControlLabel value="Email" control={<Radio />} label="Email" />
             <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
           </RadioGroup>
         </FormControl>
 
-        <Typography variant="h6" sx={{ mt: 2 }}>Address</Typography>
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Address
+        </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -258,7 +285,12 @@ const PatientForm = () => {
           />
         </Box>
 
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
           Submit Patient Request
         </Button>
         {error && (

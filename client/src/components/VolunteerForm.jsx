@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
+
 import {
   Button,
   TextField,
@@ -17,10 +20,14 @@ import {
   DialogTitle,
   IconButton,
 } from "@mui/material";
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
+const VolunteerForm = ({ isApproved = false }) => {
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
 
-const VolunteerForm = () => {
+  console.log("isApproved");
+  console.log(isApproved);
   const [formData, setFormData] = useState({
     roleName: "Volunteer",
     firstName: "",
@@ -35,8 +42,8 @@ const VolunteerForm = () => {
     neighborhood: "",
     street: "",
     houseNumber: "",
-    zipCode: "",     
-    isApproved:false,
+    zipCode: "",
+    isApproved: isApproved,
     communicationMethod: "",
   });
 
@@ -61,8 +68,12 @@ const VolunteerForm = () => {
       setError("You have entered an invalid birthdate!");
       return;
     }
-
-    const url = `http://localhost:3000/signup`;
+    let url;
+    if (user.roleName !== "Admin") {
+      url = `http://localhost:3000/signup`;
+    } else {
+      url = `http://host:3000/addUser`;
+    }
     const requestOptions = {
       method: "POST",
       headers: {
@@ -81,7 +92,8 @@ const VolunteerForm = () => {
         }
         return response.json();
       })
-      .then(() => {
+      .then((data) => {
+        if (user.roleName !== "Admin") setUser(data);
         setOpen(true);
       })
       .catch((error) => {
@@ -105,7 +117,7 @@ const VolunteerForm = () => {
 
   const handleClose = () => {
     setOpen(false);
-    window.location.href = "/";
+    navigate("/home");
   };
 
   return (
@@ -204,7 +216,7 @@ const VolunteerForm = () => {
           value={formData.location}
           onChange={handleChange}
         />
-         <FormControl component="fieldset" margin="normal">
+        <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">
             Preferred Communication Method
           </FormLabel>
@@ -275,7 +287,7 @@ const VolunteerForm = () => {
             onChange={handleChange}
           />
         </Box>
-       
+
         <Button
           type="submit"
           fullWidth
@@ -308,7 +320,6 @@ const VolunteerForm = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
     </Container>
   );
 };
