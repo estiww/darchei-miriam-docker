@@ -74,9 +74,25 @@ async function signup(
   street,
   houseNumber,
   zipCode,
+  isApproved,
   communicationMethod
 ) {
   try {
+    console.log('signup',roleName,
+      firstName,
+      lastName,
+      gender,
+      birthDate,
+      phone,
+      email,
+      hashedPassword,
+      city,
+      neighborhood,
+      street,
+      houseNumber,
+      zipCode,
+      isApproved,
+      communicationMethod)
     // מציאת RoleId על פי RoleName
     const findRoleIdSql = "SELECT RoleId FROM RoleTable WHERE RoleName = ?";
     const [roleResult] = await pool.query(findRoleIdSql, [roleName]);
@@ -124,7 +140,7 @@ async function signup(
             IsApproved, 
             CommunicationMethod
           ) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
     const [userResult] = await pool.query(insertUserSql, [
       passwordId,
@@ -136,6 +152,7 @@ async function signup(
       gender,
       birthDate,
       roleId,
+      isApproved,
       communicationMethod,
     ]);
 

@@ -1,9 +1,13 @@
-import React, { useState } from "react";
-import {useNavigate } from 'react-router-dom';
-import {Button,TextField,FormControl,FormControlLabel,Checkbox,Box,Container,Typography,MenuItem,Select,InputLabel,Grid,FormGroup,Dialog,DialogTitle,DialogContent,DialogContentText,DialogActions,} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import {
+  Button, TextField, FormControl, FormControlLabel, Checkbox, Box, Container,
+  Typography, MenuItem, Select, InputLabel, Grid, FormGroup, Dialog, DialogTitle,
+  DialogContent, DialogContentText, DialogActions
+} from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import sendRefreshToken from "../components/SendRefreshToken";
-
+import AsyncSelect from 'react-select/async';
 
 const TravelRequestForm = () => {
   const navigate = useNavigate();
@@ -19,13 +23,19 @@ const TravelRequestForm = () => {
     status: "התקבלה",
     travelType: "חד פעמי",
     recurringDays: [],
-    recurringDuration: "",
     endDate: "",
   });
 
+  const [originType, setOriginType] = useState('address'); // 'address' or 'medicalCenter'
+  const [destinationType, setDestinationType] = useState('medicalCenter'); // 'address' or 'medicalCenter'
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+
+  useEffect(() => {
+    // Fetch the options for addresses and medical centers
+    // You can also add fetch calls here to get options from the backend if needed
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,15 +50,6 @@ const TravelRequestForm = () => {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
-
-    // Reset recurringDays if recurringDuration changes
-    if (name === "recurringDuration") {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        recurringDays: [],
-        [name]: value,
-      }));
-    }
   };
 
   const handleDayChange = (e) => {
@@ -93,7 +94,7 @@ const TravelRequestForm = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          const response = await sendRefreshToken();
+          await sendRefreshToken();
         }
       }
 
@@ -114,7 +115,6 @@ const TravelRequestForm = () => {
         status: "התקבלה",
         travelType: "חד פעמי",
         recurringDays: [],
-        recurringDuration: "",
         endDate: "",
       });
     } catch (error) {
@@ -125,7 +125,14 @@ const TravelRequestForm = () => {
 
   const handleClose = () => {
     setOpenDialog(false);
-    navigate('/home')
+    navigate('/home');
+  };
+
+  const loadOptions = async (inputValue, type) => {
+    // Replace with your API call to get the data
+    const response = await fetch(`http://localhost:3000/${type}?query=${inputValue}`);
+    const data = await response.json();
+    return data.map((item) => ({ value: item.id, label: item.name }));
   };
 
   return (
@@ -140,23 +147,41 @@ const TravelRequestForm = () => {
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <TextField
-                fullWidth
-                required
-                label="Origin"
-                name="origin"
-                value={formData.origin}
-                onChange={handleChange}
+              <FormControl fullWidth>
+                <InputLabel id="originType-label">Origin Type</InputLabel>
+                <Select
+                  labelId="originType-label"
+                  name="originType"
+                  value={originType}
+                  onChange={(e) => setOriginType(e.target.value)}
+                >
+                  <MenuItem value="address">Address</MenuItem>
+                  <MenuItem value="medicalCenter">Medical Center</MenuItem>
+                </Select>
+              </FormControl>
+              <AsyncSelect
+                cacheOptions
+                loadOptions={(inputValue) => loadOptions(inputValue, originType)}
+                onChange={(option) => setFormData({ ...formData, origin: option.value })}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField
-                fullWidth
-                required
-                label="Destination"
-                name="destination"
-                value={formData.destination}
-                onChange={handleChange}
+              <FormControl fullWidth>
+                <InputLabel id="destinationType-label">Destination Type</InputLabel>
+                <Select
+                  labelId="destinationType-label"
+                  name="destinationType"
+                  value={destinationType}
+                  onChange={(e) => setDestinationType(e.target.value)}
+                >
+                  <MenuItem value="address">Address</MenuItem>
+                  <MenuItem value="medicalCenter">Medical Center</MenuItem>
+                </Select>
+              </FormControl>
+              <AsyncSelect
+                cacheOptions
+                loadOptions={(inputValue) => loadOptions(inputValue, destinationType)}
+                onChange={(option) => setFormData({ ...formData, destination: option.value })}
               />
             </Grid>
           </Grid>
@@ -219,34 +244,25 @@ const TravelRequestForm = () => {
             <>
               <Grid container spacing={1} sx={{ mt: 1 }}>
                 <Grid item xs={6}>
-                    <>
-                      <Typography variant="subtitle2">Select Days</Typography>
-                      <FormGroup row>
-                        {[
-                          "ראשון",
-                          "שני",
-                          "שלישי",
-                          "רביעי",
-                          "חמישי",
-                          "שישי",
-                          "שבת",
-                        ].map((day) => (
-                          <FormControlLabel
-                            key={day}
-                            control={
-                              <Checkbox
-                                name={day}
-                                checked={formData.recurringDays.includes(day)}
-                                onChange={handleDayChange}
-                              />
-                            }
-                            label={day}
-                          />
-                        ))}
-                      </FormGroup>
-                    </>
+                  <>
+                    <Typography variant="subtitle2">Select Days</Typography>
+                    <FormGroup row>
+                      {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
+                        <FormControlLabel
+                          key={day}
+                          control={
+                            <Checkbox
+                              name={day}
+                              checked={formData.recurringDays.includes(day)}
+                              onChange={handleDayChange}
+                            />
+                          }
+                          label={day}
+                        />
+                      ))}
+                    </FormGroup>
+                  </>
                 </Grid>
-              
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
@@ -261,46 +277,31 @@ const TravelRequestForm = () => {
               </Grid>
             </>
           )}
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="isAlone"
-                checked={formData.isAlone}
-                onChange={handleChange}
-              />
-            }
-            label="Alone"
-          />
           <Button
             type="submit"
-            fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            color="primary"
+            sx={{ mt: 2 }}
           >
-            Submit Request
+            Submit
           </Button>
           {error && (
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            <Typography variant="body2" color="error" sx={{ mt: 2 }}>
               {error}
             </Typography>
           )}
         </Box>
       )}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <CheckCircleOutlineIcon color="success" />
-            Travel request submitted successfully!
-          </Box>
-        </DialogTitle>
+      <Dialog open={openDialog} onClose={handleClose}>
+        <DialogTitle>Success</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Travel request submitted successfully!
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            OK
+          <Button onClick={handleClose} color="primary" autoFocus>
+            Close
           </Button>
         </DialogActions>
       </Dialog>

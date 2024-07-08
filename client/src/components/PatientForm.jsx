@@ -32,7 +32,8 @@ const PatientForm = () => {
     neighborhood: "",
     street: "",
     houseNumber: "",
-    zipCode: "",
+    zipCode: "",     
+     isApproved:false,
     communicationMethod: "",
   });
 

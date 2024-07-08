@@ -69,7 +69,9 @@ function Login() {
         setError(error.message);
       });
   };
-
+  const handleSignupNavigate = () => {
+    navigate("/signup");
+  };
   const forgotPassword = (event) => {
     event.preventDefault();
     const email = event.target.getAttribute("data-email");
@@ -137,10 +139,6 @@ function Login() {
               id="password"
               autoComplete="current-password"
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 2, mb: 2 }}>
               Log In
             </Button>
@@ -152,7 +150,7 @@ function Login() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/signup" variant="body2">
+              <Link component="button" onClick={handleSignupNavigate} variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

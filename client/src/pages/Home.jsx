@@ -14,12 +14,13 @@ import UserProfile from "./UserProfile";
 import TravelRequests from "./TravelRequests";
 import TravelMatches from "./TravelMatches";
 import TravelRequestForm from "./TravelRequestForm";
-import { UserContext } from "../App";
+import AddAdmin from "./AddAdmin";
 import Users from "./Users";
+import MyTravels from "../components/MyTravels";
+import { UserContext } from "../App";
 import Reminders from "../components/Reminders";
 import CloseIcon from "@mui/icons-material/Close";
 import DriveEtaIcon from "@mui/icons-material/DriveEta";
-import MyTravels from "../components/MyTravels";
 import Logo from '../imgs/Logo.png'; 
 import HomePage from "./HomePage";
 const Home = () => {
@@ -86,6 +87,11 @@ const Home = () => {
                   <Button color="inherit" component={Link} to="travelRequests" style={{ color: "#000" }}>
                     בקשות פתוחות
                   </Button>
+                )}{(user.roleName === "Admin"
+                  ) && (
+                  <Button color="inherit" component={Link} to="addAdmin" style={{ color: "#000" }}>
+                     AddAdmin
+                  </Button>
                 )}
                 {user.roleName === "Admin" && (
                   <Button color="inherit" component={Link} to="travelMatches" style={{ color: "#000" }}>
@@ -149,12 +155,13 @@ const Home = () => {
       >
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="travelRequests" element={<TravelRequests />} />
+          <Route path="travelRequests" element={<TravelRequests setMinimizedReminders={setMinimizedReminders}/>} />
           <Route path="travelMatches" element={<TravelMatches />} />
           <Route path="travelRequestForm" element={<TravelRequestForm />} />
           <Route path="profile" element={<UserProfile />} />
           <Route path="myTravels" element={<MyTravels />} />
           <Route path="users" element={<Users />} />
+          <Route path="addAdmin" element={<AddAdmin />} />
         </Routes>
       </Container>
       {user && user.roleName === "Volunteer" ? (

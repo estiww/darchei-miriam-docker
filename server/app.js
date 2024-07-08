@@ -42,6 +42,7 @@ app.use(verifyJWT);
 // Route for refresh event
 app.use('/someEndpoint',someEndpointRoute);
 app.use('/users', usersRoute);
+app.use('/addAdmin', usersRoute);
 app.use("/travelRequests", travelRequestsRoute);
 app.use('/travelMatches', travelMatchesRoute);
 

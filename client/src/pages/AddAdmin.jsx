@@ -15,28 +15,25 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  IconButton,
 } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-
-const VolunteerForm = () => {
+const AddAdmin = () => {
   const [formData, setFormData] = useState({
-    roleName: "Volunteer",
+    roleName: "Admin",
     firstName: "",
     lastName: "",
     birthDate: "",
     phone: "",
     email: "",
     password: "",
-    location: "",
     gender: "",
     city: "",
     neighborhood: "",
     street: "",
     houseNumber: "",
-    zipCode: "",     
-    isApproved:false,
+    zipCode: "",      
+    isApproved:true,
     communicationMethod: "",
   });
 
@@ -49,7 +46,7 @@ const VolunteerForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
+    if (!formData.email || !formData.password || !formData.birthDate) {
       setError("Please fill in all fields.");
       return;
     }
@@ -58,11 +55,11 @@ const VolunteerForm = () => {
       return;
     }
     if (!validateBirthDate(formData.birthDate)) {
-      setError("You have entered an invalid birthdate!");
+      setError("You have entered an invalid birth date!");
       return;
     }
 
-    const url = `http://localhost:3000/signup`;
+    const url = `http://localhost:3000/addAdmin`;
     const requestOptions = {
       method: "POST",
       headers: {
@@ -86,7 +83,7 @@ const VolunteerForm = () => {
       })
       .catch((error) => {
         console.error("Error:", error.message);
-        setError("Failed to create volunteer request");
+        setError("Failed to create admin request");
       });
 
     setError("");
@@ -100,7 +97,12 @@ const VolunteerForm = () => {
   const validateBirthDate = (birthDate) => {
     const today = new Date();
     const birthDateObj = new Date(birthDate);
-    return birthDateObj.setFullYear(birthDateObj.getFullYear() + 18) < today;
+    const age = today.getFullYear() - birthDateObj.getFullYear();
+    const monthDifference = today.getMonth() - birthDateObj.getMonth();
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
+      return age > 18;
+    }
+    return age >= 18;
   };
 
   const handleClose = () => {
@@ -111,7 +113,7 @@ const VolunteerForm = () => {
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Typography variant="h6">Volunteer Registration</Typography>
+        <Typography variant="h6">Add Admin</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -141,11 +143,7 @@ const VolunteerForm = () => {
             onChange={handleChange}
           >
             <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel
-              value="Female"
-              control={<Radio />}
-              label="Female"
-            />
+            <FormControlLabel value="Female" control={<Radio />} label="Female" />
           </RadioGroup>
         </FormControl>
 
@@ -195,38 +193,22 @@ const VolunteerForm = () => {
             onChange={handleChange}
           />
         </Box>
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Location"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-        />
-         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">
-            Preferred Communication Method
-          </FormLabel>
+
+        <FormControl component="fieldset" margin="normal">
+          <FormLabel component="legend">Preferred Communication Method</FormLabel>
           <RadioGroup
             row
             name="communicationMethod"
             value={formData.communicationMethod}
             onChange={handleChange}
           >
-            <FormControlLabel
-              value="WhatsApp"
-              control={<Radio />}
-              label="WhatsApp"
-            />
+            <FormControlLabel value="WhatsApp" control={<Radio />} label="WhatsApp" />
             <FormControlLabel value="Email" control={<Radio />} label="Email" />
             <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
           </RadioGroup>
         </FormControl>
 
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Address
-        </Typography>
+        <Typography variant="h6" sx={{ mt: 2 }}>Address</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -275,14 +257,9 @@ const VolunteerForm = () => {
             onChange={handleChange}
           />
         </Box>
-       
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
-          Submit Volunteer Request
+
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+          Submit Admin Request
         </Button>
         {error && (
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>
@@ -308,9 +285,8 @@ const VolunteerForm = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
     </Container>
   );
 };
 
-export default VolunteerForm;
+export default AddAdmin;

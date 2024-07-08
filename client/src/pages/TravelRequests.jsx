@@ -19,7 +19,7 @@ import FlagIcon from "@mui/icons-material/Flag";
 import sendRefreshToken from "../components/SendRefreshToken";
 import { useNavigate } from "react-router-dom";
 
-const TravelRequests = () => {
+const TravelRequests = ({ setMinimizedReminders }) => {
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
@@ -112,7 +112,8 @@ const TravelRequests = () => {
     } finally {
       setLoading(false);
       fetchTravelRequests();
-    }
+      setMinimizedReminders(true)
+       }
   };
 
   const createTravelMatches = async (requestId) => {
