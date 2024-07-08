@@ -68,4 +68,4 @@ const createFutureRequests = async () => {
   };
     
 // Schedule the cron job to run every minute
-cron.schedule('* * * * *', createFutureRequests);
+cron.schedule('0 0 * * *', createFutureRequests);
