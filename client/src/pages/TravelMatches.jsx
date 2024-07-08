@@ -22,7 +22,8 @@ const TravelMatches = () => {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message);
+        // throw new Error(data.message);
+        await fetchTravelMatches()
       }
 
       const data = await response.json();

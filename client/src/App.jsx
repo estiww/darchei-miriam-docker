@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import ResetPassword from "./pages/ResetPassword";
 import "./App.css";
 import sendRefreshToken from "./components/SendRefreshToken";
+import Donation from "./pages/Donation";
 
 export const UserContext = createContext();
 
@@ -44,7 +45,7 @@ const AppContent = () => {
     } catch (error) {
       console.log(error);
       if (error.message === "440") {
-        navigate("/login"); // זרוק מחדש את השגיאה כדי שהפונקציה הקוראת תטפל בה
+        navigate("/home"); // זרוק מחדש את השגיאה כדי שהפונקציה הקוראת תטפל בה
       }
     }
   };
@@ -61,6 +62,7 @@ const AppContent = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/resetPassword/:token" element={<ResetPassword />} />
+        <Route path="/donate" element={<Donation/>} />
       </Routes>
     </UserContext.Provider>
   );

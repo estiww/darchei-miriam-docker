@@ -50,7 +50,7 @@ const TravelRequestForm = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (name === "numberOfPassengers" && (value !== "1" && value !== "2")) {
+    if (name === "numberOfPassengers" && value !== "1" && value !== "2") {
       setError("Number of passengers must be 1 or 2");
     } else {
       setError("");
@@ -77,17 +77,26 @@ const TravelRequestForm = () => {
     e.preventDefault();
 
     const currentDate = new Date();
-    const travelDate = new Date(`${formData.travelDate}T${formData.travelTime}`);
+    const travelDate = new Date(
+      `${formData.travelDate}T${formData.travelTime}`
+    );
 
     if (travelDate < currentDate) {
       setError("Travel date and time must be in the future");
       return;
     }
 
+    const maxTravelDate = new Date();
+    maxTravelDate.setDate(currentDate.getDate() + 7);
+    if (travelDate > maxTravelDate) {
+      setError("Travel date must be within one week from today");
+      return;
+    }
+
     if (formData.travelType === "קבוע" && formData.endDate) {
       const endDate = new Date(formData.endDate);
-      if (endDate < currentDate) {
-        setError("End date must be in the future");
+      if (endDate < travelDate) {
+        setError("End date must be later than the travel date");
         return;
       }
     }
@@ -98,7 +107,7 @@ const TravelRequestForm = () => {
     const updatedFormData = {
       ...formData,
       origin: originFullAddress,
-      destination: destinationFullAddress
+      destination: destinationFullAddress,
     };
 
     try {
@@ -113,7 +122,11 @@ const TravelRequestForm = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          await sendRefreshToken();
+          const response = await sendRefreshToken();
+          if (response.status === 440) {
+            console.log(440);
+            throw new Error("440");
+          }
         }
       }
 
@@ -139,14 +152,17 @@ const TravelRequestForm = () => {
         endDate: "",
       });
     } catch (error) {
-      console.error("Error creating travel request:", error.message);
-      setError("Failed to create travel request");
+      setError(error.message);
+      if (error.message === "440") {
+        navigate("/login");
+      }
+
     }
   };
 
   const handleClose = () => {
     setOpenDialog(false);
-    navigate('/home');
+    navigate("/home");
   };
 
   const loadAddressOptions = async (inputValue) => {
@@ -157,12 +173,14 @@ const TravelRequestForm = () => {
       const data = await response.json();
       console.log("Data from API:", data);
       return data.map((item) => {
-        const addressParts = item.display_name.split(',').slice(0, 3);
+        const addressParts = item.display_name.split(",").slice(0, 3);
         // הוסף את מספר הבית לאחר המרכיב הראשון
         if (addressParts.length > 1) {
-          addressParts[1] = `${addressParts[1]} ${formData.originHouseNumber || formData.destinationHouseNumber}`;
+          addressParts[1] = `${addressParts[1]} ${
+            formData.originHouseNumber || formData.destinationHouseNumber
+          }`;
         }
-        const formattedAddress = addressParts.join(', ');
+        const formattedAddress = addressParts.join(", ");
         console.log("Formatted address:", formattedAddress);
         return {
           value: item.place_id,
@@ -174,7 +192,7 @@ const TravelRequestForm = () => {
       return [];
     }
   };
-      
+
   return (
     <Container>
       {isSubmitted ? (
@@ -377,3 +395,5 @@ const TravelRequestForm = () => {
 };
 
 export default TravelRequestForm;
+
+

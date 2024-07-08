@@ -26,7 +26,7 @@ CREATE TABLE AddressTable (
 -- טבלת תפקידים
 CREATE TABLE RoleTable (
     RoleId INT AUTO_INCREMENT PRIMARY KEY,
-    RoleName ENUM('Patient', 'Volunteer', 'Admin') NOT NULL
+    RoleName ENUM('Patient', 'Volunteer', 'Admin', 'Driver') NOT NULL
 );
 
 -- טבלת משתמשים
@@ -142,7 +142,9 @@ INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALU
 INSERT INTO RoleTable (RoleName) VALUES
 ('Patient'),
 ('Volunteer'),
-('Admin');
+('Admin'),
+('Driver'):
+
 
 -- הכנסת נתונים לדוגמה בטבלת משתמשים
 INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail,Gender,BirthDate,CommunicationMethod,RoleId, IsApproved) VALUES

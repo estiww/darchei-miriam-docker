@@ -16,6 +16,7 @@ const logoutRoute = require("./routes/logoutRoute");
 const travelMatchesRoute = require('./routes/travelMatchesRoute');
 const usersRoute = require('./routes/usersRoute');
 const someEndpointRoute = require('./routes/someEndpointRoute');
+const sendEmail = require('./routes/sendEmailRoute');
 
 
 const logger = require('./middleware/logger');
@@ -34,6 +35,7 @@ app.use('/signup', signupRoute);
 app.use('/refreshTokenRoute', refreshTokenRoute);
 app.use('/forgotPassword', forgotPasswordRoute);
 app.use('/resetPassword', resetPasswordRoute);
+app.use('/sendEmail', sendEmail);
 
 
 

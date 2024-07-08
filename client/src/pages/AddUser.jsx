@@ -176,6 +176,7 @@ import { Button, Box, Container, Typography } from "@mui/material";
 import VolunteerForm from "../components/VolunteerForm";
 import PatientForm from "../components/PatientForm";
 import AdminForm from "../components/AdminForm";
+import DriverForm from "../components/DriverForm";
 import { useLocation } from "react-router-dom";
 
 const Signup = () => {
@@ -186,11 +187,13 @@ const Signup = () => {
   const renderForm = () => {
     switch (selectedForm) {
       case "volunteer":
-        return <VolunteerForm isApproved={true}/>;
+        return <VolunteerForm isApproved={true} />;
       case "patient":
-        return <PatientForm isApproved={true}/>;
+        return <PatientForm isApproved={true} />;
       case "admin":
         return <AdminForm />;
+      case "driver":
+        return <DriverForm />;
       default:
         return null;
     }
@@ -209,11 +212,17 @@ const Signup = () => {
         >
           Volunteer Request
         </Button>
-        <Button onClick={() => setSelectedForm("patient")} variant="contained" sx={{ marginRight: 2 }}>
+        <Button
+          onClick={() => setSelectedForm("patient")}
+          variant="contained"
+          sx={{ marginRight: 2 }}
+        >
           Assistance Request
         </Button>
-        <Button onClick={() => setSelectedForm("admin")} variant="contained">
+        <Button onClick={() => setSelectedForm("admin")} variant="contained"sx={{ marginRight: 2 }}>
           new admin
+        </Button><Button onClick={() => setSelectedForm("driver")} variant="contained">
+          new driver
         </Button>
       </Box>
       <Box>{renderForm()}</Box>

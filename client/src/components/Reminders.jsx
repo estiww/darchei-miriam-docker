@@ -39,7 +39,7 @@ const Reminders = () => {
   };
 
   return (
-    <div style={{ maxHeight: '570px', overflowY: 'auto' }}>
+    <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
       <Typography variant="h6">Upcoming Travels</Typography>
       <List>
         {Array.isArray(upcomingTravels) && upcomingTravels.length > 0 ? (

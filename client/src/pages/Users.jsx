@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, TextField, Switch, FormControlLabel } from "@mui/material";
+import sendRefreshToken from "../components/SendRefreshToken";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -7,6 +9,7 @@ const Users = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchError, setSearchError] = useState("");
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
@@ -14,17 +17,24 @@ const Users = () => {
         method: "GET",
         credentials: "include",
       });
-
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message);
-      }
+        if (response.status === 401) {
+          const response = await sendRefreshToken();
+          if (response.status === 440) {
+            console.log(440);
+            throw new Error("440");
+          }
+          return fetchUsers();
+        }}
 
       const data = await response.json();
       setUsers(data);
       setSearchError(""); // Clear search error message on successful fetch
     } catch (error) {
       setError(error.message);
+      if (error.message === "440") {
+        navigate("/login");
+      }
     }
   };
 
