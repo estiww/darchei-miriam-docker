@@ -49,9 +49,9 @@ const createFutureRequests = async () => {
             request.NumberOfPassengers,
             request.IsAlone,
             'התקבלה',
-            request.Recurring,
-            request.RecurringDays,
-            request.RecurringEndDate
+            !request.Recurring,
+            null,
+            null
           ]);
   
           console.log(`Future request created successfully for PatientId: ${request.PatientId}`);
@@ -68,4 +68,4 @@ const createFutureRequests = async () => {
   };
     
 // Schedule the cron job to run every minute
-cron.schedule('0 0 * * *', createFutureRequests);
+cron.schedule('* * * * *', createFutureRequests);

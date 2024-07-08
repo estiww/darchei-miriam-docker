@@ -191,9 +191,9 @@ const Signup = () => {
       case "patient":
         return <PatientForm isApproved={true} />;
       case "admin":
-        return <AdminForm />;
+        return <AdminForm isApproved={true}/>;
       case "driver":
-        return <DriverForm />;
+        return <DriverForm isApproved={true}  />;
       default:
         return null;
     }
