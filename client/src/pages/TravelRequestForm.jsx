@@ -20,14 +20,29 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Paper,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AsyncSelect from "react-select/async";
 import sendRefreshToken from "../components/SendRefreshToken";
+import { styled } from '@mui/material/styles';
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  margin: theme.spacing(3, 0),
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[3],
+}));
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  fontWeight: 'bold',
+  color: theme.palette.primary.main,
+  marginBottom: theme.spacing(2),
+}));
 
 const TravelRequestForm = () => {
   const { user, setUser } = useContext(UserContext);
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -50,6 +65,7 @@ const TravelRequestForm = () => {
   const [error, setError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -201,161 +217,149 @@ const TravelRequestForm = () => {
   };
 
   return (
-    <Container>
-      {isSubmitted ? (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" color="success.main">
-            Travel request submitted successfully!
-          </Typography>
-        </Box>
-      ) : (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <AsyncSelect
-                cacheOptions
-                loadOptions={loadAddressOptions}
-                onChange={(option) =>
-                  setFormData((prev) => ({ ...prev, origin: option.label }))
-                }
-                placeholder="Search for origin address"
-                noOptionsMessage={() => "לא נמצאו תוצאות"}
-              />
-              <TextField
-                fullWidth
-                label="House Number"
-                name="originHouseNumber"
-                value={formData.originHouseNumber}
-                onChange={handleChange}
-                sx={{ mt: 2 }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <AsyncSelect
-                cacheOptions
-                loadOptions={loadAddressOptions}
-                onChange={(option) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    destination: option.label,
-                  }))
-                }
-                placeholder="Search for destination address"
-                noOptionsMessage={() => "לא נמצאו תוצאות"}
-              />
-              <TextField
-                fullWidth
-                label="House Number"
-                name="destinationHouseNumber"
-                value={formData.destinationHouseNumber}
-                onChange={handleChange}
-                sx={{ mt: 2 }}
-              />
-            </Grid>
-          </Grid>
-          {user?.roleName == "Admin" && (
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                required
-                label="User Id"
-                name="userId"
-                value={formData.userId}
-                onChange={handleChange}
-                sx={{ mt: 2 }}
-              />
-            </Grid>
-          )}
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                required
-                label="Travel Date"
-                name="travelDate"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={formData.travelDate}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                required
-                label="Travel Time"
-                name="travelTime"
-                type="time"
-                InputLabelProps={{ shrink: true }}
-                value={formData.travelTime}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                required
-                label="Number of Passengers"
-                name="numberOfPassengers"
-                type="number"
-                value={formData.numberOfPassengers}
-                onChange={handleChange}
-                inputProps={{ min: 1, max: 2 }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="travelType-label">Travel Type</InputLabel>
-                <Select
-                  labelId="travelType-label"
-                  name="travelType"
-                  value={formData.travelType}
+    <Container maxWidth="md">
+      <StyledPaper elevation={3}>
+        <StyledTypography variant="h4" component="h1" align="center">
+          טופס בקשת נסיעה
+        </StyledTypography>
+        {isSubmitted ? (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" color="success.main" align="center">
+              בקשת הנסיעה הוגשה בהצלחה!
+            </Typography>
+          </Box>
+        ) : (
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <AsyncSelect
+                  cacheOptions
+                  loadOptions={loadAddressOptions}
+                  onChange={(option) =>
+                    setFormData((prev) => ({ ...prev, origin: option.label }))
+                  }
+                  placeholder="חפש כתובת מוצא"
+                  noOptionsMessage={() => "לא נמצאו תוצאות"}
+                />
+                <TextField
+                  fullWidth
+                  label="מספר בית"
+                  name="originHouseNumber"
+                  value={formData.originHouseNumber}
                   onChange={handleChange}
-                  label="Travel Type"
-                >
-                  <MenuItem value="חד פעמי">One-time</MenuItem>
-                  <MenuItem value="קבוע">Fixed</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-          {formData.travelType === "קבוע" && (
-            <>
-              <Grid container spacing={1} sx={{ mt: 1 }}>
-                <Grid item xs={6}>
-                  <>
-                    <Typography variant="subtitle2">Select Days</Typography>
-                    <FormGroup row>
-                      {[
-                        "ראשון",
-                        "שני",
-                        "שלישי",
-                        "רביעי",
-                        "חמישי",
-                        "שישי",
-                        "שבת",
-                      ].map((day) => (
-                        <FormControlLabel
-                          key={day}
-                          control={
-                            <Checkbox
-                              name={day}
-                              checked={formData.recurringDays.includes(day)}
-                              onChange={handleDayChange}
-                            />
-                          }
-                          label={day}
-                        />
-                      ))}
-                    </FormGroup>
-                  </>
-                </Grid>
-                <Grid item xs={6}>
+                  sx={{ mt: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <AsyncSelect
+                  cacheOptions
+                  loadOptions={loadAddressOptions}
+                  onChange={(option) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      destination: option.label,
+                    }))
+                  }
+                  placeholder="חפש כתובת יעד"
+                  noOptionsMessage={() => "לא נמצאו תוצאות"}
+                />
+                <TextField
+                  fullWidth
+                  label="מספר בית"
+                  name="destinationHouseNumber"
+                  value={formData.destinationHouseNumber}
+                  onChange={handleChange}
+                  sx={{ mt: 2 }}
+                />
+              </Grid>
+              {user?.roleName === "Admin" && (
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="End Date"
+                    required
+                    label="מזהה משתמש"
+                    name="userId"
+                    value={formData.userId}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="תאריך נסיעה"
+                  name="travelDate"
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.travelDate}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="שעת נסיעה"
+                  name="travelTime"
+                  type="time"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.travelTime}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="מספר נוסעים"
+                  name="numberOfPassengers"
+                  type="number"
+                  value={formData.numberOfPassengers}
+                  onChange={handleChange}
+                  inputProps={{ min: 1, max: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="travelType-label">סוג נסיעה</InputLabel>
+                  <Select
+                    labelId="travelType-label"
+                    name="travelType"
+                    value={formData.travelType}
+                    onChange={handleChange}
+                    label="סוג נסיעה"
+                  >
+                    <MenuItem value="חד פעמי">חד פעמי</MenuItem>
+                    <MenuItem value="קבוע">קבוע</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            {formData.travelType === "קבוע" && (
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle1">בחר ימים:</Typography>
+                  <FormGroup row>
+                    {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
+                      <FormControlLabel
+                        key={day}
+                        control={
+                          <Checkbox
+                            name={day}
+                            checked={formData.recurringDays.includes(day)}
+                            onChange={handleDayChange}
+                          />
+                        }
+                        label={day}
+                      />
+                    ))}
+                  </FormGroup>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="תאריך סיום"
                     name="endDate"
                     type="date"
                     InputLabelProps={{ shrink: true }}
@@ -364,49 +368,49 @@ const TravelRequestForm = () => {
                   />
                 </Grid>
               </Grid>
-            </>
-          )}
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="isAlone"
-                checked={formData.isAlone}
-                onChange={handleChange}
-              />
-            }
-            label="Alone"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Submit Request
-          </Button>
-          {error && (
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-        </Box>
-      )}
+            )}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="isAlone"
+                  checked={formData.isAlone}
+                  onChange={handleChange}
+                />
+              }
+              label="נוסע לבד"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              שלח בקשה
+            </Button>
+            {error && (
+              <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
+          </Box>
+        )}
+      </StyledPaper>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CheckCircleOutlineIcon color="success" />
-            Travel request submitted successfully!
+            בקשת הנסיעה הוגשה בהצלחה!
           </Box>
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Travel request submitted successfully!
+            בקשת הנסיעה שלך התקבלה ותטופל בהקדם.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            OK
+            אישור
           </Button>
         </DialogActions>
       </Dialog>
@@ -415,4 +419,5 @@ const TravelRequestForm = () => {
 };
 
 export default TravelRequestForm;
+
 

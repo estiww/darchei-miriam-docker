@@ -10,6 +10,8 @@ import {
   TextField,
   Box,
   IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   DirectionsCar,
@@ -20,12 +22,38 @@ import {
   Phone as PhoneIcon,
   Email as EmailIcon,
   Fax as FaxIcon,
+  LocationOn as LocationIcon,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { UserContext } from "../App"; // Assuming UserContext is exported from App.js
+import { UserContext } from "../App";
+import { styled } from "@mui/system";
+
+const HeroSection = styled(Box)(({ theme }) => ({
+  backgroundImage: 'url("/path/to/hero-image.jpg")',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  height: '70vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: 'white',
+  textAlign: 'center',
+}));
+
+const StatsBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(3),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'transform 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.05)',
+  },
+}));
 
 const AnimatedNumber = ({ end, duration }) => {
   const [count, setCount] = useState(0);
@@ -49,7 +77,10 @@ const AnimatedNumber = ({ end, duration }) => {
 };
 
 const HomePage = () => {
+
   const { user, setUser } = useContext(UserContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -64,6 +95,7 @@ const HomePage = () => {
       [e.target.name]: e.target.value,
     });
   };
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,304 +144,167 @@ const HomePage = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: isMobile ? 1 : 3,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
   };
 
   return (
-    <Container style={{ marginTop: "80px", marginBottom: "20px" }}>
-      <Grid
-        container
-        spacing={3}
-        justifyContent="center"
-        alignItems="center"
-        style={{ minHeight: "100vh" }}
-      >
-        <Grid item xs={12} textAlign="center">
-          <Typography variant="h4" gutterBottom>
-            ברוכים הבאים לארגון דרכי מרים
+    <>
+      <HeroSection>
+        <Container>
+          <Typography variant="h2" gutterBottom>
+            דרכי מרים - לב ואוזן קשבת
           </Typography>
-        </Grid>
+          <Typography variant="h5" gutterBottom>
+            עמותה לסיוע ותמיכה בחולים ובני משפחותיהם
+          </Typography>
+        </Container>
+      </HeroSection>
 
-        {/* Display the approval message if the request is pending */}
+      <Container sx={{ mt: 8, mb: 8 }}>
         {user && !user.isApproved && (
-          <Grid item xs={12} textAlign="center">
-            <Typography variant="h6" color="error">
+          <Box sx={{ mb: 4, p: 2, bgcolor: 'warning.light', borderRadius: 2 }}>
+            <Typography variant="h6" align="center">
               הבקשה שלך להצטרפות נשלחה, והיא מחכה לאישור
             </Typography>
-          </Grid>
+          </Box>
         )}
 
-        <Grid item xs={12}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Card
-                style={{
-                  position: "relative",
-                  overflow: "hidden",
-                  animation: "fadeInUp 1s",
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image="/path/to/image1.jpg"
-                  alt="תמונה 1"
-                  style={{ transition: "transform 1s" }}
-                />
-                <CardContent>
-                  <Typography variant="h5" component="div">
-                    פעילות הארגון
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    תיאור קצר של פעילות הארגון.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Card
-                style={{
-                  position: "relative",
-                  overflow: "hidden",
-                  animation: "fadeInUp 1s",
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image="/path/to/image2.jpg"
-                  alt="תמונה 2"
-                  style={{ transition: "transform 1s" }}
-                />
-                <CardContent>
-                  <Typography variant="h5" component="div">
-                    פעילויות נוספות
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    מידע נוסף על פעילויות הארגון.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h4" gutterBottom>
+              מי אנחנו
+            </Typography>
+            <Typography variant="body1" paragraph>
+              דרכי מרים הוקמה בשנת 2006 על ידי קבוצת מתנדבים שהחליטו להקים ארגון שיסייע לחולים ולבני משפחותיהם. 
+              מטרת העמותה היא להקל על סבלם של החולים ובני משפחותיהם, ולסייע להם בכל דרך אפשרית.
+            </Typography>
+            <Typography variant="body1">
+              אנו מספקים שירותי הסעות, תמיכה רגשית, וסיוע בצרכים יומיומיים למאות אנשים מדי יום. 
+              בנוסף, אנו מפעילים מערך מתנדבים ענף, מרכזי תמיכה, ומארגנים אירועי קהילה לחיזוק הקשרים החברתיים.
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CardMedia
+              component="img"
+              height="400"
+              image="/path/to/volunteers.jpg"
+              alt="מתנדבי דרכי מרים"
+              sx={{ borderRadius: 2 }}
+            />
           </Grid>
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          textAlign="center"
-          marginTop={4}
-          style={{
-            backgroundColor: "#B300B3",
-            padding: "20px",
-            color: "white",
-          }}
-        >
-          <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            style={{ marginTop: "20px" }}
-          >
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={2}
-              style={{ animation: "fadeInUp 1s" }}
-            >
-              <DirectionsCar style={{ fontSize: 48 }} />
-              <Typography variant="h4">
-                <AnimatedNumber end={50000} duration={2000} />
-              </Typography>
-              <Typography variant="body2">
-                נסיעות
-                <br />
-                בכל שנה
-              </Typography>
-            </Grid>
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={2}
-              style={{ animation: "fadeInUp 1s 0.2s" }}
-            >
-              <People style={{ fontSize: 48 }} />
-              <Typography variant="h4">
-                <AnimatedNumber end={2000} duration={2000} />
-              </Typography>
-              <Typography variant="body2">מתנדבים</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={2}
-              style={{ animation: "fadeInUp 1s 0.4s" }}
-            >
-              <LocalCafe style={{ fontSize: 48 }} />
-              <Typography variant="h4">
-                <AnimatedNumber end={100000} duration={2000} />
-              </Typography>
-              <Typography variant="body2">
-                כוסות
-                <br />
-                בכל שנה
-              </Typography>
-            </Grid>
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={2}
-              style={{ animation: "fadeInUp 1s 0.6s" }}
-            >
-              <LocalHospital style={{ fontSize: 48 }} />
-              <Typography variant="h4">
-                <AnimatedNumber end={5000} duration={2000} />
-              </Typography>
-              <Typography variant="body2">מטופלים</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={2}
-              style={{ animation: "fadeInUp 1s 0.8s" }}
-            >
-              <Healing style={{ fontSize: 48 }} />
-              <Typography variant="h4">
-                <AnimatedNumber end={180000} duration={2000} />
-              </Typography>
-              <Typography variant="body2">שירותים</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12} marginTop={4}>
-          <Typography variant="h5" align="center" gutterBottom>
-            גלריה
+        <Box sx={{ my: 8, py: 6, bgcolor: 'primary.main', color: 'white', borderRadius: 2 }}>
+          <Typography variant="h4" align="center" gutterBottom>
+            ההשפעה שלנו במספרים
           </Typography>
-          <Slider {...slickSettings}>
-            {galleryImages.map((image, index) => (
-              <Box key={index}>
-                <img
-                  src={image}
-                  alt={`גלריה ${index + 1}`}
-                  style={{ width: "100%", borderRadius: "8px" }}
-                />
-              </Box>
+          <Grid container spacing={4} justifyContent="center">
+            {[
+              { icon: DirectionsCar, number: 50000, text: "נסיעות בשנה" },
+              { icon: People, number: 2000, text: "מתנדבים" },
+              { icon: LocalCafe, number: 100000, text: "כוסות קפה" },
+              { icon: LocalHospital, number: 5000, text: "מטופלים" },
+              { icon: Healing, number: 180000, text: "שירותים" },
+            ].map((item, index) => (
+              <Grid item xs={6} sm={4} md={2} key={index}>
+                <StatsBox>
+                  <item.icon sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
+                  <Typography variant="h4" sx={{ mb: 1 }}>
+                    <AnimatedNumber end={item.number} duration={2000} />
+                  </Typography>
+                  <Typography variant="body2" align="center">
+                    {item.text}
+                  </Typography>
+                </StatsBox>
+              </Grid>
             ))}
-          </Slider>
-        </Grid>
+          </Grid>
+        </Box>
 
-        <Grid item xs={12} sm={8} md={6} lg={4} mt={5}>
-          <Box p={3} bgcolor="background.paper" boxShadow={2}>
-            <Typography variant="h5" align="center" gutterBottom>
+        <Typography variant="h4" align="center" sx={{ mb: 4 }}>
+          הפעילות שלנו
+        </Typography>
+        <Slider {...slickSettings}>
+          {galleryImages.map((image, index) => (
+            <Box key={index} sx={{ p: 1 }}>
+              <img
+                src={image}
+                alt={`פעילות ${index + 1}`}
+                style={{ width: "100%", borderRadius: "8px", height: "250px", objectFit: "cover" }}
+              />
+            </Box>
+          ))}
+        </Slider>
+
+        <Grid container spacing={4} sx={{ mt: 8 }}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h4" gutterBottom>
               צור קשר
             </Typography>
             <form onSubmit={handleSubmit}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    label="שם מלא"
-                    fullWidth
-                    name="name"
-                    value={contactForm.name}
-                    onChange={handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="כתובת אימייל"
-                    fullWidth
-                    name="email"
-                    value={contactForm.email}
-                    onChange={handleChange}
-                    error={!!emailError}
-                    helperText={emailError}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="הודעה"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    name="message"
-                    value={contactForm.message}
-                    onChange={handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12} textAlign="center">
-                  <Button type="submit" variant="contained" color="primary">
-                    שליחה
-                  </Button>
-                </Grid>
-              </Grid>
+              <TextField
+                label="שם מלא"
+                fullWidth
+                name="name"
+                value={contactForm.name}
+                onChange={handleChange}
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="כתובת אימייל"
+                fullWidth
+                name="email"
+                value={contactForm.email}
+                onChange={handleChange}
+                error={!!emailError}
+                helperText={emailError}
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="הודעה"
+                fullWidth
+                multiline
+                rows={4}
+                name="message"
+                value={contactForm.message}
+                onChange={handleChange}
+                margin="normal"
+                variant="outlined"
+              />
+              <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                שליחה
+              </Button>
             </form>
-          </Box>
-        </Grid>
-        <Grid container spacing={2} justifyContent="center" alignItems="center">
-          <Grid item>
-            <IconButton
-              onClick={() => window.open("tel:+077-414-7777")}
-              aria-label="טלפון"
-            >
-              <PhoneIcon fontSize="large" />
-            </IconButton>
-            <Typography variant="body2" align="center">
-              077-414-7777
-            </Typography>
           </Grid>
-          <Grid item>
-            <IconButton
-              onClick={() => window.open("fax:+025325639")}
-              aria-label="פקס"
-            >
-              <FaxIcon fontSize="large" />
-            </IconButton>
-            <Typography variant="body2" align="center">
-              02-5325639
+          <Grid item xs={12} md={6} mt={8}>
+            <Typography variant="h4" gutterBottom>
+              פרטי התקשרות
             </Typography>
-          </Grid>
-          <Grid item>
-            <IconButton
-              onClick={() => window.open("mailto:info@darcheimiriam.org.il")}
-              aria-label="אימייל"
-            >
-              <EmailIcon fontSize="large" />
-            </IconButton>
-            <Typography variant="body2" align="center">
-              info@darcheimiriam.org.il
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <PhoneIcon sx={{ mr: 2, color: 'primary.main' }} />
+              <Typography>077-414-7777</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <FaxIcon sx={{ mr: 2, color: 'primary.main' }} />
+              <Typography>02-5325639</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <EmailIcon sx={{ mr: 2, color: 'primary.main' }} />
+              <Typography>info@darcheimiriam.org.il</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <LocationIcon sx={{ mr: 2, color: 'primary.main' }} />
+              <Typography>זכרון יעקב 15, ירושלים</Typography>
+            </Box>
           </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </>
   );
 };
 

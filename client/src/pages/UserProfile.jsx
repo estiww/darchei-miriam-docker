@@ -6,16 +6,38 @@ import {
   Typography,
   Container,
   IconButton,
+  Paper,
+  Box,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { UserContext } from "../App"; // Assuming UserContext is exported from App.js
+import { UserContext } from "../App";
+import { styled } from '@mui/material/styles';
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  margin: theme.spacing(3, 0),
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[3],
+}));
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  fontWeight: 'bold',
+  color: theme.palette.primary.main,
+  marginBottom: theme.spacing(1),
+}));
 
 const UserProfile = () => {
   const { user, setUser } = useContext(UserContext);
   const [editMode, setEditMode] = useState(false);
   const [userDetails, setUserDetails] = useState({ ...user });
-  console.log(userDetails);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserDetails({
@@ -30,213 +52,143 @@ const UserProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("PUT");
-    console.log(userDetails);
     try {
-      const requestOptions = {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-       
-        body: JSON.stringify(userDetails),
-        credentials: "include",
-      };
-      
       const response = await fetch(
         `http://localhost:3000/users/${userDetails.id}`,
-        requestOptions
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userDetails),
+          credentials: "include",
+        }
       );
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to update user");
+        throw new Error(data.error || "עדכון פרטי המשתמש נכשל");
       }
-    } catch (error) {
-      // setError(error.message);
-    } finally {
       setUser(userDetails);
       setEditMode(false);
-      //האם צריך פה קריאת שרת
-      // fetchTravelRequests();
+    } catch (error) {
+      console.error(error);
+      // כאן תוכלי להוסיף הודעת שגיאה למשתמש
     }
-    // Here you would typically also send the updated details to your server
   };
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        User Profile
-        {!editMode ? (
-          <IconButton onClick={toggleEditMode} style={{ marginLeft: "10px" }}>
-            <EditIcon />
+    <Container maxWidth="md">
+      <StyledPaper elevation={3}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            פרופיל משתמש
+          </Typography>
+          <IconButton onClick={editMode ? handleSubmit : toggleEditMode} color="primary">
+            {editMode ? <SaveIcon /> : <EditIcon />}
           </IconButton>
+        </Box>
+        <Divider style={{ margin: '16px 0' }} />
+        {editMode ? (
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField label="שם פרטי" name="firstName" value={userDetails.firstName} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="שם משפחה" name="lastName" value={userDetails.lastName} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="דוא״ל" name="email" value={userDetails.email} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="טלפון" name="phone" value={userDetails.phone} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="עיר" name="city" value={userDetails.city} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="שכונה" name="neighborhood" value={userDetails.neighborhood} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="רחוב" name="street" value={userDetails.street} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="מספר בית" name="houseNumber" value={userDetails.houseNumber} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField label="מיקוד" name="zipCode" value={userDetails.zipCode} onChange={handleChange} fullWidth />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl component="fieldset">
+                  <Typography>אמצעי תקשורת מועדף</Typography>
+                  <RadioGroup
+                    row
+                    name="communicationMethod"
+                    value={userDetails.communicationMethod}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel value="WhatsApp" control={<Radio />} label="ווטסאפ" />
+                    <FormControlLabel value="Email" control={<Radio />} label="מייל" />
+                    <FormControlLabel value="Phone" control={<Radio />} label="טלפון" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              {userDetails.role === "Volunteer" && (
+                <Grid item xs={12} sm={6}>
+                  <TextField label="מיקום" name="location" value={userDetails.location || ""} onChange={handleChange} fullWidth />
+                </Grid>
+              )}
+            </Grid>
+          </form>
         ) : (
-          <IconButton onClick={handleSubmit} style={{ marginLeft: "10px" }}>
-            <SaveIcon />
-          </IconButton>
-        )}
-      </Typography>
-      {editMode ? (
-        <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="First Name"
-                name="firstName"
-                value={userDetails.firstName}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">שם פרטי</StyledTypography>
+              <Typography>{userDetails.firstName}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Last Name"
-                name="lastName"
-                value={userDetails.lastName}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">שם משפחה</StyledTypography>
+              <Typography>{userDetails.lastName}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Email"
-                name="email"
-                value={userDetails.email}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">דוא״ל</StyledTypography>
+              <Typography>{userDetails.email}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Phone"
-                name="phone"
-                value={userDetails.phone}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">טלפון</StyledTypography>
+              <Typography>{userDetails.phone}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="City"
-                name="city"
-                value={userDetails.city}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">עיר</StyledTypography>
+              <Typography>{userDetails.city}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Neighborhood"
-                name="neighborhood"
-                value={userDetails.neighborhood}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">שכונה</StyledTypography>
+              <Typography>{userDetails.neighborhood}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Street"
-                name="street"
-                value={userDetails.street}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">רחוב</StyledTypography>
+              <Typography>{userDetails.street}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="House Number"
-                name="houseNumber"
-                value={userDetails.houseNumber}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">מספר בית</StyledTypography>
+              <Typography>{userDetails.houseNumber}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Zip Code"
-                name="zipCode"
-                value={userDetails.zipCode}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">מיקוד</StyledTypography>
+              <Typography>{userDetails.zipCode}</Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Communication Method"
-                name="communicationMethod"
-                value={userDetails.communicationMethod}
-                onChange={handleChange}
-                fullWidth
-              />
+              <StyledTypography variant="subtitle1">אמצעי תקשורת מועדף</StyledTypography>
+              <Typography>{userDetails.communicationMethod}</Typography>
             </Grid>
             {userDetails.role === "Volunteer" && (
               <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Location"
-                  name="location"
-                  value={userDetails.location || ""}
-                  onChange={handleChange}
-                  fullWidth
-                />
+                <StyledTypography variant="subtitle1">מיקום</StyledTypography>
+                <Typography>{userDetails.location}</Typography>
               </Grid>
             )}
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary">
-                Save
-              </Button>
-            </Grid>
           </Grid>
-        </form>
-      ) : (
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">First Name</Typography>
-            <Typography>{userDetails.firstName}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Last Name</Typography>
-            <Typography>{userDetails.lastName}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Email</Typography>
-            <Typography>{userDetails.email}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Phone</Typography>
-            <Typography>{userDetails.phone}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">City</Typography>
-            <Typography>{userDetails.city}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Neighborhood</Typography>
-            <Typography>{userDetails.neighborhood}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Street</Typography>
-            <Typography>{userDetails.street}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">House Number</Typography>
-            <Typography>{userDetails.houseNumber}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Zip Code</Typography>
-            <Typography>{userDetails.zipCode}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h6">Communication Method</Typography>
-            <Typography>{userDetails.communicationMethod}</Typography>
-          </Grid>
-          {userDetails.role === "Volunteer" && (
-            <Grid item xs={12} sm={6}>
-              <Typography variant="h6">Location</Typography>
-              <Typography>{userDetails.location}</Typography>
-            </Grid>
-          )}
-        </Grid>
-      )}
+        )}
+      </StyledPaper>
     </Container>
   );
 };

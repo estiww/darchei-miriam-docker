@@ -60,7 +60,7 @@ const Signup = () => {
       <NavigationMenu />
       <Box sx={{ marginTop: 12, textAlign: 'center' }}>
         <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
-          בחר סוג בקשה
+הרשמה
         </Typography>
         <Typography variant="body1" gutterBottom color="text.secondary">
           אנא בחר את סוג הבקשה המתאים לך

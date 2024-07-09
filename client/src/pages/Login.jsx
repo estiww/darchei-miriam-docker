@@ -100,7 +100,7 @@ function Login() {
       <NavigationMenu />
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Paper elevation={3} sx={{ mt: 25, p: 4, borderRadius: 2 }}>
+        <Paper elevation={3} sx={{ mt: 20, p: 4, borderRadius: 2 }}>
           <Box
             sx={{
               display: "flex",

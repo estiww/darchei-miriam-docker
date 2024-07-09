@@ -75,6 +75,7 @@ const TravelRequests = ({ setMinimizedReminders }) => {
     "זיו",
     "בית לוינשטיין",
     "משגב לדך",
+    "אסותא",
   ];
 
   const fetchTravelRequests = async () => {

@@ -313,7 +313,7 @@ const PatientForm = ({ isApproved = false }) => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          {user?.roleName === "Admin" ? "אישור" : "שלח בקשה למנהל"}
+          {user?.roleName === "Admin" ? "אישור" : "שלח בקשת הצטרפות"}
         </Button>
       </Box>
       <Dialog open={open} onClose={handleClose}>
