@@ -1,7 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, TextField, Switch, FormControlLabel } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableSortLabel,
+  TextField,
+  Switch,
+  FormControlLabel,
+  Box,
+} from "@mui/material";
+import { styled } from '@mui/material/styles';
 import sendRefreshToken from "../components/SendRefreshToken";
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  boxShadow: theme.shadows[3],
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+  width: '30%',
+}));
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -10,7 +36,6 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchError, setSearchError] = useState("");
   const navigate = useNavigate();
-
   const fetchUsers = async () => {
     try {
       const response = await fetch("http://localhost:3000/users", {
@@ -150,30 +175,31 @@ const Users = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Users
+      <Typography variant="h4" gutterBottom align="center">
+        משתמשים
       </Typography>
       {error && <Typography color="error">{error}</Typography>}
-      <TextField
-        label="Search"
-        variant="outlined"
-        value={searchTerm}
-        onChange={handleSearch}
-        margin="normal"
-        style={{ marginBottom: '2rem', width: '30%' }}
-      />
+      <Box display="flex" justifyContent="center">
+        <StyledTextField
+          label="חיפוש"
+          variant="outlined"
+          value={searchTerm}
+          onChange={handleSearch}
+          margin="normal"
+        />
+      </Box>
 
-      <TableContainer component={Paper}>
+      <StyledTableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>{createSortHandler('FirstName', 'First Name')}</TableCell>
-              <TableCell>{createSortHandler('LastName', 'Last Name')}</TableCell>
-              <TableCell>{createSortHandler('Mail', 'Email')}</TableCell>
-              <TableCell>{createSortHandler('Phone', 'Phone')}</TableCell>
-              <TableCell>{createSortHandler('City', 'City')}</TableCell>
-              <TableCell>{createSortHandler('RoleName', 'Role')}</TableCell>
-              <TableCell>{createSortHandler('IsApproved', 'Is Approved')}</TableCell>
+              <TableCell>{createSortHandler('FirstName', 'שם פרטי')}</TableCell>
+              <TableCell>{createSortHandler('LastName', 'שם משפחה')}</TableCell>
+              <TableCell>{createSortHandler('Mail', 'דוא"ל')}</TableCell>
+              <TableCell>{createSortHandler('Phone', 'טלפון')}</TableCell>
+              <TableCell>{createSortHandler('City', 'עיר')}</TableCell>
+              <TableCell>{createSortHandler('RoleName', 'תפקיד')}</TableCell>
+              <TableCell>{createSortHandler('IsApproved', 'מאושר')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -190,19 +216,19 @@ const Users = () => {
                     control={
                       <Switch
                         checked={Boolean(user.IsApproved)}
-                        onChange={(event) => handleIsApprovedChange(user.UserId, event.target.checked)}
+                        onChange={(event) => handleIsApprovedChange(user?.UserId, event.target.checked)}
                         color="primary"
                       />
                     }
-                    label={user.IsApproved ? "Approved" : "Not Approved"}
+                    label={user.IsApproved ? "מאושר" : "לא מאושר"}
                   />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
-      {searchError && <Typography color="error">{searchError}</Typography>}
+      </StyledTableContainer>
+      {searchError && <Typography color="error" align="center" style={{ marginTop: '1rem' }}>{searchError}</Typography>}
     </Container>
   );
 };

@@ -53,6 +53,13 @@ const TravelItem = styled(ListItem)(({ theme }) => ({
   },
 }));
 
+const Container = styled(Box)(({ theme }) => ({
+  height: "75vh",  
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+}));
+
 const Reminders = () => {
   const [upcomingTravels, setUpcomingTravels] = useState([]);
   const [selectedTravel, setSelectedTravel] = useState(null);
@@ -104,125 +111,127 @@ const Reminders = () => {
   };
 
   return (
-    <StyledPaper elevation={3}>
-      <Box p={2} bgcolor="primary.main" color="primary.contrastText">
-        <Typography variant="h6">תזכורות נסיעות קרובות</Typography>
-      </Box>
-      <StyledList>
-        {upcomingTravels.length > 0 ? (
-          upcomingTravels.map((travel) => (
-            <TravelItem
-              button
-              key={travel.id}
-              onClick={() => setSelectedTravel(travel)}
-            >
-              <Box display="flex" alignItems="center" width="100%" mb={1}>
-                <LocationIcon color="primary" />
-                <Typography variant="subtitle1" ml={1}>
-                  {travel.Origin} → {travel.Destination}
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="center" width="100%">
-                <TimeIcon color="action" />
-                <Typography variant="body2" color="textSecondary" ml={1}>
-                  {travel.TravelDate} | {travel.TravelTime}
-                </Typography>
-                <Box flexGrow={1} />
-                <Tooltip title="פרטים נוספים">
-                  <IconButton
-                    size="small"
-                    onClick={() => setSelectedTravel(travel)}
-                  >
-                    <InfoIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </TravelItem>
-          ))
-        ) : (
-          <ListItem>
-            <Typography variant="body1">לא נמצאו נסיעות קרובות.</Typography>
-          </ListItem>
-        )}
-      </StyledList>
+    <Container>
+      <StyledPaper elevation={3}>
+        <Box p={2} bgcolor="primary.main" color="primary.contrastText">
+          <Typography variant="h6">תזכורות נסיעות קרובות</Typography>
+        </Box>
+        <StyledList>
+          {upcomingTravels.length > 0 ? (
+            upcomingTravels.map((travel) => (
+              <TravelItem
+                button
+                key={travel.id}
+                onClick={() => setSelectedTravel(travel)}
+              >
+                <Box display="flex" alignItems="center" width="100%" mb={1}>
+                  <LocationIcon color="primary" />
+                  <Typography variant="subtitle1" ml={1}>
+                    {travel.Origin} → {travel.Destination}
+                  </Typography>
+                </Box>
+                <Box display="flex" alignItems="center" width="100%">
+                  <TimeIcon color="action" />
+                  <Typography variant="body2" color="textSecondary" ml={1}>
+                    {travel.TravelDate} | {travel.TravelTime}
+                  </Typography>
+                  <Box flexGrow={1} />
+                  <Tooltip title="פרטים נוספים">
+                    <IconButton
+                      size="small"
+                      onClick={() => setSelectedTravel(travel)}
+                    >
+                      <InfoIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </TravelItem>
+            ))
+          ) : (
+            <ListItem>
+              <Typography variant="body1">לא נמצאו נסיעות קרובות.</Typography>
+            </ListItem>
+          )}
+        </StyledList>
 
-      <Dialog
-        open={Boolean(selectedTravel)}
-        onClose={handleClose}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle bgcolor="primary.main" color="primary.contrastText">
-          פרטי הנסיעה
-        </DialogTitle>
-        <DialogContent dividers>
-          {selectedTravel && (
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                {selectedTravel.PatientFirstName}
-              </Typography>
-              <Divider />
-              <Box mt={2}>
-                <Typography>
-                  <strong>מוצא:</strong> {selectedTravel.Origin}
+        <Dialog
+          open={Boolean(selectedTravel)}
+          onClose={handleClose}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle bgcolor="primary.main" color="primary.contrastText">
+            פרטי הנסיעה
+          </DialogTitle>
+          <DialogContent dividers>
+            {selectedTravel && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  {selectedTravel.PatientFirstName}
                 </Typography>
-                <Typography>
-                  <strong>יעד:</strong> {selectedTravel.Destination}
-                </Typography>
-                <Typography>
-                  <strong>תאריך:</strong> {selectedTravel.TravelDate}
-                </Typography>
-                <Typography>
-                  <strong>שעה:</strong> {selectedTravel.TravelTime}
-                </Typography>
-                <Typography>
-                  <strong>מספר נוסעים:</strong>{" "}
-                  {selectedTravel.NumberOfPassengers}
-                </Typography>
-              </Box>
-              <Box mt={2}>
-                <Typography variant="subtitle1" gutterBottom>
-                  ניווט:
-                </Typography>
-                <Box display="flex" gap={2}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<NavigationIcon />}
-                    onClick={() =>
-                      handleNavigate(
-                        selectedTravel.Origin,
-                        selectedTravel.Destination,
-                        "waze"
-                      )
-                    }
-                  >
-                    Waze
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<NavigationIcon />}
-                    onClick={() =>
-                      handleNavigate(
-                        selectedTravel.Origin,
-                        selectedTravel.Destination,
-                        "google"
-                      )
-                    }
-                  >
-                    Google Maps
-                  </Button>
+                <Divider />
+                <Box mt={2}>
+                  <Typography>
+                    <strong>מוצא:</strong> {selectedTravel.Origin}
+                  </Typography>
+                  <Typography>
+                    <strong>יעד:</strong> {selectedTravel.Destination}
+                  </Typography>
+                  <Typography>
+                    <strong>תאריך:</strong> {selectedTravel.TravelDate}
+                  </Typography>
+                  <Typography>
+                    <strong>שעה:</strong> {selectedTravel.TravelTime}
+                  </Typography>
+                  <Typography>
+                    <strong>מספר נוסעים:</strong>{" "}
+                    {selectedTravel.NumberOfPassengers}
+                  </Typography>
+                </Box>
+                <Box mt={2}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    ניווט:
+                  </Typography>
+                  <Box display="flex" gap={2}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<NavigationIcon />}
+                      onClick={() =>
+                        handleNavigate(
+                          selectedTravel.Origin,
+                          selectedTravel.Destination,
+                          "waze"
+                        )
+                      }
+                    >
+                      Waze
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<NavigationIcon />}
+                      onClick={() =>
+                        handleNavigate(
+                          selectedTravel.Origin,
+                          selectedTravel.Destination,
+                          "google"
+                        )
+                      }
+                    >
+                      Google Maps
+                    </Button>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            סגור
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </StyledPaper>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              סגור
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </StyledPaper>
+    </Container>
   );
 };
 
