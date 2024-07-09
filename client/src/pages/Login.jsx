@@ -16,7 +16,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { UserContext } from "../App"; // נייבא את הקונטקסט
-
+import NavigationMenu from "../components/NavigationMenu";
 const theme = createTheme();
 
 function Login() {
@@ -49,8 +49,8 @@ function Login() {
     fetch(url, requestOptions)
       .then((response) => {
         if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error("Invalid credentials. Please try again.");
+          if (response.status === 402) {
+            throw new Error("incorrect password or user name");
           }
           return response.json().then((data) => {
             throw new Error(data.message);
@@ -60,7 +60,7 @@ function Login() {
       })
       .then((data) => {
         setUser(data);
-        console.log('data');
+        console.log("data");
         console.log(data);
         setError("");
         navigate("/home");
@@ -82,8 +82,7 @@ function Login() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
-      credentials: 'include',
-
+      credentials: "include",
     };
 
     fetch(url, requestOptions)
@@ -102,6 +101,7 @@ function Login() {
 
   return (
     <ThemeProvider theme={theme}>
+      <NavigationMenu />
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -119,7 +119,12 @@ function Login() {
           <Typography component="h1" variant="h5">
             Log in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
               margin="normal"
               required
@@ -141,18 +146,31 @@ function Login() {
               id="password"
               autoComplete="current-password"
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 2, mb: 2 }}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 2, mb: 2 }}
+            >
               Log In
             </Button>
 
             <Grid container>
               <Grid item xs>
-                <Link onClick={forgotPassword} data-email={email} variant="body2">
+                <Link
+                  onClick={forgotPassword}
+                  data-email={email}
+                  variant="body2"
+                >
                   Forgot password?
                 </Link>
               </Grid>
               <Grid item>
-              <Link component="button" onClick={handleSignupNavigate} variant="body2">
+                <Link
+                  component="button"
+                  onClick={handleSignupNavigate}
+                  variant="body2"
+                >
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

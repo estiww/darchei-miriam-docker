@@ -18,6 +18,7 @@ const createTravelRequest = async (req, res) => {
   try {
     const {
       origin,
+      userId,
       travelTime,
       travelDate,
       destination,
@@ -28,9 +29,15 @@ const createTravelRequest = async (req, res) => {
       recurringDays,
       endDate,
     } = req.body;
+    let;
+    patientId;
 
-    const patientId = await model.getPatientIdByUserId(req.userId);
-    
+    console.log("userIdddddddddddddddddddddddddd")
+    console.log(userId)
+    //אם לא מנהל
+    if (userId == "") patientId = await model.getPatientIdByUserId(req.userId);
+    //מנהל
+    else patientId = await model.getPatientIdByUserId(userId);
     const newTravelRequest = {
       patientId,
       origin,

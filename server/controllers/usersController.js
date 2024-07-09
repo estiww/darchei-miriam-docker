@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const model = require("../models/usersModels");
 
 const generateTokens = (user) => {
-  console.log('generateTokens');
+  console.log("generateTokens");
   const accessToken = jwt.sign(
     {
       userId: user.UserId,
@@ -50,12 +50,16 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ message: "Username and password are required." });
+      return res
+        .status(400)
+        .json({ message: "Username and password are required." });
     }
 
     const user = await model.getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: "Incorrect password or username" });
+      return res
+        .status(402)
+        .json({ message: "Incorrect password or username" });
     }
 
     const match = await bcrypt.compare(password, user.PasswordValue);
@@ -76,10 +80,12 @@ const login = async (req, res) => {
         communicationMethod: user.CommunicationMethod,
         phone: user.Phone,
         roleName: user.RoleName,
-        isApproved: user.IsApproved
+        isApproved: user.IsApproved,
       });
     } else {
-      return res.status(401).json({ message: "Incorrect password or username" });
+      return res
+        .status(401)
+        .json({ message: "Incorrect password or username" });
     }
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -113,7 +119,7 @@ async function signup(req, res) {
 
     const existingUser = await model.getUserByEmail(email);
     if (existingUser) {
-      return res.status(401).json({ message: "User already exists" });
+      return res.status(402).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -167,7 +173,7 @@ async function signup(req, res) {
         communicationMethod: user.CommunicationMethod,
         phone: user.Phone,
         roleName: user.RoleName,
-        isApproved: user.IsApproved
+        isApproved: user.IsApproved,
       });
     } else {
       return res.status(500).json({ error: "Failed to create user" });
@@ -203,7 +209,7 @@ async function createUser(req, res) {
 
     const existingUser = await model.getUserByEmail(email);
     if (existingUser) {
-      return res.status(401).json({ message: "User already exists" });
+      return res.status(402).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -257,7 +263,7 @@ async function createUser(req, res) {
         communicationMethod: user.CommunicationMethod,
         phone: user.Phone,
         roleName: user.RoleName,
-        isApproved: user.IsApproved
+        isApproved: user.IsApproved,
       });
     } else {
       return res.status(500).json({ error: "Failed to create user" });
@@ -334,7 +340,7 @@ async function getAll(req, res) {
 
 async function updateIsApproved(req, res) {
   try {
-    console.log('hiiiiiiiiiiiii')
+    console.log("hiiiiiiiiiiiii");
     const { id } = req.params;
     const { isApproved } = req.body;
     const result = await model.updateIsApproved(id, isApproved);
@@ -376,5 +382,5 @@ module.exports = {
   updateUserDetails,
   updateIsApproved,
   generateTokens,
-  setTokensAsCookies
+  setTokensAsCookies,
 };

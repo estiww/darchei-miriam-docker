@@ -22,7 +22,6 @@ const forgotPassword = async (req, res) => {
 
     // הגדרות למייל שיישלח למשתמש כולל קישור לאיפוס סיסמה
     const resetPassword = {
-      from: "darcheimiriam2024@gmail.com",
       to: email,
       subject: "Password Reset",
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n

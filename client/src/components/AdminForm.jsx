@@ -146,7 +146,7 @@ const AdminForm = ({ isApproved = false }) => {
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Typography variant="h6">Patient Registration</Typography>
+        <Typography variant="h6">Admin Registration</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
@@ -309,7 +309,7 @@ const AdminForm = ({ isApproved = false }) => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Submit Patient Request
+          Submit Admin Request
         </Button>
         {error && (
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>

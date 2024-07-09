@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from '../App';
 import {
   Button,
   TextField,
@@ -25,6 +26,8 @@ import AsyncSelect from "react-select/async";
 import sendRefreshToken from "../components/SendRefreshToken";
 
 const TravelRequestForm = () => {
+  const { user, setUser } = useContext(UserContext);
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -32,6 +35,7 @@ const TravelRequestForm = () => {
     originHouseNumber: "",
     destination: "",
     destinationHouseNumber: "",
+    usertId: "",
     travelTime: "",
     travelDate: "",
     numberOfPassengers: 1,
@@ -141,6 +145,7 @@ const TravelRequestForm = () => {
         originHouseNumber: "",
         destination: "",
         destinationHouseNumber: "",
+        usertId: "",
         travelTime: "",
         travelDate: "",
         numberOfPassengers: 1,
@@ -156,7 +161,6 @@ const TravelRequestForm = () => {
       if (error.message === "440") {
         navigate("/login");
       }
-
     }
   };
 
@@ -246,6 +250,19 @@ const TravelRequestForm = () => {
               />
             </Grid>
           </Grid>
+          {user.roleName == "Admin" && (
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                required
+                label="User Id"
+                name="usertId"
+                value={formData.usertId}
+                onChange={handleChange}
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+          )}
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={6}>
               <TextField
@@ -395,5 +412,4 @@ const TravelRequestForm = () => {
 };
 
 export default TravelRequestForm;
-
 

@@ -13,6 +13,8 @@ const sendEmailController = async (req, res) => {
         `,
   };
 
+
+  
   try {
     await sendEmail(mailOptions);
     res.status(200).json({ message: "המייל נשלח בהצלחה" });
@@ -23,5 +25,6 @@ const sendEmailController = async (req, res) => {
 };
 
 module.exports = {
+
   sendEmailController,
 };

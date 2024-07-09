@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -15,6 +15,7 @@ const NavigationMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -41,6 +42,8 @@ const NavigationMenu = () => {
       console.error("Logout error:", error);
     }
   };
+
+  const isLoginPage = location.pathname.includes("/login");
 
   return (
     <AppBar position="fixed" style={{ backgroundColor: "white", boxShadow: "none", borderBottom: "1px solid #ccc" }}>
@@ -110,9 +113,17 @@ const NavigationMenu = () => {
               </Menu>
             </>
           ) : (
-            <Button color="inherit" component={Link} to="/login" style={{ color: "#000" }}>
-              Log In
-            </Button>
+            <>
+              {isLoginPage ? (
+                <Button color="inherit" component={Link} to="/signup" style={{ color: "#000" }}>
+                  Sign Up
+                </Button>
+              ) : (
+                <Button color="inherit" component={Link} to="/login" style={{ color: "#000" }}>
+                  Log In
+                </Button>
+              )}
+            </>
           )}
         </div>
       </Toolbar>

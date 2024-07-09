@@ -16,16 +16,32 @@ import {
   Select,
   FormControl,
   InputLabel,
+  Badge,
 } from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import FlagIcon from "@mui/icons-material/Flag";
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import AlarmIcon from '@mui/icons-material/Alarm';
 import sendRefreshToken from "../components/SendRefreshToken";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { keyframes } from '@mui/system';
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
 
 const TravelRequests = ({ setMinimizedReminders }) => {
   const [requests, setRequests] = useState([]);
@@ -34,10 +50,10 @@ const TravelRequests = ({ setMinimizedReminders }) => {
   const [requestToTake, setRequestToTake] = useState(null);
   const [loading, setLoading] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [filterType, setFilterType] = useState("");
+  const [filterType, setFilterType] = useState("origin");
   const [filterValue, setFilterValue] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [selectedDate, setSelectedDate] = useState(null); // State for selected date
+  const [selectedDate, setSelectedDate] = useState(null);
   const navigate = useNavigate();
 
   const hospitals = [
@@ -112,7 +128,7 @@ const TravelRequests = ({ setMinimizedReminders }) => {
     } else if (date.toDateString() === tomorrow.toDateString()) {
       return "Tomorrow";
     } else {
-      return dayjs(dateStr).format("DD/MM"); // Format date as day and month
+      return dayjs(dateStr).format("DD/MM");
     }
   };
 
@@ -204,9 +220,28 @@ const TravelRequests = ({ setMinimizedReminders }) => {
     }
     const parts = address.split(",");
     if (parts.length > 2) {
-      return parts[1].trim(); // Get the second part
+      return parts[1].trim();
     }
     return address;
+  };
+
+  const isRequestUrgent = (request) => {
+    const dateParts = request.TravelDate.split('-');
+    const timeParts = request.TravelTime.split(':');
+    
+    const requestDateTime = new Date(
+      parseInt(dateParts[0]),
+      parseInt(dateParts[1]) - 1,
+      parseInt(dateParts[2]),
+      parseInt(timeParts[0]),
+      parseInt(timeParts[1]),
+      parseInt(timeParts[2])
+    );
+    
+    const now = new Date();
+    const thirtyMinutesLater = new Date(now.getTime() + 60 * 60000);
+
+    return requestDateTime <= thirtyMinutesLater;
   };
 
   const filteredRequests = requests
@@ -228,6 +263,12 @@ const TravelRequests = ({ setMinimizedReminders }) => {
       return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
     });
 
+  const handleDateChange = (newValue) => {
+    const formattedDate = dayjs(newValue).format("DD/MM");
+    setSelectedDate(newValue);
+    setFilterValue(formattedDate);
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom mt={10}>
@@ -241,55 +282,51 @@ const TravelRequests = ({ setMinimizedReminders }) => {
         alignItems="center"
         mb={5}
       >
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
-            <InputLabel>Filter By</InputLabel>
+        <Grid item>
+          <FormControl variant="outlined">
+            <InputLabel>סוג סינון</InputLabel>
             <Select
               value={filterType}
-              onChange={(e) => {
-                setFilterType(e.target.value);
-                setFilterValue("");
-                setSelectedDate(null);
-              }}
+              onChange={(e) => setFilterType(e.target.value)}
+              label="סוג סינון"
             >
-              <MenuItem value="origin">מקור</MenuItem>
+              <MenuItem value="origin">מוצא</MenuItem>
               <MenuItem value="destination">יעד</MenuItem>
               <MenuItem value="date">תאריך</MenuItem>
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
-          {filterType === "date" && (
+        {filterType === "date" ? (
+          <Grid item>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="בחר תאריך"
                 value={selectedDate}
-                onChange={(newValue) => {
-                  setSelectedDate(newValue);
-                  setFilterValue(dayjs(newValue).format("DD/MM"));
-                }}
-                renderInput={(params) => <TextField {...params} fullWidth />}
+                onChange={handleDateChange}
+                renderInput={(params) => <TextField {...params} />}
               />
             </LocalizationProvider>
-          )}
-          {filterType !== "date" && (
+          </Grid>
+        ) : (
+          <Grid item>
             <TextField
-              label="Filter Value"
+              variant="outlined"
+              label="ערך סינון"
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
-              fullWidth
             />
-          )}
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
-            <InputLabel>Sort By Date</InputLabel>
+          </Grid>
+        )}
+        <Grid item>
+          <FormControl variant="outlined">
+            <InputLabel>סדר</InputLabel>
             <Select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
+              label="סדר"
             >
-              <MenuItem value="asc">מהמוקדם למאוחר</MenuItem>
-              <MenuItem value="desc">מהמאוחר למוקדם</MenuItem>
+              <MenuItem value="asc">עולה</MenuItem>
+              <MenuItem value="desc">יורד</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -302,34 +339,67 @@ const TravelRequests = ({ setMinimizedReminders }) => {
         <Grid container spacing={2} justifyContent="center" mb={5}>
           {filteredRequests.map((request) => (
             <Grid item xs={12} sm={6} md={3} key={request.TravelRequestId}>
-              <Box
-                border={1}
-                borderRadius={4}
-                p={2}
-                height="180px"
-                width="180px"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                textAlign="left"
+              <Badge
+                badgeContent={
+                  isRequestUrgent(request) ? (
+                    <Box display="flex" alignItems="center">
+                      <PriorityHighIcon fontSize="small" />
+                      <Typography variant="caption" ml={0.5}>דחוף</Typography>
+                    </Box>
+                  ) : null
+                }
+                color="error"
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
               >
-                <Typography variant="body1">
-                  <EventIcon /> {formatDate(request.TravelDate)} <br />
-                  <AccessTimeIcon /> {formatTime(request.TravelTime)} <br />
-                  <PlaceIcon /> {getRelevantPart(request.Origin)} <br />
-                  <FlagIcon /> {getRelevantPart(request.Destination)}
-                </Typography>
-                <Box mt={2} width="100%">
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenDialog(request.TravelRequestId)}
-                    fullWidth
+                <Box
+                  border={2}
+                  borderColor={isRequestUrgent(request) ? "error.main" : "grey.300"}
+                  borderRadius={4}
+                  p={2}
+                  height="180px"
+                  width="180px"
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  textAlign="left"
+                  position="relative"
+                  boxShadow={isRequestUrgent(request) ? 4 : 1}
+                >
+                  {isRequestUrgent(request) && (
+                    <Box position="absolute" top={8} right={8}>
+                      <AlarmIcon
+                        color="error"
+                        sx={{
+                          animation: `${pulse} 1.5s infinite`,
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <Typography
+                    variant="body1"
+                    fontWeight={isRequestUrgent(request) ? "bold" : "normal"}
+                    color={isRequestUrgent(request) ? "error.main" : "text.primary"}
                   >
-                    לקיחת בקשה
-                  </Button>
+                    <EventIcon /> {formatDate(request.TravelDate)} <br />
+                    <AccessTimeIcon /> {formatTime(request.TravelTime)} <br />
+                    <PlaceIcon /> {getRelevantPart(request.Origin)} <br />
+                    <FlagIcon /> {getRelevantPart(request.Destination)}
+                  </Typography>
+                  <Box mt={2} width="100%">
+                    <Button
+                      variant="outlined"
+                      onClick={() => handleOpenDialog(request.TravelRequestId)}
+                      fullWidth
+                    >
+                      לקיחת בקשה
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
+              </Badge>
             </Grid>
           ))}
         </Grid>
