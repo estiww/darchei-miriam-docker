@@ -1,5 +1,5 @@
 const model = require("../models/travelRequestsModel");
-
+const usersModel=require("../models/usersModels");
 const getOpentravelRequests = async (req, res) => {
   try {
     const status = req.query.status;
@@ -32,10 +32,8 @@ const createTravelRequest = async (req, res) => {
     let patientId;
     console.log("userIdddddddddddddddddddddddddd")
     console.log(userId)
-    //אם לא מנהל
-    if (userId == "") patientId = await model.getPatientIdByUserId(req.userId);
-    //מנהל
-    else patientId = await model.getPatientIdByUserId(userId);
+    if (userId == "") patientId = await usersModel.getPatientIdByUserId(req.userId);
+    else patientId = await usersModel.getPatientIdByUserId(userId);
     const newTravelRequest = {
       patientId,
       origin,
@@ -59,6 +57,13 @@ const createTravelRequest = async (req, res) => {
 
 const requestTaken = async (req, res) => {
   try {
+    userId=req.body.userId;
+    console.log("Fffffff",userId)
+    volunteerId = await usersModel.getVolunteerIdByUserId(userId);
+    if(!volunteerId){
+      throw new Error("No volunteer found for the given UserId"); 
+    }
+
     const travelRequestId = req.params.id;
     const response = await model.updateTravelRequestStatus(travelRequestId);
     if (!response) {
@@ -68,8 +73,9 @@ const requestTaken = async (req, res) => {
     res.json({ message: "status updated successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 module.exports = { getOpentravelRequests, createTravelRequest, requestTaken };
+

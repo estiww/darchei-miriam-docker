@@ -6,7 +6,7 @@ const { sendEmail } = require("../services/sendEmail");
 const createTravelMatch = async (req, res) => {
   try {
     const requestId = req.params.requestId;
-    const volunteerId = await userModel.getVolunteerIdByUserId(req.userId);
+    const volunteerId = await userModel.getVolunteerIdByUserId(req.body.userId);
     console.log("volunteerId", volunteerId);
     const result = await model.createTravelMatch(volunteerId, requestId);
     if (result) {
@@ -129,4 +129,3 @@ module.exports = {
   getUpcomingTravels,
   getMyTravels,
 };
-

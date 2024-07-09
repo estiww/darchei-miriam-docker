@@ -389,6 +389,23 @@ async function getUserResetTokenEmail(email) {
     throw err;
   }
 }
+
+
+async function getPatientIdByUserId(userId) {
+  try {
+    const patientSql = "SELECT PatientId FROM PatientTable WHERE UserId = ?";
+    const [patientResult] = await pool.query(patientSql, [userId]);
+
+    if (patientResult.length === 0) {
+      throw new Error("No patient found for the given UserId");
+    }
+
+    return patientResult[0].PatientId;
+  } catch (err) {
+    throw err;
+  }
+}
+
 async function getVolunteerIdByUserId(userId) {
   try {
     const sql = `
@@ -546,9 +563,10 @@ module.exports = {
   getUserByToken,
   updateUserPassword,
   getUserResetTokenEmail,
-  getVolunteerIdByUserId,
   getUsers,
   updateIsApproved,
   updateUserToken,
+  getVolunteerIdByUserId,
+  getPatientIdByUserId,
   getUserIdByRefreshToken
 };
