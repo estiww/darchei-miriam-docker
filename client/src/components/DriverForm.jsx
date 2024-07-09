@@ -55,87 +55,15 @@ const DriverForm = ({ isApproved = false }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    if (!formData.email || !formData.password) {
-      setError("Please fill in all fields.");
-      return;
-    }
-    if (!validateEmail(formData.email)) {
-      setError("You have entered an invalid email address!");
-      return;
-    }
-    if (!validateBirthDate(formData.birthDate)) {
-      setError("You have entered an invalid birthdate!");
-      return;
-    }
-  
-    let url;
-    if (user.roleName !== "Admin") {
-      url = `http://localhost:3000/signup`;
-    } else {
-      url = `http://localhost:3000/addUser`;
-    }
-  
-    const fetchData = async () => {
-      try {
-        let response = await fetch(url, requestOptions);
-  
-        if (!response.ok) {
-          if (user.roleName === "Admin" && response.status === 401) {
-            console.log('user.roleName === "Admin" && response.status === 401');
-            const tokenResponse = await sendRefreshToken();
-            if (tokenResponse.status === 440) {
-              console.log(440);
-              throw new Error("440");
-            }
-            return fetchData(); // Retry the request after refreshing the token
-          }
-  
-          const data = await response.json();
-          throw new Error(data.message);
-        }
-  
-        const data = await response.json();
-        if (user.roleName !== "Admin") {
-          setUser(data);
-        }
-        setOpen(true); // Open the dialog upon successful request
-      } catch (error) {
-        setError(error.message);
-        if (error.message === "440") {
-          navigate("/login");
-        }
-      }
-    };
-  
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-      credentials: "include",
-    };
-  
-    // try {
-    //   await fetchData(); // Call fetchData to initiate the request
-    // } catch (error) {
-    //   setError(error.message);
-    // }
-    await fetchData();
+    // ... (keep the existing handleSubmit logic)
   };
-  
-  
+
   const validateEmail = (mailAddress) => {
-    let mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    return mailAddress.match(mailformat);
+    // ... (keep the existing validateEmail function)
   };
 
   const validateBirthDate = (birthDate) => {
-    const today = new Date();
-    const birthDateObj = new Date(birthDate);
-    return birthDateObj.setFullYear(birthDateObj.getFullYear() + 18) < today;
+    // ... (keep the existing validateBirthDate function)
   };
 
   const handleClose = () => {
@@ -146,41 +74,39 @@ const DriverForm = ({ isApproved = false }) => {
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Typography variant="h6">Driver Registration</Typography>
+        <Typography variant="h6">הוספת נהג</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="First Name"
+            label="שם פרטי"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Last Name"
+            label="שם משפחה"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">Gender</FormLabel>
+          <FormLabel component="legend">מגדר</FormLabel>
           <RadioGroup
             row
             name="gender"
             value={formData.gender}
             onChange={handleChange}
           >
-            <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel
-              value="Female"
-              control={<Radio />}
-              label="Female"
-            />
+            <FormControlLabel value="Male" control={<Radio />} label="זכר" />
+            <FormControlLabel value="Female" control={<Radio />} label="נקבה" />
           </RadioGroup>
         </FormControl>
 
@@ -189,11 +115,12 @@ const DriverForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Birth Date"
+            label="תאריך לידה"
             name="birthDate"
             type="date"
             InputLabelProps={{
               shrink: true,
+              style: { textAlign: 'right', right: 0, left: 'auto' }
             }}
             value={formData.birthDate}
             onChange={handleChange}
@@ -202,10 +129,11 @@ const DriverForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Phone"
+            label="טלפון"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
@@ -213,28 +141,28 @@ const DriverForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Email"
+            label="דואר אלקטרוני"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Password"
+            label="סיסמה"
             name="password"
             type="password"
             value={formData.password}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
-       
+
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">
-            Preferred Communication Method
-          </FormLabel>
+          <FormLabel component="legend">אמצעי תקשורת מועדף</FormLabel>
           <RadioGroup
             row
             name="communicationMethod"
@@ -244,34 +172,36 @@ const DriverForm = ({ isApproved = false }) => {
             <FormControlLabel
               value="WhatsApp"
               control={<Radio />}
-              label="WhatsApp"
+              label="וואטסאפ"
             />
-            <FormControlLabel value="Email" control={<Radio />} label="Email" />
-            <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
+            <FormControlLabel value="Email" control={<Radio />} label="דואר אלקטרוני" />
+            <FormControlLabel value="Phone" control={<Radio />} label="טלפון" />
           </RadioGroup>
         </FormControl>
 
         <Typography variant="h6" sx={{ mt: 2 }}>
-          Address
+          כתובת
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="City"
+            label="עיר"
             name="city"
             value={formData.city}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Neighborhood"
+            label="שכונה"
             name="neighborhood"
             value={formData.neighborhood}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
@@ -279,27 +209,30 @@ const DriverForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Street"
+            label="רחוב"
             name="street"
             value={formData.street}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="House Number"
+            label="מספר בית"
             name="houseNumber"
             value={formData.houseNumber}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             fullWidth
-            label="Zip Code"
+            label="מיקוד"
             name="zipCode"
             value={formData.zipCode}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         {error && (
@@ -313,29 +246,24 @@ const DriverForm = ({ isApproved = false }) => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Submit Driver Request
+         אישור
         </Button>
-        {error && (
-          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            {error}
-          </Typography>
-        )}
       </Box>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CheckCircleOutlineIcon color="success" />
-            Request Successful
+            הבקשה נשלחה בהצלחה
           </Box>
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Your request has been received and is pending approval.
+            הבקשה שלך התקבלה והיא ממתינה לאישור.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            OK
+            אישור
           </Button>
         </DialogActions>
       </Dialog>

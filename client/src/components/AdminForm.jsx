@@ -147,54 +147,53 @@ const AdminForm = ({ isApproved = false }) => {
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Typography variant="h6">Admin Registration</Typography>
+        <Typography variant="h6">הוספת מנהל</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="First Name"
+            label="שם פרטי"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Last Name"
+            label="שם משפחה"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">Gender</FormLabel>
+          <FormLabel component="legend">מגדר</FormLabel>
           <RadioGroup
             row
             name="gender"
             value={formData.gender}
             onChange={handleChange}
           >
-            <FormControlLabel value="Male" control={<Radio />} label="Male" />
-            <FormControlLabel
-              value="Female"
-              control={<Radio />}
-              label="Female"
-            />
+            <FormControlLabel value="Male" control={<Radio />} label="זכר" />
+            <FormControlLabel value="Female" control={<Radio />} label="נקבה" />
           </RadioGroup>
         </FormControl>
-
+  
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Birth Date"
+            label="תאריך לידה"
             name="birthDate"
             type="date"
             InputLabelProps={{
               shrink: true,
+              style: { textAlign: 'right', right: 0, left: 'auto' }
             }}
             value={formData.birthDate}
             onChange={handleChange}
@@ -203,10 +202,11 @@ const AdminForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Phone"
+            label="טלפון"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
@@ -214,28 +214,28 @@ const AdminForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Email"
+            label="דואר אלקטרוני"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Password"
+            label="סיסמה"
             name="password"
             type="password"
             value={formData.password}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
   
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">
-            Preferred Communication Method
-          </FormLabel>
+          <FormLabel component="legend">אמצעי תקשורת מועדף</FormLabel>
           <RadioGroup
             row
             name="communicationMethod"
@@ -245,34 +245,36 @@ const AdminForm = ({ isApproved = false }) => {
             <FormControlLabel
               value="WhatsApp"
               control={<Radio />}
-              label="WhatsApp"
+              label="וואטסאפ"
             />
-            <FormControlLabel value="Email" control={<Radio />} label="Email" />
-            <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
+            <FormControlLabel value="Email" control={<Radio />} label="דואר אלקטרוני" />
+            <FormControlLabel value="Phone" control={<Radio />} label="טלפון" />
           </RadioGroup>
         </FormControl>
-
+  
         <Typography variant="h6" sx={{ mt: 2 }}>
-          Address
+          כתובת
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="City"
+            label="עיר"
             name="city"
             value={formData.city}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="Neighborhood"
+            label="שכונה"
             name="neighborhood"
             value={formData.neighborhood}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
@@ -280,27 +282,30 @@ const AdminForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Street"
+            label="רחוב"
             name="street"
             value={formData.street}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            label="House Number"
+            label="מספר בית"
             name="houseNumber"
             value={formData.houseNumber}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
           <TextField
             margin="normal"
             fullWidth
-            label="Zip Code"
+            label="מיקוד"
             name="zipCode"
             value={formData.zipCode}
             onChange={handleChange}
+            InputLabelProps={{ style: { textAlign: 'right', right: 0, left: 'auto' } }}
           />
         </Box>
         {error && (
@@ -314,25 +319,24 @@ const AdminForm = ({ isApproved = false }) => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Submit Admin Request
+         אישור
         </Button>
-        
       </Box>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CheckCircleOutlineIcon color="success" />
-            Request Successful
+            הבקשה נשלחה בהצלחה
           </Box>
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Your request has been received and is pending approval.
+            הבקשה שלך התקבלה והיא ממתינה לאישור.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            OK
+            אישור
           </Button>
         </DialogActions>
       </Dialog>

@@ -8,14 +8,25 @@ import Button from "@mui/material/Button";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Logo from '../imgs/Logo.png'; 
+import MenuIcon from "@mui/icons-material/Menu";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import Logo from "../imgs/Logo.png";
 import { UserContext } from "../App";
+import Box from "@mui/material/Box";
 
 const NavigationMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -23,6 +34,16 @@ const NavigationMenu = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const toggleDrawer = (open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setDrawerOpen(open);
   };
 
   const handleLogout = async () => {
@@ -33,7 +54,7 @@ const NavigationMenu = () => {
       });
 
       if (response.ok) {
-        setUser(undefined); // Reset user
+        setUser(undefined);
         navigate("/home");
       } else {
         console.error("Logout failed");
@@ -45,87 +66,183 @@ const NavigationMenu = () => {
 
   const isLoginPage = location.pathname.includes("/login");
 
+  const menuItems = [
+    {
+      text: "בקשות פתוחות",
+      link: "/home/travelRequests",
+      roles: ["Admin", "Volunteer"],
+    },
+    { text: "הוספת משתמש", link: "/home/addUser", roles: ["Admin"] },
+    { text: "התאמות נסיעה", link: "/home/travelMatches", roles: ["Admin"] },
+    {
+      text: "טופס בקשת נסיעה",
+      link: "/home/travelRequestForm",
+      roles: ["Admin", "Patient"],
+    },
+    { text: "משתמשים", link: "/home/users", roles: ["Admin"] },
+  ];
+
+  const filteredMenuItems = menuItems.filter(
+    (item) => user && user.isApproved && item.roles.includes(user.roleName)
+  );
+
+  const renderMenuItems = () => (
+    <>
+      {filteredMenuItems.map((item, index) => (
+        <Button
+          key={index}
+          color="inherit"
+          component={Link}
+          to={item.link}
+          style={{ color: "#000" }}
+          onClick={isMobile ? toggleDrawer(false) : null}
+        >
+          {item.text}
+        </Button>
+      ))}
+    </>
+  );
+
+  const renderMobileMenu = () => (
+    <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+      <List>
+        {filteredMenuItems.map((item, index) => (
+          <ListItem
+            button
+            key={index}
+            component={Link}
+            to={item.link}
+            onClick={toggleDrawer(false)}
+          >
+            <ListItemText primary={item.text} />
+          </ListItem>
+        ))}
+        {user && user.isApproved && (
+          <>
+            <ListItem
+              button
+              component={Link}
+              to="/home/profile"
+              onClick={toggleDrawer(false)}
+            >
+              <ListItemText primary="פרופיל" />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/home/myTravels"
+              onClick={toggleDrawer(false)}
+            >
+              <ListItemText primary="הנסיעות שלי" />
+            </ListItem>
+            <ListItem
+              button
+              onClick={() => {
+                handleLogout();
+                toggleDrawer(false)();
+              }}
+            >
+              <ListItemText primary="התנתקות" />
+            </ListItem>
+          </>
+        )}
+      </List>
+    </Drawer>
+  );
+
   return (
-    <AppBar position="fixed" style={{ backgroundColor: "white", boxShadow: "none", borderBottom: "1px solid #ccc" }}>
-      <Toolbar>
+    <AppBar
+      position="fixed"
+      style={{
+        backgroundColor: "white",
+        boxShadow: "none",
+        borderBottom: "1px solid #ccc",
+      }}
+    >
+      <Toolbar style={{ justifyContent: "space-between" }}>
         <Typography
-          variant="h6"
           component={Link}
           to="/home"
-          style={{ textDecoration: "none", color: "inherit", flexGrow: 1 }}
+          style={{ textDecoration: "none", color: "inherit" }}
         >
           <img
             src={Logo}
             alt="Darchei Miriam Logo"
-            style={{ height: "80px", width: "auto", margin: "auto" }}
+            style={{ height: "80px", width: "auto" }}
           />
         </Typography>
-        <div>
-          {user && user.isApproved ? (
+        
+        {isMobile ? (
+          <IconButton
+            edge="end"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleDrawer(true)}
+          >
+            <MenuIcon style={{ color: "#000" }} />
+          </IconButton>
+        ) : (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
+            {user && user.isApproved && renderMenuItems()}
+          </Box>
+        )}
+        
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {!user && (
             <>
-              {(user.roleName === "Admin" || user.roleName === "Volunteer") && (
-                <Button color="inherit" component={Link} to="travelRequests" style={{ color: "#000" }}>
-                  בקשות פתוחות
-                </Button>
-              )}
-              {user.roleName === "Admin" && (
-                <Button color="inherit" component={Link} to="addUser" style={{ color: "#000" }}>
-                   AddUser
-                </Button>
-              )}
-              {user.roleName === "Admin" && (
-                <Button color="inherit" component={Link} to="travelMatches" style={{ color: "#000" }}>
-                  Travel Matches
-                </Button>
-              )}
-              {(user.roleName === "Admin" || user.roleName === "Patient") && (
+              {isLoginPage ? (
                 <Button
                   color="inherit"
                   component={Link}
-                  to="travelRequestForm"
+                  to="/signup"
                   style={{ color: "#000" }}
                 >
-                  Travel Request Form
-                </Button>
-              )}
-              {user.roleName === "Admin" && (
-                <Button color="inherit" component={Link} to="users" style={{ color: "#000" }}>
-                  Users
-                </Button>
-              )}
-              <IconButton color="inherit" onClick={handleMenu}>
-                <AccountCircle style={{ color: "#000" }} />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose} component={Link} to="profile">
-                  Profile
-                </MenuItem>
-
-                <MenuItem onClick={handleClose} component={Link} to="myTravels">
-                  My Travels
-                </MenuItem>
-
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <>
-              {isLoginPage ? (
-                <Button color="inherit" component={Link} to="/signup" style={{ color: "#000" }}>
-                  Sign Up
+                  הרשמה
                 </Button>
               ) : (
-                <Button color="inherit" component={Link} to="/login" style={{ color: "#000" }}>
-                  Log In
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/login"
+                  style={{ color: "#000" }}
+                >
+                  התחברות
                 </Button>
               )}
             </>
           )}
-        </div>
+          {user && user.isApproved && (
+            <IconButton 
+              color="inherit" 
+              onClick={handleMenu}
+              style={{ marginLeft: '16px' }}
+            >
+              <AccountCircle style={{ color: "#000", fontSize: '2.5rem' }} />
+            </IconButton>
+          )}
+        </Box>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem
+            onClick={handleClose}
+            component={Link}
+            to="/home/profile"
+          >
+            פרופיל
+          </MenuItem>
+          <MenuItem
+            onClick={handleClose}
+            component={Link}
+            to="/home/myTravels"
+          >
+            הנסיעות שלי
+          </MenuItem>
+          <MenuItem onClick={handleLogout}>התנתקות</MenuItem>
+        </Menu>
+        {isMobile && renderMobileMenu()}
       </Toolbar>
     </AppBar>
   );

@@ -30,7 +30,7 @@ const VolunteerForm = ({ isApproved = false }) => {
   console.log("isApproved");
   console.log(isApproved);
   const [formData, setFormData] = useState({
-    roleName: "Volunteer",
+    roleName: "מתנדב",
     firstName: "",
     lastName: "",
     birthDate: "",
@@ -59,20 +59,20 @@ const VolunteerForm = ({ isApproved = false }) => {
     setError("");
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      setError("Please fill in all fields.");
+      setError("נא למלא את כל השדות.");
       return;
     }
     if (!validateEmail(formData.email)) {
-      setError("You have entered an invalid email address!");
+      setError("כתובת האימייל שהזנת אינה תקינה!");
       return;
     }
     if (!validateBirthDate(formData.birthDate)) {
-      setError("You have entered an invalid birthdate!");
+      setError("תאריך הלידה שהזנת אינו תקין!");
       return;
     }
 
     let url;
-    if (user.roleName !== "Admin") {
+    if (user.roleName !== "מנהל") {
       url = `http://localhost:3000/signup`;
     } else {
       url = `http://localhost:3000/addUser`;
@@ -83,14 +83,14 @@ const VolunteerForm = ({ isApproved = false }) => {
         let response = await fetch(url, requestOptions);
 
         if (!response.ok) {
-          if (user.roleName === "Admin" && response.status === 401) {
-            console.log('user.roleName === "Admin" && response.status === 401');
+          if (user.roleName === "מנהל" && response.status === 401) {
+            console.log('user.roleName === "מנהל" && response.status === 401');
             const tokenResponse = await sendRefreshToken();
             if (tokenResponse.status === 440) {
               console.log(440);
               throw new Error("440");
             }
-            return fetchData(); // Retry the request after refreshing the token
+            return fetchData();
           }
 
           const data = await response.json();
@@ -98,10 +98,10 @@ const VolunteerForm = ({ isApproved = false }) => {
         }
 
         const data = await response.json();
-        if (user.roleName !== "Admin") {
+        if (user.roleName !== "מנהל") {
           setUser(data);
         }
-        setOpen(true); // Open the dialog upon successful request
+        setOpen(true);
       } 
       catch (error) {
         console.log("error.message");
@@ -122,11 +122,6 @@ const VolunteerForm = ({ isApproved = false }) => {
       credentials: "include",
     };
 
-    // try {
-    //   await fetchData(); // Call fetchData to initiate the request
-    // } catch (error) {
-    //   setError(error.message);
-    // }
     await fetchData()
   };
 
@@ -149,13 +144,13 @@ const VolunteerForm = ({ isApproved = false }) => {
   return (
     <Container>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Typography variant="h6">Volunteer Registration</Typography>
+        <Typography variant="h6">רישום מתנדב</Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="First Name"
+            label="שם פרטי"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
@@ -164,25 +159,25 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Last Name"
+            label="שם משפחה"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
           />
         </Box>
         <FormControl component="fieldset" margin="normal">
-          <FormLabel component="legend">Gender</FormLabel>
+          <FormLabel component="legend">מגדר</FormLabel>
           <RadioGroup
             row
             name="gender"
             value={formData.gender}
             onChange={handleChange}
           >
-            <FormControlLabel value="Male" control={<Radio />} label="Male" />
+            <FormControlLabel value="זכר" control={<Radio />} label="זכר" />
             <FormControlLabel
-              value="Female"
+              value="נקבה"
               control={<Radio />}
-              label="Female"
+              label="נקבה"
             />
           </RadioGroup>
         </FormControl>
@@ -192,7 +187,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Birth Date"
+            label="תאריך לידה"
             name="birthDate"
             type="date"
             InputLabelProps={{
@@ -205,7 +200,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Phone"
+            label="טלפון"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
@@ -216,7 +211,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Email"
+            label="אימייל"
             name="email"
             type="email"
             value={formData.email}
@@ -226,7 +221,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Password"
+            label="סיסמה"
             name="password"
             type="password"
             value={formData.password}
@@ -237,14 +232,14 @@ const VolunteerForm = ({ isApproved = false }) => {
           margin="normal"
           required
           fullWidth
-          label="Location"
+          label="מיקום"
           name="location"
           value={formData.location}
           onChange={handleChange}
         />
         <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">
-            Preferred Communication Method
+            שיטת תקשורת מועדפת
           </FormLabel>
           <RadioGroup
             row
@@ -253,24 +248,24 @@ const VolunteerForm = ({ isApproved = false }) => {
             onChange={handleChange}
           >
             <FormControlLabel
-              value="WhatsApp"
+              value="וואטסאפ"
               control={<Radio />}
-              label="WhatsApp"
+              label="וואטסאפ"
             />
-            <FormControlLabel value="Email" control={<Radio />} label="Email" />
-            <FormControlLabel value="Phone" control={<Radio />} label="Phone" />
+            <FormControlLabel value="אימייל" control={<Radio />} label="אימייל" />
+            <FormControlLabel value="טלפון" control={<Radio />} label="טלפון" />
           </RadioGroup>
         </FormControl>
 
         <Typography variant="h6" sx={{ mt: 2 }}>
-          Address
+          כתובת
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            label="City"
+            label="עיר"
             name="city"
             value={formData.city}
             onChange={handleChange}
@@ -279,7 +274,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Neighborhood"
+            label="שכונה"
             name="neighborhood"
             value={formData.neighborhood}
             onChange={handleChange}
@@ -290,7 +285,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="Street"
+            label="רחוב"
             name="street"
             value={formData.street}
             onChange={handleChange}
@@ -299,7 +294,7 @@ const VolunteerForm = ({ isApproved = false }) => {
             margin="normal"
             required
             fullWidth
-            label="House Number"
+            label="מספר בית"
             name="houseNumber"
             value={formData.houseNumber}
             onChange={handleChange}
@@ -307,7 +302,7 @@ const VolunteerForm = ({ isApproved = false }) => {
           <TextField
             margin="normal"
             fullWidth
-            label="Zip Code"
+            label="מיקוד"
             name="zipCode"
             value={formData.zipCode}
             onChange={handleChange}
@@ -324,24 +319,26 @@ const VolunteerForm = ({ isApproved = false }) => {
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Submit Volunteer Request
+          שלח בקשת התנדבות
         </Button>
       </Box>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CheckCircleOutlineIcon color="success" />
-            Request Successful
+            הבקשה התקבלה בהצלחה
           </Box>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Your request has been received and is pending approval.
+        <DialogContentText>
+            {user?.roleName === "Admin" 
+              ? "המטופל נוסף למערכת בהצלחה." 
+              : "הבקשה שלך התקבלה והיא ממתינה לאישור."}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            OK
+            אישור
           </Button>
         </DialogActions>
       </Dialog>

@@ -5,25 +5,22 @@ import {
   Button,
   CssBaseline,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Link,
   Grid,
   Box,
   Typography,
   Container,
+  Paper,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { UserContext } from "../App"; // נייבא את הקונטקסט
+import { UserContext } from "../App";
 import NavigationMenu from "../components/NavigationMenu";
-const theme = createTheme();
 
 function Login() {
   const [error, setError] = useState("");
-  const [email, setEmail] = useState(""); // State to hold email for forgot password
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext); // נשתמש ב-useContext כדי לגשת ל-setUser
+  const { setUser } = useContext(UserContext);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -32,7 +29,7 @@ function Login() {
     const password = data.get("password");
 
     if (!email || !password) {
-      setError("Please fill in all fields.");
+      setError("אנא מלא את כל השדות.");
       return;
     }
 
@@ -43,14 +40,14 @@ function Login() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
-      credentials: "include", // This is important to include cookies
+      credentials: "include",
     };
 
     fetch(url, requestOptions)
       .then((response) => {
         if (!response.ok) {
           if (response.status === 409) {
-            throw new Error("incorrect password or user name");
+            throw new Error("שם משתמש או סיסמה שגויים");
           }
           return response.json().then((data) => {
             throw new Error(data.message);
@@ -60,8 +57,6 @@ function Login() {
       })
       .then((data) => {
         setUser(data);
-        console.log("data");
-        console.log(data);
         setError("");
         navigate("/home");
       })
@@ -69,12 +64,13 @@ function Login() {
         setError(error.message);
       });
   };
+
   const handleSignupNavigate = () => {
     navigate("/signup");
   };
+
   const forgotPassword = (event) => {
     event.preventDefault();
-    const email = event.target.getAttribute("data-email");
     const url = "http://localhost:3000/forgotPassword";
     const requestOptions = {
       method: "POST",
@@ -89,101 +85,115 @@ function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          alert("An email with reset instructions has been sent.");
+          alert("נשלח אימייל עם הוראות לאיפוס הסיסמה.");
         } else {
-          alert("Error: " + data.message);
+          alert("שגיאה: " + data.message);
         }
       })
       .catch((error) => {
-        alert("Error: " + error.message);
+        alert("שגיאה: " + error.message);
       });
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <NavigationMenu />
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Log in
-          </Typography>
+        <Paper elevation={3} sx={{ mt: 25, p: 4, borderRadius: 2 }}>
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              onChange={(e) => setEmail(e.target.value)} // Update email state
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 2, mb: 2 }}
-            >
-              Log In
-            </Button>
-
-            <Grid container>
-              <Grid item xs>
-                <Link
-                  onClick={forgotPassword}
-                  data-email={email}
-                  variant="body2"
-                >
-                  Forgot password?
-                </Link>
+            <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
+              <LockOutlinedIcon />
+            </Avatar>{" "}
+            <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+              התחברות
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="כתובת אימייל"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                onChange={(e) => setEmail(e.target.value)}
+                InputProps={{
+                  dir: "ltr",
+                }}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="סיסמה"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                InputProps={{
+                  dir: "ltr",
+                }}
+                sx={{ mb: 3 }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mb: 3 }}
+              >
+                התחבר
+              </Button>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Link
+                    onClick={forgotPassword}
+                    variant="body2"
+                    sx={{
+                      cursor: "pointer",
+                      display: "block",
+                      textAlign: "center",
+                    }}
+                  >
+                    שכחת סיסמה?
+                  </Link>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Link
+                    onClick={handleSignupNavigate}
+                    variant="body2"
+                    sx={{
+                      cursor: "pointer",
+                      display: "block",
+                      textAlign: "center",
+                    }}
+                  >
+                    אין לך חשבון? הירשם
+                  </Link>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Link
-                  component="button"
-                  onClick={handleSignupNavigate}
+              {error && (
+                <Typography
                   variant="body2"
+                  color="error"
+                  sx={{ mt: 2, textAlign: "center" }}
                 >
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
-            {error && (
-              <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                {error}
-              </Typography>
-            )}
+                  {error}
+                </Typography>
+              )}
+            </Box>
           </Box>
-        </Box>
+        </Paper>
       </Container>
-    </ThemeProvider>
+    </>
   );
 }
 
