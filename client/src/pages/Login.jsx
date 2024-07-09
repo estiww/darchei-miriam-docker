@@ -49,7 +49,7 @@ function Login() {
     fetch(url, requestOptions)
       .then((response) => {
         if (!response.ok) {
-          if (response.status === 402) {
+          if (response.status === 409) {
             throw new Error("incorrect password or user name");
           }
           return response.json().then((data) => {

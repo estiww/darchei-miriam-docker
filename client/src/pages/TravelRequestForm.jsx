@@ -35,7 +35,7 @@ const TravelRequestForm = () => {
     originHouseNumber: "",
     destination: "",
     destinationHouseNumber: "",
-    usertId: "",
+    userId: "",
     travelTime: "",
     travelDate: "",
     numberOfPassengers: 1,
@@ -132,6 +132,9 @@ const TravelRequestForm = () => {
             throw new Error("440");
           }
         }
+        const data = await response.json();
+        throw new Error(data.message);
+
       }
 
       const data = await response.json();
@@ -145,7 +148,7 @@ const TravelRequestForm = () => {
         originHouseNumber: "",
         destination: "",
         destinationHouseNumber: "",
-        usertId: "",
+        userId: "",
         travelTime: "",
         travelDate: "",
         numberOfPassengers: 1,
@@ -250,14 +253,14 @@ const TravelRequestForm = () => {
               />
             </Grid>
           </Grid>
-          {user.roleName == "Admin" && (
+          {user?.roleName == "Admin" && (
             <Grid item xs={6}>
               <TextField
                 fullWidth
                 required
                 label="User Id"
-                name="usertId"
-                value={formData.usertId}
+                name="userId"
+                value={formData.userId}
                 onChange={handleChange}
                 sx={{ mt: 2 }}
               />

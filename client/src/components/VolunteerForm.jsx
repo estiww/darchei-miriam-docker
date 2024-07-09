@@ -56,6 +56,7 @@ const VolunteerForm = ({ isApproved = false }) => {
   };
 
   const handleSubmit = async (e) => {
+    setError("");
     e.preventDefault();
     if (!formData.email || !formData.password) {
       setError("Please fill in all fields.");
@@ -69,18 +70,18 @@ const VolunteerForm = ({ isApproved = false }) => {
       setError("You have entered an invalid birthdate!");
       return;
     }
-  
+
     let url;
     if (user.roleName !== "Admin") {
       url = `http://localhost:3000/signup`;
     } else {
       url = `http://localhost:3000/addUser`;
     }
-  
+
     const fetchData = async () => {
       try {
         let response = await fetch(url, requestOptions);
-  
+
         if (!response.ok) {
           if (user.roleName === "Admin" && response.status === 401) {
             console.log('user.roleName === "Admin" && response.status === 401');
@@ -91,24 +92,27 @@ const VolunteerForm = ({ isApproved = false }) => {
             }
             return fetchData(); // Retry the request after refreshing the token
           }
-  
+
           const data = await response.json();
           throw new Error(data.message);
         }
-  
+
         const data = await response.json();
         if (user.roleName !== "Admin") {
           setUser(data);
         }
         setOpen(true); // Open the dialog upon successful request
-      } catch (error) {
+      } 
+      catch (error) {
+        console.log("error.message");
+        console.log(error.message);
         setError(error.message);
         if (error.message === "440") {
           navigate("/login");
         }
       }
     };
-  
+
     const requestOptions = {
       method: "POST",
       headers: {
@@ -117,17 +121,15 @@ const VolunteerForm = ({ isApproved = false }) => {
       body: JSON.stringify(formData),
       credentials: "include",
     };
-  
-    try {
-      await fetchData(); // Call fetchData to initiate the request
-    } catch (error) {
-      setError(error.message);
-    }
-  
-    setError("");
+
+    // try {
+    //   await fetchData(); // Call fetchData to initiate the request
+    // } catch (error) {
+    //   setError(error.message);
+    // }
+    await fetchData()
   };
-  
-  
+
   const validateEmail = (mailAddress) => {
     let mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return mailAddress.match(mailformat);
@@ -311,7 +313,11 @@ const VolunteerForm = ({ isApproved = false }) => {
             onChange={handleChange}
           />
         </Box>
-
+        {error && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
         <Button
           type="submit"
           fullWidth
@@ -320,11 +326,6 @@ const VolunteerForm = ({ isApproved = false }) => {
         >
           Submit Volunteer Request
         </Button>
-        {error && (
-          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            {error}
-          </Typography>
-        )}
       </Box>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>

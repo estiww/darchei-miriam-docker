@@ -56,6 +56,7 @@ const PatientForm = ({ isApproved = false }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     if (!formData.email || !formData.password) {
       setError("Please fill in all fields.");
       return;
@@ -100,7 +101,8 @@ const PatientForm = ({ isApproved = false }) => {
           setUser(data);
         }
         setOpen(true); // Open the dialog upon successful request
-      } catch (error) {
+      } 
+      catch (error) {
         setError(error.message);
         if (error.message === "440") {
           navigate("/login");
@@ -117,13 +119,13 @@ const PatientForm = ({ isApproved = false }) => {
       credentials: "include",
     };
   
-    try {
-      await fetchData(); // Call fetchData to initiate the request
-    } catch (error) {
-      setError(error.message);
-    }
-  
-    setError("");
+    // try {
+    //   await fetchData(); // Call fetchData to initiate the request
+    // } catch (error) {
+    //   setError(error.message);
+    // }
+    await fetchData();
+    
   };
   
   
@@ -302,7 +304,11 @@ const PatientForm = ({ isApproved = false }) => {
             onChange={handleChange}
           />
         </Box>
-
+        {error && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
         <Button
           type="submit"
           fullWidth
@@ -311,11 +317,7 @@ const PatientForm = ({ isApproved = false }) => {
         >
           Submit Patient Request
         </Button>
-        {error && (
-          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            {error}
-          </Typography>
-        )}
+       
       </Box>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>

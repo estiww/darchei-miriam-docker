@@ -58,7 +58,7 @@ const login = async (req, res) => {
     const user = await model.getUserByEmail(email);
     if (!user) {
       return res
-        .status(402)
+        .status(409)
         .json({ message: "Incorrect password or username" });
     }
 
@@ -119,7 +119,7 @@ async function signup(req, res) {
 
     const existingUser = await model.getUserByEmail(email);
     if (existingUser) {
-      return res.status(402).json({ message: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -209,7 +209,7 @@ async function createUser(req, res) {
 
     const existingUser = await model.getUserByEmail(email);
     if (existingUser) {
-      return res.status(402).json({ message: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

@@ -29,9 +29,7 @@ const createTravelRequest = async (req, res) => {
       recurringDays,
       endDate,
     } = req.body;
-    let;
-    patientId;
-
+    let patientId;
     console.log("userIdddddddddddddddddddddddddd")
     console.log(userId)
     //אם לא מנהל

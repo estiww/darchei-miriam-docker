@@ -56,6 +56,7 @@ const AdminForm = ({ isApproved = false }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     if (!formData.email || !formData.password) {
       setError("Please fill in all fields.");
       return;
@@ -117,13 +118,13 @@ const AdminForm = ({ isApproved = false }) => {
       credentials: "include",
     };
   
-    try {
-      await fetchData(); // Call fetchData to initiate the request
-    } catch (error) {
-      setError(error.message);
-    }
-  
-    setError("");
+    // try {
+    //   await fetchData(); // Call fetchData to initiate the request
+    // } catch (error) {
+    //   setError(error.message);
+    // }
+    await fetchData()
+   
   };
   
   
@@ -302,7 +303,11 @@ const AdminForm = ({ isApproved = false }) => {
             onChange={handleChange}
           />
         </Box>
-
+        {error && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
         <Button
           type="submit"
           fullWidth
@@ -311,11 +316,7 @@ const AdminForm = ({ isApproved = false }) => {
         >
           Submit Admin Request
         </Button>
-        {error && (
-          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            {error}
-          </Typography>
-        )}
+        
       </Box>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
