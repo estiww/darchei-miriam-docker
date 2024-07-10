@@ -1,10 +1,6 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const model = require("../models/usersModels");
-const {
-  generateTokens,
-  setTokensAsCookies,
-} = require("../controllers/usersController");
 
 const someEndpoint = async (req, res) => {
 

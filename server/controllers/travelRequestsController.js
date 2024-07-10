@@ -30,8 +30,6 @@ const createTravelRequest = async (req, res) => {
       endDate,
     } = req.body;
     let patientId;
-    console.log("userIdddddddddddddddddddddddddd")
-    console.log(userId)
     if (userId == "") patientId = await usersModel.getPatientIdByUserId(req.userId);
     else patientId = await usersModel.getPatientIdByUserId(userId);
     const newTravelRequest = {
@@ -58,7 +56,6 @@ const createTravelRequest = async (req, res) => {
 const requestTaken = async (req, res) => {
   try {
     userId=req.body.userId;
-    console.log("Fffffff",userId)
     volunteerId = await usersModel.getVolunteerIdByUserId(userId);
     if(!volunteerId){
       throw new Error("No volunteer found for the given UserId"); 

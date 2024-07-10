@@ -247,9 +247,6 @@ async function createUser(req, res) {
         await model.createVolunteer(result.insertId, location);
       }
 
-      // const tokens = generateTokens(user);
-      // await model.upsertRefreshToken(user.UserId, tokens.refreshToken);
-      // setTokensAsCookies(res, tokens);
       return res.json({
         id: user.UserId,
         email: user.Mail,
@@ -305,9 +302,9 @@ async function updateUserDetails(req, res) {
       communicationMethod
     );
 
-    if (roleName === "Patient") {
-      await model.updatePatient(id);
-    }
+    // if (roleName === "Patient") {
+    //   await model.updatePatient(id);
+    // }
 
     if (roleName === "Volunteer") {
       await model.updateVolunteer(id, location);
@@ -340,7 +337,6 @@ async function getAll(req, res) {
 
 async function updateIsApproved(req, res) {
   try {
-    console.log("hiiiiiiiiiiiii");
     const { id } = req.params;
     const { isApproved } = req.body;
     const result = await model.updateIsApproved(id, isApproved);
