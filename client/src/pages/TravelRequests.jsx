@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Box,
@@ -16,34 +17,25 @@ import {
   Select,
   FormControl,
   InputLabel,
-  Badge,
+  Chip,
+  Paper,
+  Card,
+  CardContent,
+  IconButton,
 } from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import FlagIcon from "@mui/icons-material/Flag";
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AlarmIcon from '@mui/icons-material/Alarm';
-import sendRefreshToken from "../components/SendRefreshToken";
-import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { keyframes } from '@mui/system';
+import { UserContext } from "../App";
 
-const pulse = keyframes`
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-`;
 
 const TravelRequests = ({ setMinimizedReminders }) => {
+  const { user } = useContext(UserContext); // שימוש ב-UserContext
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
@@ -54,7 +46,9 @@ const TravelRequests = ({ setMinimizedReminders }) => {
   const [filterValue, setFilterValue] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [userId, setUserId] = useState(""); // מצב חדש עבור ה-User ID
   const navigate = useNavigate();
+  const userIdToSend = user?.roleName === "Admin" ? userId : user?.id; 
 
   const hospitals = [
     "הדסה עין כרם",
@@ -130,8 +124,7 @@ const TravelRequests = ({ setMinimizedReminders }) => {
       return "Tomorrow";
     } else {
       return dayjs(dateStr).format("DD/MM");
-    }
-  };
+  }};
 
   const formatTime = (timeStr) => {
     const [hours, minutes] = timeStr.split(":");
@@ -141,21 +134,27 @@ const TravelRequests = ({ setMinimizedReminders }) => {
   const handleTakeRequest = async (requestId) => {
     setLoading(true);
     setConfirmationMessage("");
-    try {
+    try {       
+      console.log("User ID to send:", userIdToSend);
+  
       const response = await fetch(
         `http://localhost:3000/travelRequests/${requestId}`,
         {
           method: "PUT",
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: userIdToSend }),
         }
       );
-
+  
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to take request");
       }
-
-      await createTravelMatches(requestId);
+  
+      await createTravelMatches(requestId, userIdToSend);
       setConfirmationMessage("הנסיעה נלקחה תודה רבה!");
     } catch (error) {
       setError(error.message);
@@ -165,7 +164,7 @@ const TravelRequests = ({ setMinimizedReminders }) => {
       setMinimizedReminders(true);
     }
   };
-
+  
   const createTravelMatches = async (requestId) => {
     try {
       const response = await fetch(
@@ -173,6 +172,10 @@ const TravelRequests = ({ setMinimizedReminders }) => {
         {
           method: "POST",
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: userIdToSend }),
         }
       );
 
@@ -253,174 +256,171 @@ const TravelRequests = ({ setMinimizedReminders }) => {
         } else if (filterType === "destination") {
           return getRelevantPart(request.Destination).includes(filterValue);
         } else if (filterType === "date") {
-          return formatDate(request.TravelDate) === filterValue;
+          const requestDate = dayjs(request.TravelDate).startOf("day");
+          const selectedFilterDate = dayjs(filterValue).startOf("day");
+          return requestDate.isSame(selectedFilterDate);
         }
       }
       return true;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.TravelDate);
-      const dateB = new Date(b.TravelDate);
+      const dateA = new Date(a.TravelDate + " " + a.TravelTime);
+      const dateB = new Date(b.TravelDate + " " + b.TravelTime);
       return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
     });
 
-  const handleDateChange = (newValue) => {
-    const formattedDate = dayjs(newValue).format("DD/MM");
-    setSelectedDate(newValue);
-    setFilterValue(formattedDate);
-  };
+    
 
-  return (
-    <Container>
-      <Typography variant="h4" gutterBottom mt={10}>
-        Open Travel Requests
-      </Typography>
-      {error && <Typography color="error">{error}</Typography>}
-      <Grid
-        container
-        spacing={2}
-        justifyContent="center"
-        alignItems="center"
-        mb={5}
-      >
-        <Grid item>
-          <FormControl variant="outlined">
-            <InputLabel>סוג סינון</InputLabel>
-            <Select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              label="סוג סינון"
-            >
-              <MenuItem value="origin">מוצא</MenuItem>
-              <MenuItem value="destination">יעד</MenuItem>
-              <MenuItem value="date">תאריך</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        {filterType === "date" ? (
-          <Grid item>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="בחר תאריך"
-                value={selectedDate}
-                onChange={handleDateChange}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          </Grid>
-        ) : (
-          <Grid item>
-            <TextField
-              variant="outlined"
-              label="ערך סינון"
-              value={filterValue}
-              onChange={(e) => setFilterValue(e.target.value)}
-            />
-          </Grid>
+    return (
+      <Container maxWidth="md">
+        <Box my={4}>
+          <Typography variant="h4" gutterBottom color="primary" align="center" fontWeight="bold">
+            בקשות נסיעה
+          </Typography>
+          <Paper elevation={3} sx={{ p: 3, mb: 4, backgroundColor: '#f5f5f5' }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel id="filter-type-label">סוג סינון</InputLabel>
+                  <Select
+                    labelId="filter-type-label"
+                    value={filterType}
+                    label="סוג סינון"
+                    onChange={(e) => setFilterType(e.target.value)}
+                  >
+                    <MenuItem value="origin">מוצא</MenuItem>
+                    <MenuItem value="destination">יעד</MenuItem>
+                    <MenuItem value="date">תאריך</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                {filterType === "date" ? (
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="בחר תאריך"
+                      value={selectedDate}
+                      onChange={(date) => {
+                        setSelectedDate(date);
+                        setFilterValue(date ? date.toISOString() : "");
+                      }}
+                      renderInput={(params) => <TextField {...params} fullWidth variant="outlined" />}
+                    />
+                  </LocalizationProvider>
+                ) : (
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label={filterType === "origin" ? "מוצא" : "יעד"}
+                    value={filterValue}
+                    onChange={(e) => setFilterValue(e.target.value)}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  startIcon={<AlarmIcon />}
+                >
+                  {sortOrder === "asc" ? "מוקדם למאוחר" : "מאוחר למוקדם"}
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Box>
+        
+        {error && (
+          <Box my={2}>
+            <Typography variant="body1" color="error" align="center">
+              שגיאה: {error}
+            </Typography>
+          </Box>
         )}
-        <Grid item>
-          <FormControl variant="outlined">
-            <InputLabel>סדר</InputLabel>
-            <Select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              label="סדר"
-            >
-              <MenuItem value="asc">עולה</MenuItem>
-              <MenuItem value="desc">יורד</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
-      {filteredRequests.length === 0 ? (
-        <Typography variant="body1" align="center">
-          לא נמצאו תוצאות לפי הסינון
-        </Typography>
-      ) : (
-        <Grid container spacing={2} justifyContent="center" mb={5}>
+  
+        <Grid container spacing={2}>
           {filteredRequests.map((request) => (
-            <Grid item xs={12} sm={6} md={3} key={request.TravelRequestId}>
-              <Badge
-                badgeContent={
-                  isRequestUrgent(request) ? (
-                    <Box display="flex" alignItems="center">
-                      <PriorityHighIcon fontSize="small" />
-                      <Typography variant="caption" ml={0.5}>דחוף</Typography>
-                    </Box>
-                  ) : null
-                }
-                color="error"
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+            <Grid item xs={12} key={request.TravelRequestId}>
+              <Card 
+                elevation={3}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  p: 1,
+                  backgroundColor: isRequestUrgent(request) ? '#fff0f7' : 'white',
+                  borderLeft: isRequestUrgent(request) ? '4px solid #b6247e' : 'none',
                 }}
               >
-                <Box
-                  border={2}
-                  borderColor={isRequestUrgent(request) ? "error.main" : "grey.300"}
-                  borderRadius={4}
-                  p={2}
-                  height="180px"
-                  width="180px"
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                  textAlign="left"
-                  position="relative"
-                  boxShadow={isRequestUrgent(request) ? 4 : 1}
-                >
-                  {isRequestUrgent(request) && (
-                    <Box position="absolute" top={8} right={8}>
-                      <AlarmIcon
-                        color="error"
-                        sx={{
-                          animation: `${pulse} 1.5s infinite`,
-                        }}
-                      />
-                    </Box>
-                  )}
-                  <Typography
-                    variant="body1"
-                    fontWeight={isRequestUrgent(request) ? "bold" : "normal"}
-                    color={isRequestUrgent(request) ? "error.main" : "text.primary"}
-                  >
-                    <EventIcon /> {formatDate(request.TravelDate)} <br />
-                    <AccessTimeIcon /> {formatTime(request.TravelTime)} <br />
-                    <PlaceIcon /> {getRelevantPart(request.Origin)} <br />
-                    <FlagIcon /> {getRelevantPart(request.Destination)}
+                <CardContent sx={{ flex: '1 0 auto', py: 1, display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="h6" component="div" sx={{ mr: 2, minWidth: '60px' }}>
+                    #{request.TravelRequestId}
                   </Typography>
-                  <Box mt={2} width="100%">
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleOpenDialog(request.TravelRequestId)}
-                      fullWidth
-                    >
-                      לקיחת בקשה
-                    </Button>
+                  <Box display="flex" alignItems="center" flexWrap="wrap">
+                    <Box display="flex" alignItems="center" mr={2}>
+                      <EventIcon color="action" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      <Typography variant="body2">{formatDate(request.TravelDate)}</Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" mr={2}>
+                      <AccessTimeIcon color="action" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      <Typography variant="body2">{formatTime(request.TravelTime)}</Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" mr={2}>
+                      <PlaceIcon color="action" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      <Typography variant="body2" noWrap>{getRelevantPart(request.Origin)}</Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center">
+                      <FlagIcon color="action" sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      <Typography variant="body2" noWrap>{getRelevantPart(request.Destination)}</Typography>
+                    </Box>
                   </Box>
+                </CardContent>
+                <Box display="flex" alignItems="center">
+                  {isRequestUrgent(request) && (
+                    <Chip 
+                      label="דחוף" 
+                      color="primary" 
+                      size="small"
+                      sx={{ mr: 1, fontWeight: 'bold' }}
+                    />
+                  )}
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleOpenDialog(request.TravelRequestId)}
+                    disabled={loading}
+                    size="small"
+                  >
+                    <ArrowForwardIosIcon />
+                  </IconButton>
                 </Box>
-              </Badge>
+              </Card>
             </Grid>
           ))}
         </Grid>
-      )}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>אישור לקיחת בקשה</DialogTitle>
-        <DialogContent>
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress />
-            </Box>
-          ) : confirmationMessage ? (
-            <DialogContentText>{confirmationMessage}</DialogContentText>
-          ) : (
+
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>אישור לקיחת בקשה</DialogTitle>
+          <DialogContent>
             <DialogContentText>
               האם אתה בטוח שברצונך לקחת את הבקשה?
             </DialogContentText>
-          )}
-        </DialogContent>
-        {!loading && !confirmationMessage && (
+            {user?.roleName === "Admin" && (
+              <TextField
+                fullWidth
+                margin="normal"
+                label="User ID"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+              />
+            )}
+            {confirmationMessage && (
+              <Typography variant="body1" color="primary">
+                {confirmationMessage}
+              </Typography>
+            )}
+          </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog} color="primary">
               ביטול
@@ -428,14 +428,15 @@ const TravelRequests = ({ setMinimizedReminders }) => {
             <Button
               onClick={() => handleTakeRequest(requestToTake)}
               color="primary"
+              disabled={loading}
             >
-              אישור
+              {loading ? <CircularProgress size={24} /> : "אישור"}
             </Button>
           </DialogActions>
-        )}
-      </Dialog>
-    </Container>
-  );
-};
-
-export default TravelRequests;
+        </Dialog>
+      </Container>
+    );
+  };
+  
+  export default TravelRequests;
+  

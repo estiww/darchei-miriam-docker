@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, TextField, CircularProgress } from "@mui/material";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, TextField, CircularProgress, Box } from "@mui/material";
+import sendRefreshToken from "../components/SendRefreshToken";
+import { useNavigate } from "react-router-dom";
 
 const TravelMatches = () => {
   const [matches, setMatches] = useState([]);
@@ -11,38 +13,56 @@ const TravelMatches = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef();
+  const navigate = useNavigate();
 
-  const fetchTravelMatches = async (page = 0, limit = 50) => {
+
+  const fetchTravelMatches = async (currentPage) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3000/travelMatches?limit=${limit}&offset=${page * limit}`, {
+      const limit = 4;
+      const response = await fetch(`http://localhost:3000/travelMatches?limit=${limit}&offset=${currentPage * limit}`, {
         method: "GET",
         credentials: "include",
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          const refreshResponse = await sendRefreshToken();
+          if (refreshResponse.status === 440) {
+            throw new Error("440");
+          }
+          return fetchTravelMatches(currentPage);
+        }
         const data = await response.json();
-        // throw new Error(data.message);
-        await fetchTravelMatches()
+        throw new Error(data.message);
       }
 
       const data = await response.json();
 
-      // Filtering out matches that already exist in state
-      const newMatches = data.filter(newMatch => !matches.some(match => match.TravelMatchId === newMatch.TravelMatchId));
-
-      setMatches(prevMatches => [...prevMatches, ...newMatches]);
-      setHasMore(newMatches.length > 0); // Check if there are more matches to load
+      setMatches(prevMatches => {
+        const newMatches = data.filter(newMatch => !prevMatches.some(match => match.TravelMatchId === newMatch.TravelMatchId));
+        return [...prevMatches, ...newMatches];
+      });
+      setHasMore(data.length === limit);
       setLoading(false);
-      setSearchError(""); // Clear search error message on successful fetch
+      setSearchError("");
     } catch (error) {
       setError(error.message);
+      if (error.message === "440") {
+        navigate("/login");
+      }
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTravelMatches(page);
+    fetchTravelMatches(0);
+  }, []); // This will run only once on component mount
+
+  useEffect(() => {
+    if (page > 0) {
+      fetchTravelMatches(page);
+    }
   }, [page]);
 
   const requestSort = (key) => {
@@ -126,78 +146,80 @@ const TravelMatches = () => {
     }
   }, [searchTerm, matchesToShow]);
 
-  const lastMatchElementRef = (node) => {
-    if (loading) return;
+  const lastMatchElementRef = useCallback((node) => {
+    if (loading || !hasMore) return;
+  
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && hasMore) {
         setPage((prevPage) => prevPage + 1);
       }
     });
+  
     if (node) observer.current.observe(node);
-  };
+  
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [loading, hasMore]);
 
+  
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        Travel Matches
-      </Typography>
-      {error && <Typography color="error">{error}</Typography>}
-      <TextField
-        label="Search"
-        variant="outlined"
-        value={searchTerm}
-        onChange={handleSearch}
-        margin="normal"
-        style={{ marginBottom: '2rem', width: '30%' }}
-      />
-      
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{createSortHandler('VolunteerFullName', 'Volunteer Name')}</TableCell>
-              <TableCell>{createSortHandler('MatchDate', 'Match Date')}</TableCell>
-              <TableCell>{createSortHandler('MatchTime', 'Match Time')}</TableCell>
-              <TableCell>{createSortHandler('TravelOrigin', 'Origin')}</TableCell>
-              <TableCell>{createSortHandler('TravelDestination', 'Destination')}</TableCell>
-              <TableCell>{createSortHandler('TravelTime', 'Travel Time')}</TableCell>
-              <TableCell>{createSortHandler('NumberOfPassengers', 'Passengers')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {matchesToShow.map((match, index) => {
-              if (matchesToShow.length === index + 1) {
-                return (
-                  <TableRow ref={lastMatchElementRef} key={match.TravelMatchId}>
-                    <TableCell>{highlightSearchTerm(`${match.VolunteerFirstName} ${match.VolunteerLastName}`)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.MatchDate)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.MatchTime)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.TravelOrigin)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.TravelDestination)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.TravelTime)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.NumberOfPassengers.toString())}</TableCell>
-                  </TableRow>
-                );
-              } else {
-                return (
-                  <TableRow key={match.TravelMatchId}>
-                    <TableCell>{highlightSearchTerm(`${match.VolunteerFirstName} ${match.VolunteerLastName}`)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.MatchDate)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.MatchTime)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.TravelOrigin)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.TravelDestination)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.TravelTime)}</TableCell>
-                    <TableCell>{highlightSearchTerm(match.NumberOfPassengers.toString())}</TableCell>
-                  </TableRow>
-                );
-              }
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {searchError && <Typography color="error">{searchError}</Typography>}
-      {loading && <CircularProgress />}
+    <Container maxWidth="lg">
+      <Box my={4}>
+        <Typography variant="h4" gutterBottom align="center" color="primary" fontWeight="bold">
+          התאמות נסיעה
+        </Typography>
+        {error && <Typography color="error" align="center" mb={2}>{error}</Typography>}
+        <Box display="flex" justifyContent="center" mb={3}>
+          <TextField
+            label="חיפוש"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearch}
+            sx={{ width: '50%' }}
+          />
+        </Box>
+        
+        <TableContainer component={Paper} elevation={3}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>{createSortHandler('VolunteerFullName', 'שם המתנדב')}</TableCell>
+                <TableCell>{createSortHandler('MatchDate', 'תאריך')}</TableCell>
+                <TableCell>{createSortHandler('MatchTime', 'שעה')}</TableCell>
+                <TableCell>{createSortHandler('TravelOrigin', 'מוצא')}</TableCell>
+                <TableCell>{createSortHandler('TravelDestination', 'יעד')}</TableCell>
+                <TableCell>{createSortHandler('TravelTime', 'זמן נסיעה')}</TableCell>
+                <TableCell>{createSortHandler('NumberOfPassengers', 'מספר נוסעים')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {matchesToShow.map((match, index) => (
+                <TableRow 
+                  key={match.TravelMatchId} 
+                  ref={matchesToShow.length === index + 1 ? lastMatchElementRef : null}
+                  sx={{ '&:nth-of-type(odd)': { backgroundColor: 'action.hover' } }}
+                >
+                  <TableCell>{highlightSearchTerm(`${match.VolunteerFirstName} ${match.VolunteerLastName}`)}</TableCell>
+                  <TableCell>{highlightSearchTerm(match.MatchDate)}</TableCell>
+                  <TableCell>{highlightSearchTerm(match.MatchTime)}</TableCell>
+                  <TableCell>{highlightSearchTerm(match.TravelOrigin)}</TableCell>
+                  <TableCell>{highlightSearchTerm(match.TravelDestination)}</TableCell>
+                  <TableCell>{highlightSearchTerm(match.TravelTime)}</TableCell>
+                  <TableCell>{highlightSearchTerm(match.NumberOfPassengers.toString())}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {searchError && <Typography color="error" align="center" mt={2}>{searchError}</Typography>}
+        {loading && (
+          <Box display="flex" justifyContent="center" mt={2}>
+            <CircularProgress />
+          </Box>
+        )}
+      </Box>
     </Container>
   );
 };

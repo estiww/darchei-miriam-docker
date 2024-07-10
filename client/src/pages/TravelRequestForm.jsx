@@ -191,7 +191,7 @@ const TravelRequestForm = () => {
   const loadAddressOptions = async (inputValue) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${inputValue}&countrycodes=il&limit=3`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${inputValue}&countrycodes=il&limit=6`
       );
       const data = await response.json();
       console.log("Data from API:", data);

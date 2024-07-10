@@ -188,7 +188,7 @@ const NavigationMenu = () => {
         )}
         
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {!user && (
+          {!user || (user && !user.isApproved) ? (
             <>
               {isLoginPage ? (
                 <Button
@@ -210,8 +210,7 @@ const NavigationMenu = () => {
                 </Button>
               )}
             </>
-          )}
-          {user && user.isApproved && (
+          ) : (
             <IconButton 
               color="inherit" 
               onClick={handleMenu}

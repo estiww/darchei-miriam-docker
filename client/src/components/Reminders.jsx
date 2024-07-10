@@ -3,7 +3,6 @@ import { UserContext } from '../App';
 import {
   List,
   ListItem,
-  ListItemText,
   Typography,
   Dialog,
   DialogTitle,
