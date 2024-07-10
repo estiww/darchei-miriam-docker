@@ -32,6 +32,15 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   flexDirection: "column",
 }));
 
+const TravelItem = styled(ListItem)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  padding: theme.spacing(2),
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
 const StyledList = styled(List)(({ theme }) => ({
   overflow: "auto",
   "& .MuiListItem-root": {
@@ -42,22 +51,67 @@ const StyledList = styled(List)(({ theme }) => ({
   },
 }));
 
-const TravelItem = styled(ListItem)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: theme.spacing(2),
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
 const Container = styled(Box)(({ theme }) => ({
-  height: "75vh",  
+  height: "75vh",
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
 }));
+
+const getRelevantPart = (address) => {
+  for (const hospital of hospitals) {
+    if (address.includes(hospital)) {
+      return hospital;
+    }
+  }
+  const parts = address.split(",");
+  if (parts.length > 1) {
+    return parts[1].trim();
+  }
+  return address;
+};
+const hospitals = [
+  "הדסה עין כרם",
+  "הדסה הר הצופים",
+  "איכילוב",
+  "שיבא",
+  'רמב"ם',
+  "סורוקה",
+  "שערי צדק",
+  "קפלן",
+  "וולפסון",
+  "לניאדו",
+  "בילינסון",
+  "אסף הרופא",
+  "פוריה",
+  "הלל יפה",
+  "ברזילי",
+  "זיו",
+  "בית לוינשטיין",
+  "משגב לדך",
+  "אסותא",
+];
+const handleNavigate = (origin, destination, app) => {
+  // פונקציה להסרת פסיקים ורווחים מיותרים
+  const cleanAddress = (address) => {
+    return address.replace(/,/g, "").replace(/\s+/g, " ").trim();
+  };
+
+  const cleanOrigin = cleanAddress(origin);
+  const cleanDestination = cleanAddress(destination);
+
+  let url;
+  if (app === "waze") {
+    url = `https://www.waze.com/ul?navigate=yes&ll=${encodeURIComponent(
+      cleanOrigin
+    )}&to=${encodeURIComponent(cleanDestination)}`;
+  } else if (app === "google") {
+    url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+      cleanOrigin
+    )}&destination=${encodeURIComponent(cleanDestination)}`;
+  }
+  window.open(url, "_blank");
+};
 
 const Reminders = () => {
   const [upcomingTravels, setUpcomingTravels] = useState([]);
@@ -96,19 +150,27 @@ const Reminders = () => {
   };
 
   const handleNavigate = (origin, destination, app) => {
+    // פונקציה להסרת פסיקים ורווחים מיותרים
+    const cleanAddress = (address) => {
+      return address.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+    };
+  
+    const cleanOrigin = cleanAddress(origin);
+    const cleanDestination = cleanAddress(destination);
+  
     let url;
     if (app === "waze") {
-      url = `https://www.waze.com/ul?navigate=yes&ll=${encodeURIComponent(
-        origin
-      )}&to=${encodeURIComponent(destination)}`;
+      url = `https://www.waze.com/ul?navigate=yes&ll=${cleanOrigin}&to=${cleanDestination}`;
     } else if (app === "google") {
-      url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-        origin
-      )}&destination=${encodeURIComponent(destination)}`;
+      url = `https://www.google.com/maps/dir/?api=1&origin=${cleanOrigin}&destination=${cleanDestination}`;
     }
-    window.open(url, "_blank");
+    
+    // קידוד ה-URL לאחר הסרת הפסיקים
+    const encodedUrl = encodeURI(url);
+    
+    window.open(encodedUrl, "_blank");
   };
-
+  
   return (
     <Container>
       <StyledPaper elevation={3}>
@@ -126,19 +188,24 @@ const Reminders = () => {
                 <Box display="flex" alignItems="center" width="100%" mb={1}>
                   <LocationIcon color="primary" />
                   <Typography variant="subtitle1" ml={1}>
-                    {travel.Origin} → {travel.Destination}
+                    {getRelevantPart(travel.Origin)} →{" "}
+                    {getRelevantPart(travel.Destination)}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" width="100%">
                   <TimeIcon color="action" />
                   <Typography variant="body2" color="textSecondary" ml={1}>
-                    {travel.TravelDate} | {travel.TravelTime}
+                    {new Date(travel.TravelDate).toLocaleDateString("he-IL")} |{" "}
+                    {travel.TravelTime.slice(0, 5)}
                   </Typography>
                   <Box flexGrow={1} />
                   <Tooltip title="פרטים נוספים">
                     <IconButton
                       size="small"
-                      onClick={() => setSelectedTravel(travel)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTravel(travel);
+                      }}
                     >
                       <InfoIcon fontSize="small" />
                     </IconButton>
@@ -175,7 +242,7 @@ const Reminders = () => {
                   </Typography>
                   <Typography>
                     <strong>יעד:</strong> {selectedTravel.Destination}
-                  </Typography>
+                  </Typography>{" "}
                   <Typography>
                     <strong>תאריך:</strong> {selectedTravel.TravelDate}
                   </Typography>
