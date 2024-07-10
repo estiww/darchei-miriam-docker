@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -19,6 +20,7 @@ export const UserContext = createContext();
 const AppContent = () => {
   const [user, setUser] = useState();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchUserData = async () => {
     try {
@@ -50,8 +52,11 @@ const AppContent = () => {
     }
   };
 
+
   useEffect(() => {
-    fetchUserData();
+    if (!location.pathname.startsWith("/resetPassword")) {
+      fetchUserData();
+    }
   }, []);
 
   return (

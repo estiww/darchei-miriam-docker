@@ -169,7 +169,7 @@ const sendEmailToAdmin = async () => {
 };
 
 
-cron.schedule("0 0 * * *", createFutureRequests);
+cron.schedule("45 17 * * *", createFutureRequests);
 // Schedule the cron job to run every 30 minutes
 cron.schedule("*/30 * * * *", sendEmailToDrivers);
 // Schedule the cron job to run every 15 minutes

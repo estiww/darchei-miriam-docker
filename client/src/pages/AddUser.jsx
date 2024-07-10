@@ -4,11 +4,8 @@ import VolunteerForm from "../components/VolunteerForm";
 import PatientForm from "../components/PatientForm";
 import AdminForm from "../components/AdminForm";
 import DriverForm from "../components/DriverForm";
-import { useLocation } from "react-router-dom";
 
 const Signup = () => {
-  const location = useLocation();
-  const { email, password } = location.state || {};
   const [selectedForm, setSelectedForm] = useState("volunteer");
 
   const renderForm = () => {

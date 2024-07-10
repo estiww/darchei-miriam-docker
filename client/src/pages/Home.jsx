@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
 import DriveEtaIcon from "@mui/icons-material/DriveEta";
@@ -13,13 +13,13 @@ import MyTravels from "../components/MyTravels";
 import Users from "./Users";
 import AddUser from "./AddUser";
 import NavigationMenu from "../components/NavigationMenu";
-import { UserContext } from "../App"; // Importing UserContext
-import Reminders from "../components/Reminders"; // Assuming Reminders is in the correct path
+import { UserContext } from "../App";
+import Reminders from "../components/Reminders";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const Home = () => {
-  const { user, setUser } = useContext(UserContext); // Using useContext to access setUser
-
-  const [minimizedReminders, setMinimizedReminders] = useState(false); // State to manage minimized status
+  const { user } = useContext(UserContext);
+  const [minimizedReminders, setMinimizedReminders] = useState(false);
 
   const toggleReminders = () => {
     setMinimizedReminders(!minimizedReminders);
@@ -39,18 +39,66 @@ const Home = () => {
       >
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="travelRequests" element={<TravelRequests setMinimizedReminders={setMinimizedReminders} />} />
-          <Route path="travelMatches" element={<TravelMatches />} />
-          <Route path="travelRequestForm" element={<TravelRequestForm />} />
+          <Route
+            path="travelRequests"
+            element={
+              <ProtectedRoute
+                element={<TravelRequests setMinimizedReminders={setMinimizedReminders} />}
+                allowedRoles={["Admin", "Volunteer","Driver"]}
+              />
+            }
+          />
+          <Route
+            path="travelMatches"
+            element={
+              <ProtectedRoute
+                element={<TravelMatches />}
+                allowedRoles={["Admin"]}
+              />
+            }
+          />
+          <Route
+            path="travelRequestForm"
+            element={
+              <ProtectedRoute
+                element={<TravelRequestForm />}
+                allowedRoles={["Admin", "Patient"]}
+              />
+            }
+          />
           <Route path="profile" element={<UserProfile />} />
-          <Route path="myTravels" element={<MyTravels />} />
-          <Route path="users" element={<Users />} />
-          <Route path="addUser" element={<AddUser />} />
+          <Route
+            path="myTravels"
+            element={
+              <ProtectedRoute
+                element={<MyTravels />}
+                allowedRoles={["Admin","Volunteer", "Patient","Driver"]}
+              />
+            }
+          />
+          <Route
+            path="users"
+            element={
+              <ProtectedRoute
+                element={<Users />}
+                allowedRoles={["Admin"]}
+              />
+            }
+          />
+          <Route
+            path="addUser"
+            element={
+              <ProtectedRoute
+                element={<AddUser />}
+                allowedRoles={["Admin"]}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Container>
 
-      {/* Render reminders based on user role */}
-      {user && user.roleName === "Volunteer" ? (
+      {user && user.roleName === "Volunteer" && (
         <div
           style={{
             position: "fixed",
@@ -88,9 +136,10 @@ const Home = () => {
             </div>
           )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 };
 
 export default Home;
+

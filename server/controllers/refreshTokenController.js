@@ -4,9 +4,7 @@ const model = require("../models/usersModels");
 
 const handleRefreshToken = async (req, res) => {
   console.log("handleRefreshToken");
-  // const userId=req.body.id;
-  // console.log('iddddddddddddddddddddddd')
-  // console.log(userId)
+  
   const cookies = req.cookies;
   //אם אין רפרש-בצד שרת תוציא ללוג אין
   if (!cookies?.refreshToken) return res.sendStatus(440);
@@ -16,18 +14,12 @@ const handleRefreshToken = async (req, res) => {
   console.log(refreshToken);
 
   
-  //יש פה בדיקה האם קיים אדם שזה הרפרש טוקן שלו
-  //צריך במידה והאתר פתוח יותר זמן משהות הרפרש טוקן ואז כבר לא קיים משתמש מחובר
   const foundUserId =await model.getUserIdByRefreshToken(refreshToken);
   //לא קיים בדטה בייס כזה רפרש טוקן
-  if (!foundUserId) return res.sendStatus(403); //Forbidden
-  // if(foundUserId!=userId)
-  //   { return res.sendStatus(403);
-  // }
-  // evaluate jwt
+  if (!foundUserId) return res.sendStatus(403); 
+  
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-    // if (err || foundUser.username !== decoded.username) return res.sendStatus(403);
     if (err) return res.sendStatus(403);
 
     req.userId = decoded.userId;
@@ -58,7 +50,6 @@ const handleRefreshToken = async (req, res) => {
       secure: true,
       maxAge: 5 * 60 * 1000,
     });
-    console.log("ששששששששששש")
     console.log(req.userId)
 
     res.json(req.userId);

@@ -230,7 +230,6 @@ const VolunteerForm = ({ isApproved = false }) => {
         </Box>
         <TextField
           margin="normal"
-          required
           fullWidth
           label="מיקום"
           name="location"

@@ -1,31 +1,20 @@
 import React, { useState } from "react";
-import { 
-  Button, 
-  Box, 
-  Container, 
-  Typography, 
-  Paper,
-  Grid,
-  Fade,
-  useTheme,
-  useMediaQuery
-} from "@mui/material";
-import { styled } from '@mui/material/styles';
+import {Button,Box,Container,Typography,Paper,Grid,Fade} from "@mui/material";
+import { styled } from "@mui/material/styles";
 import VolunteerForm from "../components/VolunteerForm";
 import PatientForm from "../components/PatientForm";
-import { useLocation } from "react-router-dom";
 import NavigationMenu from "../components/NavigationMenu";
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
-import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1.5, 3),
-  fontSize: '1rem',
-  fontWeight: 'bold',
+  fontSize: "1rem",
+  fontWeight: "bold",
   borderRadius: theme.shape.borderRadius * 1.5,
-  transition: 'all 0.3s',
-  '&:hover': {
-    transform: 'translateY(-2px)',
+  transition: "all 0.3s",
+  "&:hover": {
+    transform: "translateY(-2px)",
     boxShadow: theme.shadows[3],
   },
 }));
@@ -38,11 +27,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const Signup = () => {
-  const location = useLocation();
-  const { email, password } = location.state || {};
   const [selectedForm, setSelectedForm] = useState("volunteer");
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const renderForm = () => {
     switch (selectedForm) {
@@ -58,14 +43,19 @@ const Signup = () => {
   return (
     <Container maxWidth="md">
       <NavigationMenu />
-      <Box sx={{ marginTop: 12, textAlign: 'center' }}>
+      <Box sx={{ marginTop: 12, textAlign: "center" }}>
         <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
-הרשמה
+          הרשמה
         </Typography>
         <Typography variant="body1" gutterBottom color="text.secondary">
           אנא בחר את סוג הבקשה המתאים לך
         </Typography>
-        <Grid container spacing={3} justifyContent="center" sx={{ marginTop: 3 }}>
+        <Grid
+          container
+          spacing={3}
+          justifyContent="center"
+          sx={{ marginTop: 3 }}
+        >
           <Grid item xs={12} sm={5}>
             <StyledButton
               onClick={() => setSelectedForm("volunteer")}

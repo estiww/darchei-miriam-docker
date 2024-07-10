@@ -127,7 +127,11 @@ INSERT INTO PasswordTable (PasswordValue) VALUES
 ('$2a$10$Z1JyeOu8z3.yfho4B2o0fO23bxmdQBrx0lxhulJNk/0hIp8JFehk2'),
 ('$2a$10$oaB4yNjugjdbGsoJEMBO2uSRy2HjLZ726I7RMa2RDUm0.5XD0/AKm'),
 ('$2a$10$Q/bc/UJUwXUBXpMuTgNWc.dS1R8AHdGJvVTm9CU.GmroTRsVPI1ka'),
-('$2a$10$nZUXNH7haJZFjAlMc7OPguZ446b519jBxwYe.MMwBKJmqXzkqF7Y2');
+('$2a$10$nZUXNH7haJZFjAlMc7OPguZ446b519jBxwYe.MMwBKJmqXzkqF7Y2'),
+('$2b$10$UrRQxFo.b0stCexEtNk3wOCfjeh2udy46dQJhCQuvMxj.0qwoe7vS'),
+('$2b$10$UrRQxFo.b0stCexEtNk3wOCfjeh2udy46dQJhCQuvMxj.0qwoe7vS'),
+('$2b$10$UrRQxFo.b0stCexEtNk3wOCfjeh2udy46dQJhCQuvMxj.0qwoe7vS'),
+('$2b$10$UrRQxFo.b0stCexEtNk3wOCfjeh2udy46dQJhCQuvMxj.0qwoe7vS');
 
 -- הכנסת נתונים לדוגמה בטבלת כתובות
 INSERT INTO AddressTable (City, Neighborhood, Street, HouseNumber, ZipCode) VALUES
@@ -143,7 +147,7 @@ INSERT INTO RoleTable (RoleName) VALUES
 ('Patient'),
 ('Volunteer'),
 ('Admin'),
-('Driver'):
+('Driver');
 
 
 -- הכנסת נתונים לדוגמה בטבלת משתמשים
@@ -153,19 +157,24 @@ INSERT INTO UserTable (PasswordId, FirstName, LastName, AddressId, Phone, Mail,G
 (3, 'Yosef', 'Mor', 3, '050-3456789', 'yosef@example.com','Male','2024-05-30', 'Email', 1, FALSE),
 (4, 'Rachel', 'Green', 4, '050-9876543', 'rachel@example.com','Female','2024-05-30', 'Phone', 2, FALSE),
 (5, 'Monica', 'Geller', 5, '050-8765432', 'monica@example.com','Female','2024-05-30', 'WhatsApp', 2, FALSE),
-(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com','Female','2024-05-30', 'WhatsApp', 2, FALSE);
-
+(6, 'Ross', 'Geller', 6, '050-7654321', 'ross@example.com','Female','2024-05-30', 'WhatsApp', 2, FALSE),
+(7, 'Tzipora', 'Shenker', 6, '058-3281134', 'tzp81134@gmail.com','Female','2004-01-24', 'Email', 2, FALSE),
+(8, 'Esti', 'Weingarten', 6, '058-3269771', 'esti69771@gmail.com','Female','2004-03-25', 'Email', 3, TRUE),
+(9, 'Rachel', 'Weingarten', 6, '058-3269771', 'esti697711@gmail.com','Female','2004-03-25', 'Email', 1, TRUE),
+(10, 'Lea', 'Weingarten', 6, '058-3269771', 'esti697714@gmail.com','Female','2004-03-25', 'Email', 4, TRUE);
 -- הכנסת נתונים לדוגמה בטבלת חולים
 INSERT INTO PatientTable (UserId) VALUES
 (1),
 (2),
-(3);
+(3),
+(9);
 
 -- הכנסת נתונים לדוגמה בטבלת מתנדבים
 INSERT INTO VolunteerTable (UserId, Location) VALUES
 (4, 'Jerusalem'),
 (5, 'Tel Aviv'),
-(6, 'Haifa');
+(6, 'Haifa'),
+(7, 'Jerusalem');
 
 -- הכנסת נתונים לדוגמה בטבלת מרכזים רפואיים
 INSERT INTO MedicalCenterTable (Name, AddressId, Phone, ContactPerson) VALUES
@@ -178,3 +187,30 @@ INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Desti
 (1, 'Jerusalem', '10:00:00','2024-06-24' , 'הדסה עין כרם ', 1, TRUE, 'התקבלה', TRUE, 'ראשון,שלישי,שבת', '2024-12-31'),
 (2, 'Tel Aviv', '14:00:00', '2024-06-05', 'הדסה הר הצופים ', 1, FALSE, 'התקבלה', TRUE, 'שני,שישי', '2024-12-31'),
 (3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'הושלמה', FALSE, NULL, NULL);
+-- הכנסת נתונים לדוגמה לטבלת בקשות נסיעה
+INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Status, Recurring, RecurringDays, RecurringEndDate) VALUES
+(1, 'Jerusalem', '10:00:00', '2024-06-24', 'Hadassah Medical Center', 1, TRUE, 'התקבלה', TRUE, 'ראשון,שלישי,שבת', '2024-12-31'),
+(2, 'Tel Aviv', '14:00:00', '2024-06-05', 'Sourasky Medical Center', 1, FALSE, 'התקבלה', TRUE, 'שני,שישי', '2024-12-31'),
+(3, 'Haifa', '09:30:00', '2024-06-10', 'Rambam Health Care Campus', 2, TRUE, 'הושלמה', FALSE, NULL, NULL),
+(1, 'Jerusalem', '08:00:00', '2024-07-01', 'Hadassah Medical Center', 1, TRUE, 'נלקחה', FALSE, NULL, NULL),
+(2, 'Tel Aviv', '15:00:00', '2024-07-02', 'Sourasky Medical Center', 2, FALSE, 'נלקחה', TRUE, 'רביעי,חמישי', '2024-12-31'),
+(3, 'Haifa', '10:30:00', '2024-07-03', 'Rambam Health Care Campus', 1, TRUE, 'הושלמה', FALSE, NULL, NULL),
+(1, 'Jerusalem', '12:00:00', '2024-07-04', 'Hadassah Medical Center', 1, TRUE, 'התקבלה', TRUE, 'ראשון,חמישי', '2024-12-31'),
+(2, 'Tel Aviv', '13:00:00', '2024-07-05', 'Sourasky Medical Center', 2, FALSE, 'התקבלה', TRUE, 'רביעי,שישי', '2024-12-31'),
+(3, 'Haifa', '11:00:00', '2024-07-06', 'Rambam Health Care Campus', 1, TRUE, 'התקבלה', FALSE, NULL, NULL);
+
+
+
+-- הכנסת נתונים נוספים לדוגמה לטבלת בקשות נסיעה
+INSERT INTO TravelRequestTable (PatientId, Origin, TravelTime, TravelDate, Destination, NumberOfPassengers, IsAlone, Status, Recurring, RecurringDays, RecurringEndDate) VALUES
+(1, 'Jerusalem', '10:30:00', '2024-07-07', 'Hadassah Medical Center', 1, TRUE, 'התקבלה', TRUE, 'שלישי,חמישי,שבת', '2024-12-31'),
+(2, 'Tel Aviv', '15:30:00', '2024-07-08', 'Sourasky Medical Center', 1, FALSE, 'התקבלה', TRUE, 'שני,רביעי', '2024-12-31'),
+(3, 'Haifa', '08:30:00', '2024-07-09', 'Rambam Health Care Campus', 2, TRUE, 'התקבלה', FALSE, NULL, NULL),
+(1, 'Jerusalem', '09:00:00', '2024-07-10', 'Hadassah Medical Center', 1, TRUE, 'נלקחה', FALSE, NULL, NULL),
+(2, 'Tel Aviv', '14:30:00', '2024-07-11', 'Sourasky Medical Center', 2, FALSE, 'נלקחה', TRUE, 'חמישי,שבת', '2024-12-31'),
+(3, 'Haifa', '10:00:00', '2024-07-12', 'Rambam Health Care Campus', 1, TRUE, 'הושלמה', FALSE, NULL, NULL),
+(1, 'Jerusalem', '11:00:00', '2024-07-13', 'Hadassah Medical Center', 1, TRUE, 'התקבלה', TRUE, 'ראשון,שלישי', '2024-12-31'),
+(2, 'Tel Aviv', '13:30:00', '2024-07-14', 'Sourasky Medical Center', 2, FALSE, 'התקבלה', TRUE, 'שני,חמישי', '2024-12-31'),
+(3, 'Haifa', '12:30:00', '2024-07-15', 'Rambam Health Care Campus', 1, TRUE, 'התקבלה', FALSE, NULL, NULL);
+
+

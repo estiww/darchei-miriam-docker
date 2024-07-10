@@ -47,6 +47,7 @@ const NavigationMenu = () => {
   };
 
   const handleLogout = async () => {
+    handleClose();
     try {
       const response = await fetch(`http://localhost:3000/logout/${user.id}`, {
         method: "GET",
@@ -127,19 +128,21 @@ const NavigationMenu = () => {
             >
               <ListItemText primary="פרופיל" />
             </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/home/myTravels"
-              onClick={toggleDrawer(false)}
-            >
-              <ListItemText primary="הנסיעות שלי" />
-            </ListItem>
+            {user.roleName !== "Admin" && (
+              <ListItem
+                button
+                component={Link}
+                to="/home/myTravels"
+                onClick={toggleDrawer(false)}
+              >
+                <ListItemText primary="הנסיעות שלי" />
+              </ListItem>
+            )}
             <ListItem
               button
               onClick={() => {
-                handleLogout();
-                toggleDrawer(false)();
+                toggleDrawer(false)(); // Close the drawer first
+                handleLogout(); // Then handle the logout
               }}
             >
               <ListItemText primary="התנתקות" />
@@ -171,7 +174,7 @@ const NavigationMenu = () => {
             style={{ height: "80px", width: "auto" }}
           />
         </Typography>
-        
+
         {isMobile ? (
           <IconButton
             edge="end"
@@ -186,7 +189,7 @@ const NavigationMenu = () => {
             {user && user.isApproved && renderMenuItems()}
           </Box>
         )}
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {!user || (user && !user.isApproved) ? (
             <>
@@ -211,8 +214,8 @@ const NavigationMenu = () => {
               )}
             </>
           ) : (
-            <IconButton 
-              color="inherit" 
+            <IconButton
+              color="inherit"
               onClick={handleMenu}
               style={{ marginLeft: '16px' }}
             >
@@ -232,13 +235,15 @@ const NavigationMenu = () => {
           >
             פרופיל
           </MenuItem>
-          <MenuItem
-            onClick={handleClose}
-            component={Link}
-            to="/home/myTravels"
-          >
-            הנסיעות שלי
-          </MenuItem>
+          {user && user.roleName !== "Admin" && (
+            <MenuItem
+              onClick={handleClose}
+              component={Link}
+              to="/home/myTravels"
+            >
+              הנסיעות שלי
+            </MenuItem>
+          )}
           <MenuItem onClick={handleLogout}>התנתקות</MenuItem>
         </Menu>
         {isMobile && renderMobileMenu()}

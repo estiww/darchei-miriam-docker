@@ -7,8 +7,8 @@ const verifyPermissions = require('../middleware/verifyPermissions');
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-router.get("/",verifyPermissions(["Volunteer","Admin"]), travelRequestsController.getOpentravelRequests);
+router.get("/",verifyPermissions(["Volunteer","Admin","Driver"]), travelRequestsController.getOpentravelRequests);
 router.post("/",verifyPermissions(["Patient","Admin"]), travelRequestsController.createTravelRequest);
-router.put("/:id",verifyPermissions(["Volunteer","Admin"]),travelRequestsController.requestTaken);
+router.put("/:id",verifyPermissions(["Volunteer","Admin","Driver"]),travelRequestsController.requestTaken);
 
 module.exports = router
