@@ -18,13 +18,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push MySQL image
-        uses: docker/build-push-action@v2
-        with:
-          context: ./path_to_mysql_dockerfile  # עדכן את זה למסלול של קובץ Dockerfile של MySQL
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/mysql:latest
-
       - name: Build and push API image
         uses: docker/build-push-action@v2
         with:
@@ -35,6 +28,10 @@ jobs:
       - name: Build and push React app image
         uses: docker/build-push-action@v2
         with:
-          context: ./client  # עדכן את זה למסלול של קובץ Dockerfile של React
+          context: ./client
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/project-react-app:latest
+      
+      # MySQL image is not built but directly pulled from Docker Hub
+      - name: Pull MySQL image
+        run: docker pull mysql:latest
