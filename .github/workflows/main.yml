@@ -23,4 +23,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/darchei_miriam_docker:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}darchei_miriam_docker:latest 
