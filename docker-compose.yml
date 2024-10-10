@@ -1,0 +1,50 @@
+services:
+  api:
+    build:
+      context: ./server  # הנתיב לתיקייה שמכילה את ה-Dockerfile של השרת
+    container_name: myserver
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysqldb
+      DB_USER: root
+      DB_PASSWORD: mysql24
+      DB_DATABASE: darcheiMiriamDB
+    networks:
+      - mynetwork
+    depends_on:
+      - db
+
+  react-app:
+    build:
+      context: ./client  # הנתיב לתיקייה שמכילה את ה-Dockerfile של הקליינט
+    container_name: myreactapp
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:latest
+    container_name: mysqldb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql24
+      MYSQL_DATABASE: darcheiMiriamDB
+    ports:
+      - "3307:3306"
+    networks:
+      - mynetwork
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  db_data:
