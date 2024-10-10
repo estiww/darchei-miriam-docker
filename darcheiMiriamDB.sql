@@ -1,11 +1,11 @@
 -- מחיקת מסד נתונים קיים במידה וקיים
-DROP DATABASE IF EXISTS DarcheiMiriamDB;
+DROP DATABASE IF EXISTS darcheiMiriamDB;
 
 -- יצירת מסד נתונים חדש
-CREATE DATABASE DarcheiMiriamDB;
+CREATE DATABASE darcheiMiriamDB;
 
 -- שימוש במסד הנתונים שנוצר
-USE DarcheiMiriamDB;
+USE darcheiMiriamDB;
 
 -- טבלת סיסמאות
 CREATE TABLE PasswordTable (

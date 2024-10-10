@@ -3,12 +3,12 @@ version: '3.8'
 services:
   api:
     build:
-      context: ./server  # הנתיב לתיקייה שמכילה את ה-Dockerfile של השרת
+      context: ./server # Path to the server's Dockerfile
     container_name: myserver
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: ${DB_HOST}
+      DB_HOST: db # Use 'db' as the MySQL hostname
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
@@ -19,7 +19,7 @@ services:
 
   react-app:
     build:
-      context: ./client  # הנתיב לתיקייה שמכילה את ה-Dockerfile של הקליינט
+      context: ./client # Path to the React client's Dockerfile
     container_name: myreactapp
     ports:
       - "5173:5173"
@@ -41,7 +41,7 @@ services:
       - mynetwork
     volumes:
       - db_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 networks:
   mynetwork:
