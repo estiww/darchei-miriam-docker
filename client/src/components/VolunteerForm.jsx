@@ -30,7 +30,7 @@ const VolunteerForm = ({ isApproved = false }) => {
   console.log("isApproved");
   console.log(isApproved);
   const [formData, setFormData] = useState({
-    roleName: "מתנדב",
+    roleName: "Volunteer",
     firstName: "",
     lastName: "",
     birthDate: "",
@@ -72,7 +72,7 @@ const VolunteerForm = ({ isApproved = false }) => {
     }
 
     let url;
-    if (user.roleName !== "מנהל") {
+    if (user?.roleName !== "Admin") {
       url = `http://localhost:3000/signup`;
     } else {
       url = `http://localhost:3000/addUser`;
@@ -83,8 +83,8 @@ const VolunteerForm = ({ isApproved = false }) => {
         let response = await fetch(url, requestOptions);
 
         if (!response.ok) {
-          if (user.roleName === "מנהל" && response.status === 401) {
-            console.log('user.roleName === "מנהל" && response.status === 401');
+          if (user?.roleName === "Admin" && response.status === 401) {
+            console.log('user.roleName === "Admin" && response.status === 401');
             const tokenResponse = await sendRefreshToken();
             if (tokenResponse.status === 440) {
               console.log(440);
@@ -98,7 +98,7 @@ const VolunteerForm = ({ isApproved = false }) => {
         }
 
         const data = await response.json();
-        if (user.roleName !== "מנהל") {
+        if (user?.roleName !== "Admin") {
           setUser(data);
         }
         setOpen(true);
@@ -173,9 +173,9 @@ const VolunteerForm = ({ isApproved = false }) => {
             value={formData.gender}
             onChange={handleChange}
           >
-            <FormControlLabel value="זכר" control={<Radio />} label="זכר" />
+            <FormControlLabel value="Male" control={<Radio />} label="זכר" />
             <FormControlLabel
-              value="נקבה"
+              value="Female"
               control={<Radio />}
               label="נקבה"
             />
